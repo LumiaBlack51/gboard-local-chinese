@@ -1,0 +1,77 @@
+{
+  "method": "Each fixed phrase tested independently with full Pinyin in a local diagnostic EditText declaring IME_FLAG_NO_PERSONALIZED_LEARNING. adb shell input text sends hardware key events. Only first candidate was evaluated; screenshots retained. This is not a whole-sentence memorization benchmark or an iFlytek comparison.",
+  "rows": [
+    {
+      "word": "妄自菲薄",
+      "pinyin": "wangzifeibo",
+      "source": "出师表",
+      "original_first": "妄自菲薄"
+    },
+    {
+      "word": "作奸犯科",
+      "pinyin": "zuojianfanke",
+      "source": "出师表",
+      "original_first": "作奸犯科"
+    },
+    {
+      "word": "引喻失义",
+      "pinyin": "yinyushiyi",
+      "source": "出师表",
+      "original_first": "英语是一"
+    },
+    {
+      "word": "陟罚臧否",
+      "pinyin": "zhifazangpi",
+      "source": "出师表",
+      "original_first": "执法藏癖"
+    },
+    {
+      "word": "计日而待",
+      "pinyin": "jirierdai",
+      "source": "出师表",
+      "original_first": "计日而待"
+    },
+    {
+      "word": "斟酌损益",
+      "pinyin": "zhenzhuosunyi",
+      "source": "出师表",
+      "original_first": "斟酌损益"
+    },
+    {
+      "word": "画地为牢",
+      "pinyin": "huadiweilao",
+      "source": "报任少卿书（报任安书）",
+      "original_first": "画地为牢"
+    },
+    {
+      "word": "重于泰山",
+      "pinyin": "zhongyutaishan",
+      "source": "报任少卿书（报任安书）",
+      "original_first": "重于泰山"
+    },
+    {
+      "word": "轻于鸿毛",
+      "pinyin": "qingyuhongmao",
+      "source": "报任少卿书（报任安书）",
+      "original_first": "轻于鸿毛"
+    },
+    {
+      "word": "拾遗补阙",
+      "pinyin": "shiyibuque",
+      "source": "报任少卿书（报任安书）",
+      "original_first": "拾遗补缺"
+    },
+    {
+      "word": "招贤进能",
+      "pinyin": "zhaoxianjinneng",
+      "source": "报任少卿书（报任安书）",
+      "original_first": "找现金能"
+    },
+    {
+      "word": "与时俯仰",
+      "pinyin": "yushifuyang",
+      "source": "报任少卿书（报任安书）",
+      "original_first": "于是抚养"
+    }
+  ]
+}

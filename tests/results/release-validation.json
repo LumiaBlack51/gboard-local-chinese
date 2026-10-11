@@ -1,0 +1,156 @@
+{
+  "date": "2026-10-11",
+  "packages": [
+    {
+      "file": "enhanced\\final\\base.apk",
+      "bytes": 503215403,
+      "sha256": "1ccc8590deae7c2498b5e161d16921d6a12052873c51e5d07f7cb29295f47be2"
+    },
+    {
+      "file": "enhanced\\final\\split_brella_feature_split.apk",
+      "bytes": 35656040,
+      "sha256": "062d6d8701a9aab448122e80159acb59613871d3ad5d05372689703b346293ea"
+    },
+    {
+      "file": "enhanced\\final\\split_config.xxxhdpi.apk",
+      "bytes": 129884,
+      "sha256": "5f64c2846826ac6a32eebedc6dcb73b0ee6724cfcf9ada54bc06da8cedb2846f"
+    },
+    {
+      "file": "enhanced\\final\\split_tenoranimation_feature_split.apk",
+      "bytes": 11321708,
+      "sha256": "2883ec5c6abc1c829c49412c68b1e9d4ec408ab2f7bacb4c37380431a62883b3"
+    },
+    {
+      "file": "enhanced\\voice-helper\\final\\voice-helper.apk",
+      "bytes": 54007607,
+      "sha256": "f7dd2fb13840f160387638cb2617448dfa799271777513848855a8886b068693"
+    }
+  ],
+  "original_native_decoder_sha256": "4ab2629d3a184759bb70759f6316ef25d5d65729fe3b6dd24d0cbef35e0516d3",
+  "preserved_native_decoder": true,
+  "release_debuggable": false,
+  "allow_backup": false,
+  "internet_permission": false,
+  "speech_separate_process": true,
+  "classical_full_pinyin": {
+    "original_first": 7,
+    "engine_without_system_shortcuts_first": 10,
+    "total": 12,
+    "all_candidates": [
+      {
+        "pinyin": "wangzifeibo",
+        "target": "妄自菲薄",
+        "rank": 1
+      },
+      {
+        "pinyin": "zuojianfanke",
+        "target": "作奸犯科",
+        "rank": 1
+      },
+      {
+        "pinyin": "yinyushiyi",
+        "target": "引喻失义",
+        "rank": 1
+      },
+      {
+        "pinyin": "zhifazangpi",
+        "target": "陟罚臧否",
+        "rank": 1
+      },
+      {
+        "pinyin": "jirierdai",
+        "target": "计日而待",
+        "rank": 1
+      },
+      {
+        "pinyin": "zhenzhuosunyi",
+        "target": "斟酌损益",
+        "rank": 1
+      },
+      {
+        "pinyin": "huadiweilao",
+        "target": "画地为牢",
+        "rank": 1
+      },
+      {
+        "pinyin": "zhongyutaishan",
+        "target": "重于泰山",
+        "rank": 1
+      },
+      {
+        "pinyin": "qingyuhongmao",
+        "target": "轻于鸿毛",
+        "rank": 1
+      },
+      {
+        "pinyin": "shiyibuque",
+        "target": "拾遗补阙",
+        "rank": 1
+      },
+      {
+        "pinyin": "zhaoxianjinneng",
+        "target": "招贤进能",
+        "rank": -1
+      },
+      {
+        "pinyin": "yushifuyang",
+        "target": "与时俯仰",
+        "rank": 2
+      }
+    ]
+  },
+  "modern_full_pinyin": {
+    "first": 18,
+    "total": 18
+  },
+  "cursor": {
+    "inserted_raw": "ninhaoma",
+    "inserted_caret": "3",
+    "deleted_raw": "nihaoma",
+    "deleted_caret": "2"
+  },
+  "learning": {
+    "selected": "蔚来",
+    "private_first": "未来",
+    "normal_dictionary_changed": true,
+    "private_dictionary_unchanged": true,
+    "normal_export_bytes": 29
+  },
+  "phone_voice": {
+    "voice_fixture_expected": "今天下午召开会议请注意保护隐私",
+    "editor_text": [
+      "今天下午召开会议请注意保护隐私"
+    ],
+    "voice_exact": true
+  },
+  "avd_voice_fixture": {
+    "fixture": true,
+    "ready": true,
+    "audio_started": false,
+    "ended": true,
+    "recognized": "今天下午召开会议请注意保护隐私",
+    "results": true
+  },
+  "avd_audio_stop": {
+    "fixture": false,
+    "ready": true,
+    "audio_started": true,
+    "ended": true,
+    "recognized": "",
+    "results": true
+  },
+  "avd_audio_cancel": {
+    "fixture": false,
+    "ready": true,
+    "audio_started": true,
+    "cancel_requested": true
+  },
+  "limits": [
+    "Different model from iFlytek; exact rankings cannot be guaranteed.",
+    "Small fixed phrase sample, not a comprehensive accuracy measurement.",
+    "No measurement of physical haptic latency.",
+    "Original Gboard English learned history is not migrated.",
+    "Speech fixture and AVD audio lifecycle checked; real human speech on phone has not been sampled."
+  ]
+}

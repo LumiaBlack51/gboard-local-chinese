@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.gboard.voicecheck">
+  <uses-sdk android:minSdkVersion="32" android:targetSdkVersion="35" />
+  <uses-permission android:name="android.permission.RECORD_AUDIO" />
+  <queries><package android:name="local.gboard.voice" /></queries>
+  <application android:label="Offline voice test" android:debuggable="true" android:allowBackup="false" android:theme="@android:style/Theme.Material.Light.NoActionBar">
+    <activity android:name=".VoiceCheckActivity" android:exported="true" />
+  </application>
+</manifest>

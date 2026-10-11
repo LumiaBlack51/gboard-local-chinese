@@ -1,0 +1,32 @@
+[
+  {
+    "file": "org.fcitx.fcitx5.android-0.1.3-0-g048f581c-arm64-v8a-release.apk",
+    "bytes": 45935104,
+    "sha256": "8e5de1036aea1f55895b39b4fc25a2d563e7b0663fa2708c86598f81768b106d"
+  },
+  {
+    "file": "org.fcitx.fcitx5.android.plugin.rime-0.1.3-0-g048f581c-arm64-v8a-release.apk",
+    "bytes": 5763096,
+    "sha256": "2d8d27cd127647fc2e171297d220dd1a6ed6f295a82d047ebbcb882ddd37ca0c"
+  },
+  {
+    "file": "enhanced/rime-ice.zip",
+    "bytes": 16928040,
+    "sha256": "f3d9306492149bd804e4413adff31205688d8678b0cbe0a158134d5bb360173e"
+  },
+  {
+    "file": "enhanced/rime-data/wanxiang-lts-zh-hans.gram",
+    "bytes": 398335020,
+    "sha256": "6169f35d48aa1018e6effd16cb6ae07f307964cffe5d8c79b97faf2164693bec"
+  },
+  {
+    "file": "enhanced/vosk-android-0.3.75.aar",
+    "bytes": 13472638,
+    "sha256": "ab2f8b91ac8051561aa325546b35fed9a68b36b8121bac5c6fb927525c4adfad"
+  },
+  {
+    "file": "enhanced/vosk-small-cn.zip",
+    "bytes": 43898754,
+    "sha256": "3af8b0e7e0f835ae9d414ce5df580237a3cfb08d586c9fbbb0f7ff29ad5b14ba"
+  }
+]

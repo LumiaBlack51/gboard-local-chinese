@@ -1,0 +1,56 @@
+schema:
+  schema_id: local_pinyin_private
+  name: 中文隐私输入
+  version: '1.0'
+switches:
+  - name: ascii_mode
+    reset: 0
+engine:
+  processors: [ascii_composer, recognizer, key_binder, speller, punctuator, selector, navigator, express_editor]
+  segmentors: [ascii_segmentor, matcher, abc_segmentor, punct_segmentor, fallback_segmentor]
+  translators: [punct_translator, script_translator]
+  filters: [uniquifier]
+speller:
+  alphabet: abcdefghijklmnopqrstuvwxyz
+  delimiter: " '"
+  algebra:
+    - erase/^xx$/
+    - derive/^([jqxy])u$/$1v/
+    - derive/^([aoe])([ioun])$/$1$1$2/
+    - abbrev/^([a-z]).+$/$1/
+    - abbrev/^([zcs]h).+$/$1/
+    - derive/^([nl])ue$/$1ve/
+    - derive/^([jqxy])uan$/$1van/
+    - derive/^([jqxy])un$/$1vn/
+    - derive/^([jqxy])u([aeo])$/$1v$2/
+translator:
+  dictionary: rime_ice
+  enable_completion: true
+  enable_sentence: true
+  enable_user_dict: false
+  initial_quality: 1.2
+  spelling_hints: 0
+  contextual_suggestions: false
+  max_homophones: 8
+  preedit_format:
+    - xform/([nl])v/$1ü/
+    - xform/([nl])ue/$1üe/
+    - xform/([jqxy])v/$1u/
+punctuator:
+  half_shape:
+    ',': '，'
+    '.': '。'
+    '?': '？'
+    '!': '！'
+    ':': '：'
+    ';': '；'
+recognizer:
+  patterns: {}
+grammar:
+  language: wanxiang-lts-zh-hans
+  collocation_max_length: 6
+  collocation_min_length: 3
+  collocation_penalty: -14
+  non_collocation_penalty: -6
+  weak_collocation_penalty: -100
+  rear_penalty: -20

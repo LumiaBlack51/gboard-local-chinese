@@ -1,0 +1,16 @@
+config_version: '1.0'
+schema_list:
+  - schema: local_pinyin
+  - schema: local_pinyin_private
+menu:
+  page_size: 50
+switcher:
+  hotkeys: []
+ascii_composer:
+  good_old_caps_lock: true
+  switch_key:
+    Caps_Lock: noop
+    Shift_L: noop
+    Shift_R: noop
+    Control_L: noop
+    Control_R: noop

@@ -1,0 +1,12 @@
+Original interface and English engine: the user's installed Google Gboard 18.4.1.985164140-release-arm64-v8a, versionCode 176027078.
+Local adapter and JNI sources: enhanced/src, enhanced/native/bridge.cpp, enhanced/native/voice.cpp.
+Rime runtime 1.16.1: https://github.com/rime/librime
+ARM64 runtime libraries extracted from official Fcitx5 Android 0.1.3-0-g048f581c package: https://github.com/fcitx5-android/fcitx5-android
+Chinese dictionary: https://github.com/iDvel/rime-ice (GPL-3.0, original LICENSE in assets/local-rime/LICENSE).
+Grammar: wanxiang-lts-zh-hans.gram, release LTS, https://github.com/amzxyz/RIME-LMDG (original license included separately).
+Completion index: locally generated from the included dictionary, GBI3 format; source hashes in assets/local-rime/source-hashes.json.
+Speech engine: Vosk Android 0.3.75, https://github.com/alphacep/vosk-api
+Speech model: vosk-model-small-cn-0.22, https://alphacephei.com/vosk/models
+The separate speech APK contains VOSK-LICENSE and original model README.
+Android RecognitionService attribution implementation checked against https://github.com/aosp-mirror/platform_frameworks_base/blob/master/core/java/android/speech/RecognitionService.java
+This local build was created for the user's phone; no APK or input data has been publicly uploaded.

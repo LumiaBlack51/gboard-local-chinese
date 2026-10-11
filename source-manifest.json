@@ -1,0 +1,22 @@
+{
+  "tools/Assemble.java": "9bfbdc59148d4a85dfcdde71584243ee83acc2770c26330c50ea5e06d801fb19",
+  "tools/DexTool.java": "173bd6c366bb5df541f2e169ff73ad8b861735cd565fcc4b11e14441150a2b0e",
+  "probe/src/local/gboard/probe/DictionaryAccessService.java": "a6b45e5141f3ea687ad058b226c8f774812184f802a9383d4d781e2992b95cad",
+  "probe/src/local/gboard/probe/MainActivity.java": "10ce806bebe2106301489eb7e8bcb9e6609f3b0e3a7f8a74f2665cf9b9014f5c",
+  "enhanced/enginecheck/EngineCheckActivity.java": "5d70605aa0be9725a118169a2575baff2e8a2b4f625c4509267f485761ee6631",
+  "enhanced/native/bridge.cpp": "ca47d09260d8028dd9b659a85dc81152bdd7c441214afc8b5b68eb74cf9106b3",
+  "enhanced/native/rime_api.h": "cfdd786df06467df16a0318d9d2d7c420e3d0a420317d379313994f30cd266f0",
+  "enhanced/native/voice.cpp": "0ddb04dd4c42d2580af4747e6b6139820144fa46eb0490ca9d232785d279bd2b",
+  "enhanced/native/vosk_api.h": "f82f553a38fbff84a5731fbf086215f107e301a27daad0f038459781dc4a2adc",
+  "enhanced/voice-helper/OfflineRecognitionService.java": "bc069b9c0403628b059bdd8d0aad70d36acb086bb4c68b2cb42bb6dfb33e213d",
+  "enhanced/voice-helper/PermissionActivity.java": "1c47f9c526cc56eecd6a6513d4991232e2a45acdf3afc3c7b54338cf67ea2271",
+  "enhanced/voicecheck/VoiceCheckActivity.java": "59f45304373cd5da814e6fb2dd4e6e1a7c29d8b8a9d7af8d080dd672dd6e2883",
+  "enhanced/src/local/gboard/enhanced/Diagnostics.java": "a08ff165e5ff9ca0d558dda4ea8d1aa9c292da2dcd3c933e13f598c44c5738ef",
+  "enhanced/src/local/gboard/enhanced/EnhancedHook.java": "3f1b817d01cb7a9d5d3d1e8ebf5732478d86ccdf60f41d049bf05456780748e3",
+  "enhanced/src/local/gboard/enhanced/LocalWords.java": "fb368166263918f8569989149229cb13a8520109e5290785bd37de2e32909a1a",
+  "enhanced/src/local/gboard/enhanced/RimeBridge.java": "d27d7ee8f6620c88b153623c4e2700cdddfaf9f8712554f5494004274d3c3d1f",
+  "enhanced/src/local/gboard/enhanced/VoiceBridge.java": "182895c800605f802a6282800e4fb393a25e68e703ce1e2e2d17d5757221b291",
+  "enhanced/src/local/gboard/enhanced/VoiceHook.java": "b96ff9481e6a72681a093a84f0fec5f7cc202efffe77445d48eb65b83306ed56",
+  "enhanced/src/local/gboard/enhanced/VoicePermissionActivity.java": "28eefc1bada5bdb779fdda13f455bd51afbf64b5638d217f5e1cebbac2338d3f",
+  "enhanced/src/local/gboard/enhanced/WordIndex.java": "5bb8051a424595e11ff702fe4c2626e978f43a5f61b5b229f5d369484d148ee9"
+}

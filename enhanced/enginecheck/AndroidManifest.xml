@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.gboard.enginecheck" android:versionCode="1" android:versionName="1.0">
+  <uses-sdk android:minSdkVersion="32" android:targetSdkVersion="35" />
+  <application android:label="中文本地引擎验证" android:allowBackup="false" android:debuggable="true" android:theme="@android:style/Theme.Material.Light.NoActionBar">
+    <activity android:name="local.gboard.enhanced.EngineCheckActivity" android:exported="true" />
+  </application>
+</manifest>
