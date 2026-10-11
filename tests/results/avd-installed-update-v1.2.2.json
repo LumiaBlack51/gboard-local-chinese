@@ -1,0 +1,44 @@
+{
+  "release": "v1.2.2",
+  "source": "User-triggered updater download or verified cache from public GitHub, then Android installation confirmations.",
+  "checks": [
+    {
+      "package": "com.localx.android.inputmethod.latin",
+      "asset": "base.apk",
+      "installed_sha256_matches_release": true
+    },
+    {
+      "package": "com.localx.android.inputmethod.latin",
+      "asset": "split_brella_feature_split.apk",
+      "installed_sha256_matches_release": true
+    },
+    {
+      "package": "com.localx.android.inputmethod.latin",
+      "asset": "split_config.xxxhdpi.apk",
+      "installed_sha256_matches_release": true
+    },
+    {
+      "package": "com.localx.android.inputmethod.latin",
+      "asset": "split_tenoranimation_feature_split.apk",
+      "installed_sha256_matches_release": true
+    },
+    {
+      "package": "local.gboard.voice",
+      "asset": "voice-helper.apk",
+      "installed_sha256_matches_release": true
+    },
+    {
+      "package": "local.gboard.updater",
+      "asset": "updater.apk",
+      "installed_sha256_matches_release": true
+    }
+  ],
+  "installer_is_updater": true,
+  "keyboard_first_install_time_unchanged": true,
+  "passed": true,
+  "management_launcher_opens_updater": true,
+  "verified_install_success_message_shown": true,
+  "checking_again_reports_latest_verified_version": true,
+  "same_version_repair_available": true,
+  "actual_installed_versions_shown": true
+}

@@ -1,7 +1,7 @@
 """Confirm that the updater installed the exact GitHub release assets in an AVD."""
 import argparse,json,re,subprocess,time
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--adb',default='adb');p.add_argument('--serial',required=True);p.add_argument('--before-first-install-time',required=True);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--adb',default='adb');p.add_argument('--serial',required=True);p.add_argument('--before-first-install-time',required=True);p.add_argument('--before-last-update-time',help='For a same-version repair, require the keyboard installation timestamp to change.');a=p.parse_args()
 if not a.serial.startswith('emulator-'):p.error('Only an AVD is accepted.')
 root=Path(__file__).resolve().parent.parent
 manifest=json.loads((root/'update-manifest.json').read_text('utf8'))
@@ -10,7 +10,10 @@ def package(pkg):return adb('shell','dumpsys','package',pkg)
 deadline=time.monotonic()+180
 while True:
  installed={p['package']:package(p['package']) for p in manifest['components']}
- if all('versionCode='+str(p['versionCode'])+' ' in installed[p['package']] and 'installerPackageName=local.gboard.updater' in installed[p['package']] for p in manifest['components']):break
+ versions_match=all('versionCode='+str(p['versionCode'])+' ' in installed[p['package']] and 'installerPackageName=local.gboard.updater' in installed[p['package']] for p in manifest['components'])
+ last_update=re.search(r'lastUpdateTime=([^\r\n]+)',installed['com.localx.android.inputmethod.latin'])
+ repair_complete=not a.before_last_update_time or (last_update and last_update.group(1).strip()!=a.before_last_update_time)
+ if versions_match and repair_complete:break
  if time.monotonic()>deadline:raise TimeoutError('Update has not completed')
  time.sleep(3)
 checks=[]
@@ -28,5 +31,10 @@ for part in manifest['components']:
 first=re.search(r'firstInstallTime=([^\r\n]+)',installed['com.localx.android.inputmethod.latin']).group(1).strip()
 assert first==a.before_first_install_time
 result={'release':'v'+manifest['version'],'source':'User-triggered updater download or verified cache from public GitHub, then Android installation confirmations.','checks':checks,'installer_is_updater':True,'keyboard_first_install_time_unchanged':True,'passed':True}
-(root/'tests/results'/('avd-installed-update-v'+manifest['version']+'.json')).write_text(json.dumps(result,indent=2)+'\n',encoding='utf8')
+name='avd-installed-update-v'+manifest['version']+'.json'
+if a.before_last_update_time:
+ result['source']='User-triggered in-app same-version repair from public GitHub, then Android installation confirmations.'
+ result.update({'same_version_repair_completed':True,'keyboard_last_update_time_changed':True,'previous_last_update_time':a.before_last_update_time,'last_update_time':last_update.group(1).strip()})
+ name='avd-repaired-install-v'+manifest['version']+'.json'
+(root/'tests/results'/name).write_text(json.dumps(result,indent=2)+'\n',encoding='utf8')
 print('All six installed APKs match the release; installed by updater, with original application identity retained.')

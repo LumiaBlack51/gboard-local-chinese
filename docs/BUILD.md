@@ -57,7 +57,7 @@ python enhanced/release_metadata.py
 
 语音回调遵循 [Android 15 RecognitionService 的会话与归因约定](https://raw.githubusercontent.com/aosp-mirror/platform_frameworks_base/android15-release/core/java/android/speech/RecognitionService.java)：对应 Callback 处理停止/取消，返回识别结果前关闭麦克风。正式包回归包含停止、取消及取消后再次开始，验证连续会话不会互相干扰。
 
-更新回归在旧版 AVD 中通过管理应用点击“检查更新”，下载公开 GitHub 正式资产，依次确认安卓的三个组件更新和首次 Play Protect 扫描。`tests/verify_installed_update.py` 核对安装来源、版本、所有安装 APK 的哈希与键盘首次安装时间；`tests/verify_update_ui.py` 检查管理入口、成功提示和重复检查状态。`tests/verify_github_release.py` 比较全部九个上传文件的服务端哈希及大小。1.2.0 另以同签名 RetentionInstrumentation 在更新前后比较本地 Rime 用户文件与设置，并验证旧更新器升级和新更新器同版本修复两条路径。全部 instrumentation 仅用于 AVD，不随正式包发布。
+更新回归在旧版 AVD 中通过管理应用点击“检查更新”，下载公开 GitHub 正式资产，依次确认安卓的三个组件更新和首次 Play Protect 扫描。`tests/verify_installed_update.py` 核对安装来源、版本、所有安装 APK 的哈希与键盘首次安装时间；`tests/verify_update_ui.py` 检查管理入口、成功提示和重复检查状态。`tests/verify_github_release.py` 比较全部九个上传文件的服务端哈希及大小。1.2.0 以同签名 RetentionInstrumentation 在更新前后比较本地 Rime 用户文件与设置，并验证旧更新器升级。1.2.2 还通过新版更新器重新下载全部公开 APK，实际完成同版本修复；以 `--before-last-update-time` 检查安装更新时间发生变化，保存独立修复报告；`verify_update_ui.py --repair` 验证修复后的成功提示和再次检查状态。两次安装均保留 18 个本地用户文件和设置。全部 instrumentation 仅用于 AVD，不随正式包发布。
 
 `tests/run_updater_result_checks.py` 使用同签名 UpdaterResultInstrumentation，在实际更新器 UID 发送合成系统拒绝与取消状态给私有 InstallReceiver，并检查打开的页面即时刷新。测试会恢复此前的结果记录，不安装 APK；实际系统安装验证仍由另外的更新回归覆盖。独立测试 IME 的 LensCheckActivity 用合成拼音检查 ComposingLens 在输入法窗口中的显示与输入连接保留。
 
