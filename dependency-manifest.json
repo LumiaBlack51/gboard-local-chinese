@@ -40,6 +40,26 @@
     "sha256": "a8e0e4ec53810e433789b54a5c0134a7eaa2ffca595a6334d54c00da858841d3"
   },
   {
+    "file": "enhanced/handwriting-data/COPYING",
+    "bytes": 26430,
+    "sha256": "a190dc9c8043755d90f8b0a75fa66b9e42d4af4c980bf5ddc633f0124db3cee7"
+  },
+  {
+    "file": "enhanced/handwriting-data/handwriting-zh_CN.meta",
+    "bytes": 59,
+    "sha256": "dbf5ec0bbddef2f20266426ca736544aef62b737ec2442d4aeaefca5de63b1ba"
+  },
+  {
+    "file": "enhanced/handwriting-data/handwriting-zh_CN.model",
+    "bytes": 26834816,
+    "sha256": "e16153d1ff267cd479aea260d6f71a3edda8b4ba06db2d121513adda65a4449e"
+  },
+  {
+    "file": "enhanced/native/lib/arm64-v8a/libgboard_local_handwriting.so",
+    "bytes": 5909040,
+    "sha256": "03ccc05b799de658121d5db18fb486b71568352521497108a97db4d3d27a71c7"
+  },
+  {
     "file": "enhanced/native/lib/arm64-v8a/libonnxruntime.so",
     "bytes": 22249560,
     "sha256": "33847ad43bffe204699fd4a27f7f3603452a8cdaf2f9a44983a0bc31ffcf2da1"
@@ -48,6 +68,11 @@
     "file": "enhanced/native/lib/arm64-v8a/libsherpa-onnx-c-api.so",
     "bytes": 4465168,
     "sha256": "c85e2382e2ca12b0513826be926eaccfea896b4cbf568182e287671ba526f80d"
+  },
+  {
+    "file": "enhanced/native/lib/x86_64/libgboard_local_handwriting.so",
+    "bytes": 5513512,
+    "sha256": "bdf0f29476b1cf72a8e5d8f8ea5ae978c229d6f901bb14f5ede774541ec595bb"
   },
   {
     "file": "enhanced/native/lib/x86_64/libonnxruntime.so",

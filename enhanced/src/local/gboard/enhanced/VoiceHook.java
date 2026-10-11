@@ -40,7 +40,8 @@ public final class VoiceHook {
     run.status=new TextView(service);run.status.setTextSize(19);run.status.setPadding(36,28,36,28);
     run.fixture=Diagnostics.isDebug(service)&&new File(service.getNoBackupFilesDir(),"voice-test.pcm").isFile();
     if(run.fixture)new File(service.getNoBackupFilesDir(),"voice-test.pcm").delete();
-    run.dialog=new AlertDialog.Builder(service).setTitle("本地语音输入").setView(run.status).setPositiveButton("结束录音",null).setNegativeButton("取消",(d,w)->cancel(run)).create();
+    String title="本地语音输入";try{String version=service.getPackageManager().getPackageInfo(service.getPackageName(),0).versionName;int local=version.indexOf("-local-");title+="（"+(local>=0?version.substring(local+7):version)+"）";}catch(Exception ignored){}
+    run.dialog=new AlertDialog.Builder(service).setTitle(title).setView(run.status).setPositiveButton("结束录音",null).setNegativeButton("取消",(d,w)->cancel(run)).create();
     run.dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_ATTACHED_DIALOG);
     run.dialog.getWindow().getAttributes().token=service.getWindow().getWindow().getDecorView().getWindowToken();
     run.dialog.setOnCancelListener(d->cancel(run));run.dialog.show();Diagnostics.trace(service,"dialog shown");

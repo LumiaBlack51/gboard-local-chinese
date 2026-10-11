@@ -15,12 +15,13 @@ import org.json.*;
 /** User initiated GitHub updates in a separate UID with no keyboard or microphone access. */
 public final class UpdateActivity extends Activity {
   static final String REPO="LumiaBlack51/gboard-local-chinese",KEYBOARD="com.localx.android.inputmethod.latin",VOICE="local.gboard.voice",SELF="local.gboard.updater";
-  private TextView status;private Button check,install;private JSONArray components;private JSONObject release;private Thread worker;private volatile boolean closed;
+  private TextView status,current;private Button check,install;private JSONArray components;private JSONObject release;private Thread worker;private volatile boolean closed;
   private final Map<String,String> urls=new HashMap<>();
   private void message(String text){runOnUiThread(()->{if(!closed)status.setText(text);});}
   public void onCreate(Bundle state){super.onCreate(state);
     LinearLayout layout=new LinearLayout(this);layout.setOrientation(1);int pad=(int)(20*getResources().getDisplayMetrics().density);layout.setPadding(pad,pad,pad,pad);
     TextView title=new TextView(this);title.setText("Gboard 中文增强更新");title.setTextSize(24);layout.addView(title);
+    current=new TextView(this);current.setTextSize(16);current.setText(InstalledRelease.versions(this));layout.addView(current);
     status=new TextView(this);status.setTextSize(17);status.setText("点击检查更新后连接 GitHub。键盘和离线语音保持无联网权限；输入内容不会传给此应用。");layout.addView(status);
     check=new Button(this);check.setText("检查更新");layout.addView(check);check.setOnClickListener(v->check());
     install=new Button(this);install.setText("下载并安装更新");install.setEnabled(false);layout.addView(install);install.setOnClickListener(v->beginInstall());
@@ -51,8 +52,8 @@ public final class UpdateActivity extends Activity {
     release=json(urls.get("update-manifest.json"));validateManifest(release,signer(),urls.keySet());components=release.getJSONArray("components");boolean newer=false;
     StringBuilder versions=new StringBuilder("最新版本：").append(release.getString("version"));
     for(int i=0;i<components.length();i++){JSONObject part=components.getJSONObject(i);long current=installed(part.getString("package")),next=part.getLong("versionCode");if(current>next)throw new IOException("服务器版本比已安装版本旧，拒绝降级");if(current<next)newer=true;}
-    if(newer){message(versions+"\n"+release.optString("notes")+"\n安装将保留本地词库和设置。");runOnUiThread(()->{if(!closed)install.setEnabled(true);});}
-    else message(versions+"\n已是最新版本。");
+    if(newer){message(versions+"\n"+release.optString("notes")+"\n尚未安装这个版本。点击下载并安装更新，完成系统安装后才会生效。词库和设置保留。");runOnUiThread(()->{if(!closed){install.setText("下载并安装更新");install.setEnabled(true);}});}
+    else {String state;try{InstalledRelease.verify(this,release);state="已是最新版本；全部安装文件已核验。";}catch(Exception e){state="版本号相同，但安装文件未通过核验："+e.getMessage()+"。可重新安装修复。";}message(versions+"\n"+state);runOnUiThread(()->{if(!closed){install.setText("重新安装此版本");install.setEnabled(true);}});}
   }catch(Exception e){message("检查失败："+e.getMessage()+"\n可重新检查。");}});}
   static void validateManifest(JSONObject manifest,String certificate,Set<String> names)throws Exception{
     if(manifest.getInt("format")!=1||!certificate.equalsIgnoreCase(manifest.getString("certificateSha256")))throw new IOException("版本签名身份不匹配");
@@ -68,7 +69,7 @@ public final class UpdateActivity extends Activity {
   }downloadAndInstall();}
   public void onActivityResult(int request,int result,Intent data){super.onActivityResult(request,result,data);if(request==11){if(getPackageManager().canRequestPackageInstalls())downloadAndInstall();else{message("安装权限未开启。可再次点击安装更新。");install.setEnabled(true);}}}
   private File download(JSONObject asset,File folder)throws Exception{
-    String name=asset.getString("name");File target=new File(folder,name),temp=new File(folder,name+".part");long expected=asset.getLong("size"),received=0;MessageDigest hash=MessageDigest.getInstance("SHA-256");HttpURLConnection c=connection(urls.get(name));
+    String name=asset.getString("name");File target=new File(folder,name),temp=new File(folder,name+".part");long expected=asset.getLong("size"),received=0;if(target.isFile()&&target.length()==expected&&InstalledRelease.sha(target).equals(asset.getString("sha256")))return target;MessageDigest hash=MessageDigest.getInstance("SHA-256");HttpURLConnection c=connection(urls.get(name));
     try{if(c.getResponseCode()!=200)throw new IOException("下载返回 "+c.getResponseCode());try(InputStream in=c.getInputStream();OutputStream out=new FileOutputStream(temp)){
       byte[] buffer=new byte[131072];int n;long notify=0;while((n=in.read(buffer))!=-1){if(closed||Thread.currentThread().isInterrupted())throw new InterruptedIOException("下载已取消");received+=n;if(received>expected)throw new IOException("安装包大小不匹配");out.write(buffer,0,n);hash.update(buffer,0,n);long now=SystemClock.elapsedRealtime();if(now-notify>1000){message("正在下载 "+name+"："+(received*100/expected)+"%");notify=now;}}
     }if(received!=expected||!hex(hash.digest()).equals(asset.getString("sha256")))throw new IOException("安装包校验失败");if(target.exists()&&!target.delete())throw new IOException("无法替换缓存");if(!temp.renameTo(target))throw new IOException("无法保存安装包");return target;
@@ -86,10 +87,10 @@ public final class UpdateActivity extends Activity {
       for(int i=0;i<groups.size();i++){PackageInstaller.SessionParams p=new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);p.setAppPackageName(components.getJSONObject(i).getString("package"));long size=0;for(File file:groups.get(i))size+=file.length();p.setSize(size);int id=installer.createSession(p);sessions.add(id);
         try(PackageInstaller.Session child=installer.openSession(id)){for(File file:groups.get(i))try(InputStream in=new FileInputStream(file);OutputStream out=child.openWrite(file.getName(),0,file.length())){byte[] buffer=new byte[131072];int n;while((n=in.read(buffer))!=-1)out.write(buffer,0,n);child.fsync(out);}}parent.addChildSessionId(id);
       }
-      if(closed)throw new InterruptedIOException("安装已取消");message("校验完成，请在系统页面确认安装。");Intent callback=new Intent(this,InstallReceiver.class).setAction("local.gboard.updater.INSTALL_RESULT");PendingIntent pending=PendingIntent.getBroadcast(this,parentId,callback,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_MUTABLE);parent.commit(pending.getIntentSender());committed=true;
+      if(closed)throw new InterruptedIOException("安装已取消");getSharedPreferences("updates",0).edit().putString("pending_manifest",release.toString()).putInt("pending_session",parentId).remove("last_result").commit();message("下载校验完成，尚未安装。请在系统页面完成安装；随后将核验手机上全部组件。");Intent callback=new Intent(this,InstallReceiver.class).setAction("local.gboard.updater.INSTALL_RESULT");PendingIntent pending=PendingIntent.getBroadcast(this,parentId,callback,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_MUTABLE);parent.commit(pending.getIntentSender());committed=true;
     }
   }catch(Exception e){message("更新失败："+e.getMessage()+"\n已安装版本可继续使用。");runOnUiThread(()->{if(!closed)install.setEnabled(true);});}
   finally{if(!committed)for(int id:sessions)try{installer.abandonSession(id);}catch(Exception ignored){}}});}
   public void onDestroy(){closed=true;if(worker!=null)worker.interrupt();super.onDestroy();}
-  public void onResume(){super.onResume();String last=getSharedPreferences("updates",0).getString("last_result",null);if(last!=null){status.setText(last);getSharedPreferences("updates",0).edit().remove("last_result").apply();}}
+  public void onResume(){super.onResume();current.setText(InstalledRelease.versions(this));String last=getSharedPreferences("updates",0).getString("last_result",null);if(last!=null)status.setText(last);}
 }

@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
 from build_config import JAVA,BT,ANDROID,APKTOOL,SIGN_ARGS
+from release_version import VERSION,KEYBOARD_CODE
 from pathlib import Path
 import sys,zipfile,struct,subprocess
 from repack import replace
@@ -21,7 +22,7 @@ for c in chunks:
     position=16+start+i*width
     if strings[U32(c,position+4)]=='debuggable':struct.pack_into('<I',c,position+16,0)
 chunks[pi]=encode_pool(strings,flags);body=b''.join(chunks);manifest=struct.pack('<HHI',3,8,8+len(body))+body
-changes={'AndroidManifest.xml':set_version(manifest,176027080,'18.4.1-local-1.1.1')}
+changes={'AndroidManifest.xml':set_version(manifest,KEYBOARD_CODE,'18.4.1-local-'+VERSION)}
 for name in ['RIME-LMDG-LICENSE','LIBRIME-LICENSE','THIRD_PARTY_SOURCES.txt']:
   path=ROOT/'enhanced'/name
   if path.is_file():changes['assets/licenses/'+name]=path.read_bytes()
@@ -32,7 +33,7 @@ run(BT/'apksigner.bat','sign',*SIGN_ARGS,'--out',dest/'base.apk',dest/'aligned.a
 for split in source.parent.glob('split_*.apk'):
   with zipfile.ZipFile(split) as z:raw=z.read('AndroidManifest.xml')
   temp=dest/('unsigned-'+split.name);aligned=dest/('aligned-'+split.name)
-  replace(split,temp,{'AndroidManifest.xml':set_version(raw,176027080,'18.4.1-local-1.1.1')})
+  replace(split,temp,{'AndroidManifest.xml':set_version(raw,KEYBOARD_CODE,'18.4.1-local-'+VERSION)})
   run(BT/'zipalign.exe','-P','16','-f','4',temp,aligned)
   run(BT/'apksigner.bat','sign',*SIGN_ARGS,'--out',dest/split.name,aligned)
 run(BT/'apksigner.bat','verify',dest/'base.apk');print(dest/'base.apk')

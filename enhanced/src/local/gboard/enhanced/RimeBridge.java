@@ -30,7 +30,7 @@ public final class RimeBridge {
         String[] probe=state(session);
         if(probe.length<5)throw new IOException("Chinese dictionary not loaded");
         destroy(session);
-        ready=true;Log.i("LocalChinese","Rime ready: "+version);
+        ready=true;new android.os.Handler(android.os.Looper.getMainLooper()).post(KeyboardGestures::refresh);Log.i("LocalChinese","Rime ready: "+version);
       }catch(Throwable failure){started.set(false);Log.e("LocalChinese","Offline engine initialization failed",failure);}
     },"LocalChinese-Prepare").start();
   }

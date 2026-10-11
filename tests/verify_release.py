@@ -23,7 +23,7 @@ for component in manifest['components']:
    assert not any(n.startswith('assets/speech-') for n in z.namelist())
    if not path.name.startswith('split_'):
     xml=run(BT/'aapt.exe','dump','xmltree',path,'AndroidManifest.xml')
-    assert 'AdapterCheckActivity' not in xml
+    assert 'AdapterCheckActivity' not in xml and 'GestureCheckActivity' not in xml
     assert re.search(r'android:debuggable[^\n]*0x0',xml)
     assert re.search(r'android:allowBackup[^\n]*0x0',xml)
     internet="name='android.permission.INTERNET'" in badging
@@ -31,12 +31,15 @@ for component in manifest['components']:
     if component['package']=='local.gboard.updater':
      assert 'android.permission.RECORD_AUDIO' not in badging and 'android.view.InputMethod' not in xml
     for n in z.namelist():
-     if n.endswith('.dex'):assert b'AdapterCheckActivity' not in z.read(n)
+     if n.endswith('.dex'):assert b'AdapterCheckActivity' not in z.read(n) and b'GestureCheckActivity' not in z.read(n)
    if path.name=='base.apk':
     with zipfile.ZipFile(ROOT/'gboard-18.4.1/base.apk') as original:
      name='lib/arm64-v8a/libintegrated_shared_object.so'
      assert sha(z.read(name))==sha(original.read(name))
+    assert sha(z.read('assets/local-handwriting/handwriting-zh_CN.model'))=='e16153d1ff267cd479aea260d6f71a3edda8b4ba06db2d121513adda65a4449e'
+    assert 'lib/arm64-v8a/libgboard_local_handwriting.so' in z.namelist()
+    helper=z.read('classes5.dex');assert '结束录音'.encode() in helper and '点击开始后录音'.encode() not in helper
   checks.append({'asset':path.name,'versionCode':component['versionCode'],'sha256':asset['sha256'],'signature_verified':True,'zipalign_16k_verified':True})
-result={'release':'v1.1.1','apks':checks,'keyboard_native_decoder_unchanged':True,'keyboard_and_voice_have_no_internet':True,'debug_and_backup_disabled':True,'debug_test_activity_and_fixtures_excluded':True,'passed':True}
-(ROOT/'tests/results/release-v1.1.1.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf8')
+result={'release':'v'+manifest['version'],'apks':checks,'keyboard_native_decoder_unchanged':True,'keyboard_and_voice_have_no_internet':True,'debug_and_backup_disabled':True,'debug_test_activity_and_fixtures_excluded':True,'bundled_handwriting_model_hash_verified':True,'voice_has_no_start_confirmation':True,'passed':True}
+(ROOT/'tests/results'/('release-v'+manifest['version']+'.json')).write_text(json.dumps(result,indent=2)+'\n',encoding='utf8')
 print('Verified all six signed APKs, versions, metadata, permissions and native decoder.')

@@ -12,6 +12,7 @@
 4. 原雾凇归档放在 `enhanced/rime-ice.zip`；执行 `python enhanced/prepare_data.py` 提取词典与运行库，再执行 `python enhanced/build_word_index.py` 生成 GBI3 索引。确切词典原文 SHA-256 见 `enhanced/rime-data/source-hashes.json`。
 5. RIME-LMDG LTS 的 `wanxiang-lts-zh-hans.gram` 放在 `enhanced/rime-data/`，其大小与哈希见依赖清单。
 6. 取得官方 `sherpa-onnx-v1.13.8-android.tar.bz2`。取 ARM64 与 x86_64 的 `libonnxruntime.so`、`libsherpa-onnx-c-api.so` 到对应 `enhanced/native/lib/<ABI>/`。取得官方 `sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20-mobile.tar.bz2`，将量化 encoder、未量化 decoder、量化 joiner 及 tokens 放到 `enhanced/voice-data/`，文件名依次为 `encoder.int8.onnx`、`decoder.onnx`、`joiner.int8.onnx`、`tokens.txt`。
+7. 从 [Tegaki 0.3 简体中文归档](https://github.com/tegaki/tegaki/releases/download/v0.3/tegaki-zinnia-simplified-chinese-0.3.zip) 提取模型、元数据及 COPYING 到 `enhanced/handwriting-data/`，模型名 `handwriting-zh_CN.model`。哈希和完整可编辑 XML 来源见 [手写来源说明](../enhanced/HANDWRITING-SOURCES.md)。Zinnia 识别源码已按固定提交加入仓库。
 
 获取自己设备 APK 的示例：
 
@@ -33,6 +34,7 @@ $env:ANDROID_SDK_ROOT='C:\Path\To\Android\Sdk'
 $env:GBOARD_KEYSTORE='C:\Private\signing.p12'
 # 在本机设置 GBOARD_KEYSTORE_PASS，不写进源码、命令日志或仓库。
 python enhanced/build_native.py
+python enhanced/build_handwriting.py
 python enhanced/build_baseline.py
 python enhanced/build_enhanced.py
 python enhanced/make_release.py
@@ -45,7 +47,7 @@ python enhanced/release_metadata.py
 
 ## 独立验证
 
-测试源码位于 `enhanced/testsrc`、`enhanced/enginecheck`、`enhanced/voicecheck` 与 `probe`。`python enhanced/build_enhanced.py --test` 添加 AdapterCheckActivity，再运行 `python enhanced/make_debug.py` 输出同版本号、debuggable 的四个 AVD APK 到 `enhanced/build/test-apks`。正式版必须重新运行不带 `--test` 的构建命令，避免保留测试 Activity。其他构建入口为相应 `build_*.py` 或 `probe/build.ps1`。
+测试源码位于 `enhanced/testsrc`、`enhanced/enginecheck`、`enhanced/voicecheck` 与 `probe`。`python enhanced/build_enhanced.py --test` 添加 AdapterCheckActivity 与 GestureCheckActivity，再运行 `python enhanced/make_debug.py` 输出同版本号、debuggable 的四个 AVD APK 到 `enhanced/build/test-apks`。正式版必须重新运行不带 `--test` 的构建命令，避免保留测试 Activity。其他构建入口为相应 `build_*.py` 或 `probe/build.ps1`。
 
 1.1.1 的语音交互测试使用 `build_voicecheck.py` 生成的独立测试 APK；它将当前源码的 VoiceHook 放进 `HookCheckService` 测试输入法，在 `HookCheckActivity` 的合成编辑框中运行。仅在 AVD 选中测试输入法、启动此 Activity；它触发一次模拟麦克风命令，不再点击开始或确认，随后检查文字直接填入及面板关闭。结束后恢复原输入法，运行 `tests/run_avd_regression.py --serial emulator-XXXX` 汇总候选、语音、自动结束和录音生命周期回归。不得在个人手机或聊天应用运行这个测试输入法。
 
@@ -55,7 +57,7 @@ python enhanced/release_metadata.py
 
 语音回调遵循 [Android 15 RecognitionService 的会话与归因约定](https://raw.githubusercontent.com/aosp-mirror/platform_frameworks_base/android15-release/core/java/android/speech/RecognitionService.java)：对应 Callback 处理停止/取消，返回识别结果前关闭麦克风。正式包回归包含停止、取消及取消后再次开始，验证连续会话不会互相干扰。
 
-更新回归在旧版 AVD 中通过管理应用点击“检查更新”，下载公开 GitHub 正式资产，依次确认安卓的三个组件更新和首次 Play Protect 扫描。`tests/verify_installed_update.py` 核对安装来源、版本、所有安装 APK 的哈希与键盘首次安装时间；`tests/verify_update_ui.py` 检查管理入口、成功提示和重复检查状态。`tests/verify_github_release.py` 比较全部九个上传文件的服务端哈希及大小。结果见 `tests/results/avd-installed-update-v1.1.json`。
+更新回归在旧版 AVD 中通过管理应用点击“检查更新”，下载公开 GitHub 正式资产，依次确认安卓的三个组件更新和首次 Play Protect 扫描。`tests/verify_installed_update.py` 核对安装来源、版本、所有安装 APK 的哈希与键盘首次安装时间；`tests/verify_update_ui.py` 检查管理入口、成功提示和重复检查状态。`tests/verify_github_release.py` 比较全部九个上传文件的服务端哈希及大小。1.2.0 另以同签名 RetentionInstrumentation 在更新前后比较本地 Rime 用户文件与设置，并验证旧更新器升级和新更新器同版本修复两条路径。全部 instrumentation 仅用于 AVD，不随正式包发布。
 
 真机诊断仅在自建测试编辑框运行，禁止对聊天应用发送全局测试按键。不要为了测试启用讯飞联网。本次 AVD 中原版和增强版 Gboard 的 ARM 翻译运行均出现上游 native crash，因此将原生候选控件放在调试 Activity 中验证，并使用独立语音测试 APK；不把那个故障当成完整键盘界面通过验证。
 

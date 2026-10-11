@@ -10,6 +10,8 @@
 | 万象语法数据 | [RIME-LMDG](https://github.com/amzxyz/RIME-LMDG)，LTS 的 `wanxiang-lts-zh-hans.gram`，附 `enhanced/RIME-LMDG-LICENSE` |
 | Sherpa-ONNX 1.13.8 | [官方 Android 运行库](https://github.com/k2-fsa/sherpa-onnx/releases/tag/v1.13.8)，附 `enhanced/SHERPA-LICENSE`，含 ONNX Runtime |
 | 普通话/英语模型 | [官方双语模型](https://k2-fsa.github.io/sherpa/onnx/pretrained_models/online-transducer/zipformer-transducer-models.html)，`streaming-zipformer-bilingual-zh-en-2023-02-20-mobile`，Apache-2.0，附上游模型说明 |
+| Zinnia 手写识别 | [固定上游提交](https://github.com/taku910/zinnia/tree/581faa8f6f15e4a7b21964be3a5ec36265c80e5b/zinnia)，BSD，附 `enhanced/ZINNIA-LICENSE` |
+| Tegaki 简体中文手写模型 | [官方 0.3 归档，含完整 XML 源数据](https://github.com/tegaki/tegaki/releases/download/v0.3/tegaki-zinnia-simplified-chinese-0.3.zip)，LGPL-2.1，附 `enhanced/TEGAKI-LICENSE`，详见 [手写来源](../enhanced/HANDWRITING-SOURCES.md) |
 
 1.0.0 使用 Vosk Android 0.3.75 和 `vosk-model-small-cn-0.22`，旧版本对应来源记录保留在 Git 历史中。
 

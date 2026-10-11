@@ -3,6 +3,7 @@ import sys,struct,zipfile,subprocess
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
 from build_config import ROOT,BT,SIGN_ARGS
+from release_version import VERSION,KEYBOARD_CODE
 from clone_apk import decode_pool,encode_pool,U32
 from add_activity import set_version
 from repack import replace
@@ -23,7 +24,7 @@ for source in (ROOT/'enhanced/release').glob('*.apk'):
     if strings[U32(c,p+4)]=='debuggable':struct.pack_into('<I',c,p+16,0xffffffff);found=True
   assert found
   body=b''.join(chunks);raw=struct.pack('<HHI',3,8,len(body)+8)+body
- raw=set_version(raw,176027080,'18.4.1-local-1.1.1-debug')
+ raw=set_version(raw,KEYBOARD_CODE,'18.4.1-local-'+VERSION+'-debug')
  unsigned=out/('unsigned-'+source.name);aligned=out/('aligned-'+source.name)
  replace(source,unsigned,{'AndroidManifest.xml':raw})
  subprocess.run([str(BT/'zipalign.exe'),'-P','16','-f','4',str(unsigned),str(aligned)],check=True)

@@ -27,6 +27,6 @@ for part in manifest['components']:
  assert not remaining
 first=re.search(r'firstInstallTime=([^\r\n]+)',installed['com.localx.android.inputmethod.latin']).group(1).strip()
 assert first==a.before_first_install_time
-result={'release':'v1.1.0','source':'User-triggered updater download from public GitHub; three Android update confirmations, then Play Protect scan and installation.','checks':checks,'installer_is_updater':True,'keyboard_first_install_time_unchanged':True,'passed':True}
-(root/'tests/results/avd-installed-update-v1.1.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf8')
+result={'release':'v'+manifest['version'],'source':'User-triggered updater download or verified cache from public GitHub, then Android installation confirmations.','checks':checks,'installer_is_updater':True,'keyboard_first_install_time_unchanged':True,'passed':True}
+(root/'tests/results'/('avd-installed-update-v'+manifest['version']+'.json')).write_text(json.dumps(result,indent=2)+'\n',encoding='utf8')
 print('All six installed APKs match the release; installed by updater, with original application identity retained.')

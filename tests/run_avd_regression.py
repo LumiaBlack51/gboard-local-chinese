@@ -1,6 +1,8 @@
 """Run debug integration activities only on an explicitly selected emulator."""
-import argparse,json,subprocess,time
+import argparse,json,subprocess,time,sys
 from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
+from release_version import VERSION
 
 p=argparse.ArgumentParser();p.add_argument('--adb',default='adb');p.add_argument('--serial',required=True);p.add_argument('--voice-only',action='store_true')
 a=p.parse_args()
@@ -25,10 +27,13 @@ pkg='com.localx.android.inputmethod.latin'
 if not a.voice_only:
  adapter=read(pkg,'adapter-report.json')
  if not adapter or not adapter.get('passed'):raise RuntimeError('Run AdapterCheckActivity and obtain a passing report first.')
- save('avd-adapter-v1.1.1.json',adapter)
+ save('avd-adapter-v'+VERSION+'.json',adapter)
+ gestures=read(pkg,'gesture-report.json')
+ if not gestures or not gestures.get('passed'):raise RuntimeError('Run GestureCheckActivity and obtain a passing report first.')
+ save('avd-gestures-v'+VERSION+'.json',gestures)
 hook=read('local.gboard.voicecheck','hook-report.json')
 if not hook or not hook.get('passed'):raise RuntimeError('Run HookCheckActivity with the test IME and obtain a passing voice hook report first.')
-save('avd-voice-hook-v1.1.1.json',hook)
+save('avd-voice-hook-v'+VERSION+'.json',hook)
 voices={}
 for label,extras in [('mixed',['--ez','fixture','true','--ez','mixed','true']),('mandarin',['--ez','fixture','true']),('auto_finish',['--ez','fixture','true','--ez','auto_finish','true']),('audio_stop',['--ez','fixture','false']),('audio_cancel',['--ez','fixture','false','--ez','cancel','true'])]:
  pkg='local.gboard.voicecheck';adb('shell','am','force-stop',pkg)
@@ -42,4 +47,4 @@ for label,extras in [('mixed',['--ez','fixture','true','--ez','mixed','true']),(
  if label=='audio_stop' and not (report.get('audio_started') and report.get('ended') and report.get('results')):raise RuntimeError('Audio stop failed')
  if label=='audio_cancel' and not (report.get('audio_started') and report.get('cancel_requested')):raise RuntimeError('Audio cancel failed')
  voices[label]=report;print(label+': passed',flush=True)
-save('avd-voice-v1.1.1.json',{'model':'sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20-mobile','fixtures':'Official model test_wavs/1.wav and locally synthesized Mandarin PCM16; no private recordings.','checks':voices,'passed':True})
+save('avd-voice-v'+VERSION+'.json',{'model':'sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20-mobile','fixtures':'Official model test_wavs/1.wav and locally synthesized Mandarin PCM16; no private recordings.','checks':voices,'passed':True})

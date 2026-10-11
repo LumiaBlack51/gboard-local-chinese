@@ -22,8 +22,9 @@ run(BT/'d8.bat','--min-api','32','--lib',ANDROID,'--output',dex,directory/'helpe
 apk=ROOT/'enhanced'/('enginecheck/out/enginecheck.apk' if engine else 'build/test-apks/base.apk' if avd else 'release/base.apk')
 changes={'classes.dex' if engine else 'classes5.dex':(dex/'classes.dex').read_bytes(),'lib/arm64-v8a/libgboard_local_rime.so':(ROOT/'enhanced/native/lib/arm64-v8a/libgboard_local_rime.so').read_bytes()}
 if not engine:
-  sys.path.insert(0,str(ROOT));from add_activity import add_voice_access
+  sys.path.insert(0,str(ROOT));from add_activity import add_voice_access,add_activity
   with zipfile.ZipFile(apk) as z:changes['AndroidManifest.xml']=add_voice_access(z.read('AndroidManifest.xml'))
+  if '--test' in sys.argv:changes['AndroidManifest.xml']=add_activity(changes['AndroidManifest.xml'],'local.gboard.enhanced.GestureCheckActivity',True)
 for name in ['default.yaml','local_pinyin.schema.yaml','local_pinyin_private.schema.yaml']:
   changes['assets/local-rime/'+name]=(ROOT/'enhanced/rime-data'/name).read_bytes()
 replace(apk,directory/'unsigned-update.apk',changes)

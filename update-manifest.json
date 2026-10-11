@@ -1,31 +1,31 @@
 {
   "format": 1,
-  "version": "1.1.1",
+  "version": "1.2.0",
   "certificateSha256": "ca8e7c0c1f35a1821fc417499635e5bc8c0a774edaf19e2682f1cb6040154c74",
-  "notes": "语音点即开始、停顿后直接填入；展开候选与关闭联想分离，未确认拼音时不显示 ×。",
+  "notes": "空格滑动编辑拼音、逐字触感和点选放大；中文 26 键离线手写及独立手写板；显示已安装版本，核验安装结果并可重新安装修复。语音仍点即开始。",
   "components": [
     {
       "package": "com.localx.android.inputmethod.latin",
-      "versionCode": 176027080,
+      "versionCode": 176027081,
       "assets": [
         {
           "name": "base.apk",
-          "sha256": "f152fb645648a26dbda12a2744a679ed99a14aeaf252096717d2a1b1741c991b",
-          "size": 549139755
+          "sha256": "199685a8dbcf6dd52e96233ae1c1727713c8cba3edee4e96a07cc524b91a5316",
+          "size": 572864207
         },
         {
           "name": "split_brella_feature_split.apk",
-          "sha256": "96475b38194c2969c83d94fd8fe1fa3022864429479b03aefa95a11c3a9dbb0b",
+          "sha256": "e46ac6cc38b07d93ac8149b76351c27bd53391db6012969f88829a175c8c789b",
           "size": 35656040
         },
         {
           "name": "split_config.xxxhdpi.apk",
-          "sha256": "f88642f784bf66f6e07fe9c4f25bf90ea7df862d52bd3b1fdccfdbceaf7901c1",
+          "sha256": "a900c8b13435cbf3c9bc183e384efc584056781ef55709589f3064394cd25045",
           "size": 129884
         },
         {
           "name": "split_tenoranimation_feature_split.apk",
-          "sha256": "d40d317fc095906ca3e91f396afcb1047ff4903e6d5e1040ad8bcadb2b3d4058",
+          "sha256": "d3d4cf07d7c903754e6879af9d18a64700b847dc8d1320a6ee4122121cb1c662",
           "size": 11321708
         }
       ]
@@ -43,11 +43,11 @@
     },
     {
       "package": "local.gboard.updater",
-      "versionCode": 3,
+      "versionCode": 4,
       "assets": [
         {
           "name": "updater.apk",
-          "sha256": "d66433b8f87c533dc2402df9f65384a690514fd60a90eb08ec46c65d42c21328",
+          "sha256": "2bb077f549aedbaf0dcbe426c526c42cedbce252b3f64a1fc16e169b845dbea9",
           "size": 20817
         }
       ]

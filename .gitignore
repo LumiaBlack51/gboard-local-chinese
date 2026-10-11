@@ -25,6 +25,7 @@ java/
 oplus-framework-smali/
 enhanced/rime-data/cn_dicts/
 enhanced/voice-data/
+enhanced/handwriting-data/
 enhanced/unsigned/
 enhanced/baseline/
 enhanced/dex-work/

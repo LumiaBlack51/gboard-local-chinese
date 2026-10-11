@@ -59,6 +59,22 @@ source+='''
 .end method
 '''
 (patches/'LatinFixedCountCandidatesHolderView.smali').write_text(source,encoding='utf8')
+rel=Path('com/google/android/libraries/inputmethod/widgets/SoftKeyboardView.smali')
+source=(ROOT/'gboard-18.4.1/smali/smali'/rel).read_text('utf8')
+anchor='.method public final dispatchTouchEvent(Landroid/view/MotionEvent;)Z\n    .locals 4\n'
+assert source.count(anchor)==1
+source=source.replace(anchor,anchor+'''
+    invoke-static {p0, p1}, Llocal/gboard/enhanced/KeyboardGestures;->touch(Landroid/view/View;Landroid/view/MotionEvent;)Z
+    move-result v0
+    if-eqz v0, :local_gesture_fallthrough
+    const/4 v0, 0x1
+    return v0
+    :local_gesture_fallthrough
+''')
+for method,hook in [('onAttachedToWindow()V','attach'),('onDetachedFromWindow()V','detached')]:
+  start=source.index(method);body_start=source.index('\n',source.index('.locals',start))+1
+  source=source[:body_start]+'    invoke-static {p0}, Llocal/gboard/enhanced/KeyboardGestures;->'+hook+'(Landroid/view/View;)V\n'+source[body_start:]
+(patches/'SoftKeyboardView.smali').write_text(source,encoding='utf8')
 source=(ROOT/'gboard-18.4.1'/'smali'/'smali'/'pbb.smali').read_text(encoding='utf8')
 anchor='.method public final aw(Loas;)Z\n    .locals 26\n'
 assert source.count(anchor)==1
@@ -107,13 +123,17 @@ with zipfile.ZipFile(base) as z,zipfile.ZipFile(unsigned,'w') as out:
     if info.filename=='AndroidManifest.xml':
       sys.path.insert(0,str(ROOT));from add_activity import add_activity,add_voice_access,management_launcher
       content=management_launcher(add_voice_access(add_activity(content,'local.gboard.enhanced.VoicePermissionActivity')))
-      if '--test' in sys.argv:content=add_activity(content,'local.gboard.enhanced.AdapterCheckActivity',True)
+      if '--test' in sys.argv:
+        content=add_activity(content,'local.gboard.enhanced.AdapterCheckActivity',True)
+        content=add_activity(content,'local.gboard.enhanced.GestureCheckActivity',True)
     out.writestr(info,content)
   out.write(dex/'classes.dex','classes5.dex',compress_type=zipfile.ZIP_DEFLATED)
-  for name in ['libgboard_local_rime.so','librime.so','libFcitx5Core.so','libFcitx5Config.so','libFcitx5Utils.so','libc++_shared.so']:
+  for name in ['libgboard_local_rime.so','librime.so','libFcitx5Core.so','libFcitx5Config.so','libFcitx5Utils.so','libc++_shared.so','libgboard_local_handwriting.so']:
     out.write(ROOT/'enhanced'/'native'/'lib'/'arm64-v8a'/name,'lib/arm64-v8a/'+name,compress_type=zipfile.ZIP_STORED)
   for f in (ROOT/'enhanced'/'rime-data').rglob('*'):
     if f.is_file() and f.name!='word-index.bin':out.write(f,'assets/local-rime/'+f.relative_to(ROOT/'enhanced'/'rime-data').as_posix(),compress_type=zipfile.ZIP_STORED if f.suffix=='.gram' else zipfile.ZIP_DEFLATED)
+  out.write(ROOT/'enhanced/handwriting-data/handwriting-zh_CN.model','assets/local-handwriting/handwriting-zh_CN.model',compress_type=zipfile.ZIP_DEFLATED)
+  for name in ['ZINNIA-LICENSE','TEGAKI-LICENSE','HANDWRITING-SOURCES.md']:out.write(ROOT/'enhanced'/name,'assets/licenses/'+name,compress_type=zipfile.ZIP_DEFLATED)
 out=ROOT/'enhanced'/'release';out.mkdir(exist_ok=True)
 run(BT/'zipalign.exe','-P','16','-f','4',unsigned,out/'aligned-base.apk')
 run(BT/'apksigner.bat','sign',*SIGN_ARGS,'--out',out/'base.apk',out/'aligned-base.apk')

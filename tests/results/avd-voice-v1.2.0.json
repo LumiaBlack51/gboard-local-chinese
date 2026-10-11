@@ -1,0 +1,49 @@
+{
+  "model": "sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20-mobile",
+  "fixtures": "Official model test_wavs/1.wav and locally synthesized Mandarin PCM16; no private recordings.",
+  "checks": {
+    "mixed": {
+      "fixture": true,
+      "ready": true,
+      "audio_started": false,
+      "ended": true,
+      "recognized": "这是第一种第二种叫呃与 ALWAYS ALWAYS什么意思啊",
+      "endpoint_finished": false,
+      "results": true
+    },
+    "mandarin": {
+      "fixture": true,
+      "ready": true,
+      "audio_started": false,
+      "ended": true,
+      "recognized": "今天下午召开会议请注意保护隐私",
+      "endpoint_finished": false,
+      "results": true
+    },
+    "auto_finish": {
+      "fixture": true,
+      "ready": true,
+      "audio_started": false,
+      "ended": true,
+      "recognized": "今天下午召开会议请注意保护隐私",
+      "endpoint_finished": true,
+      "results": true
+    },
+    "audio_stop": {
+      "fixture": false,
+      "ready": true,
+      "audio_started": true,
+      "ended": true,
+      "recognized": "",
+      "endpoint_finished": false,
+      "results": true
+    },
+    "audio_cancel": {
+      "fixture": false,
+      "ready": true,
+      "audio_started": true,
+      "cancel_requested": true
+    }
+  },
+  "passed": true
+}
