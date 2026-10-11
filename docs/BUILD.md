@@ -49,6 +49,10 @@ python enhanced/release_metadata.py
 
 语音调试测试需要 `enhanced/speech-fixture.wav`：16 kHz 单声道 PCM16，合成测试句“今天下午召开会议请注意保护隐私”；混说测试 `enhanced/speech-mixed.wav` 来自上述官方模型归档的 `test_wavs/1.wav`。`build_voice_helper.py --release` 不打包这些测试录音，也不开放测试音频入口。
 
+正式语音服务的包可见性和签名校验会拒绝独立测试客户端。使用 `python enhanced/build_releasetest.py` 构建同签名 instrumentation，安装到 AVD 后执行 `tests/run_release_voice_checks.py --serial emulator-XXXX`，在键盘 UID 下验证实际录音及正式版测试音频禁用。测试 APK 与目标键盘必须同签名；它不在正式发行中。
+
+更新回归在旧版 AVD 中通过管理应用点击“检查更新”，下载公开 GitHub 正式资产，依次确认安卓的三个组件更新和首次 Play Protect 扫描。`tests/verify_installed_update.py` 核对安装来源、版本、所有安装 APK 的哈希与键盘首次安装时间；`tests/verify_update_ui.py` 检查管理入口、成功提示和重复检查状态。`tests/verify_github_release.py` 比较全部九个上传文件的服务端哈希及大小。结果见 `tests/results/avd-installed-update-v1.1.json`。
+
 真机诊断仅在自建测试编辑框运行，禁止对聊天应用发送全局测试按键。不要为了测试启用讯飞联网。本次 AVD 中原版和增强版 Gboard 的 ARM 翻译运行均出现上游 native crash，因此将原生候选控件放在调试 Activity 中验证，并使用独立语音测试 APK；不把那个故障当成完整键盘界面通过验证。
 
 v1.0.0 曾在 Android 16 真机验证；v1.1.0 的新增功能在 AVD 验证，没有重新进行真机测试。仓库把宿主路径和签名设置改成环境配置，未从空环境重新完成全部底包及模型下载构建；不宣称逐字节可复现。

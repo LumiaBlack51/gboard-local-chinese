@@ -22,7 +22,7 @@ save('update-manifest.json',{'format':1,'version':'1.1.0','certificateSha256':ce
 save('release-manifest.json',{'tag':'v1.1.0','assets':assets})
 (ROOT/'SHA256SUMS.txt').write_text(''.join(a['sha256']+'  '+a['name']+'\n' for a in assets),encoding='ascii')
 source={}
-for folder in ['enhanced/src','enhanced/native','enhanced/voice-helper','enhanced/voicecheck','enhanced/testsrc','enhanced/updater','tools','probe/src','enhanced/enginecheck']:
+for folder in ['enhanced/src','enhanced/native','enhanced/voice-helper','enhanced/voicecheck','enhanced/testsrc','enhanced/updater','enhanced/releasetest','tools','probe/src','enhanced/enginecheck']:
  for path in (ROOT/folder).rglob('*'):
   if any(p in ('out','final','lib') for p in path.relative_to(ROOT).parts):continue
   if path.suffix in ('.java','.cpp','.h'):source[path.relative_to(ROOT).as_posix()]=hashlib.sha256(path.read_bytes().replace(b'\r\n',b'\n')).hexdigest()

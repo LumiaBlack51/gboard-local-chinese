@@ -19,6 +19,7 @@
   "enhanced/testsrc/local/gboard/enhanced/AdapterCheckActivity.java": "2f415e5956cf8e6e3bd2afd16aaa8a0f4df711513efd3c6eaa1d711ef878a081",
   "enhanced/updater/InstallReceiver.java": "73bb92e6d5733346e09cb7d5334d44222e6f2507424d04b55dd912b491d1bf51",
   "enhanced/updater/UpdateActivity.java": "5e892eeeaa1d31f2c40c4d32590579b3779f6f689a85bdbf2cb6c24f46a4f525",
+  "enhanced/releasetest/VoiceReleaseInstrumentation.java": "a548fa08c8c6e0b037ed21d73640f99608ac85b688291969aa82380d99bfd212",
   "tools/Assemble.java": "9bfbdc59148d4a85dfcdde71584243ee83acc2770c26330c50ea5e06d801fb19",
   "tools/DexTool.java": "173bd6c366bb5df541f2e169ff73ad8b861735cd565fcc4b11e14441150a2b0e",
   "probe/src/local/gboard/probe/DictionaryAccessService.java": "a6b45e5141f3ea687ad058b226c8f774812184f802a9383d4d781e2992b95cad",
