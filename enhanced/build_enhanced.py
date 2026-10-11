@@ -33,7 +33,18 @@ source=(ROOT/'gboard-18.4.1/smali/smali'/rel).read_text('utf8')
 start=source.index('.method public final D(Ljava/util/List;Ljava/util/ArrayList;)V');end=source.index('.end method',start)
 body=source[start:end].replace('    return-void','    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/EnhancedHook;->bindCandidateBar(Landroid/view/View;)V\n    return-void')
 source=source[:start]+body+source[end:]
+start=source.index('.method private final Q()I');end=source.index('.end method',start)
+body=source[start:end].replace('    .locals 3','    .locals 4\n    move-object v3, p0',1)
+assert body.count('    return p0')==1
+body=body.replace('    return p0','    invoke-static {v3, p0}, Llocal/gboard/enhanced/EnhancedHook;->candidateWidth(Landroid/view/View;I)I\n    move-result p0\n    return p0')
+source=source[:start]+body+source[end:]
 source+='''
+.method protected onLayout(ZIIII)V
+    .locals 0
+    invoke-super/range {p0 .. p5}, Landroid/widget/LinearLayout;->onLayout(ZIIII)V
+    invoke-static {p0}, Llocal/gboard/enhanced/EnhancedHook;->layoutDismissButton(Landroid/view/View;)V
+    return-void
+.end method
 .method protected onAttachedToWindow()V
     .locals 0
     invoke-super {p0}, Landroid/widget/LinearLayout;->onAttachedToWindow()V

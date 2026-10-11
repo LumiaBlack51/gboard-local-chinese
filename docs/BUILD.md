@@ -45,11 +45,15 @@ python enhanced/release_metadata.py
 
 ## 独立验证
 
-测试源码位于 `enhanced/testsrc`、`enhanced/enginecheck`、`enhanced/voicecheck` 与 `probe`。`python enhanced/build_enhanced.py --test` 添加仅调试版的 AdapterCheckActivity，运行实际适配器、Rime 与原生候选控件；正式版必须重新运行不带 `--test` 的构建命令，避免保留测试 Activity。其他构建入口为相应 `build_*.py` 或 `probe/build.ps1`。
+测试源码位于 `enhanced/testsrc`、`enhanced/enginecheck`、`enhanced/voicecheck` 与 `probe`。`python enhanced/build_enhanced.py --test` 添加 AdapterCheckActivity，再运行 `python enhanced/make_debug.py` 输出同版本号、debuggable 的四个 AVD APK 到 `enhanced/build/test-apks`。正式版必须重新运行不带 `--test` 的构建命令，避免保留测试 Activity。其他构建入口为相应 `build_*.py` 或 `probe/build.ps1`。
+
+1.1.1 的语音交互测试使用 `build_voicecheck.py` 生成的独立测试 APK；它将当前源码的 VoiceHook 放进 `HookCheckService` 测试输入法，在 `HookCheckActivity` 的合成编辑框中运行。仅在 AVD 选中测试输入法、启动此 Activity；它触发一次模拟麦克风命令，不再点击开始或确认，随后检查文字直接填入及面板关闭。结束后恢复原输入法，运行 `tests/run_avd_regression.py --serial emulator-XXXX` 汇总候选、语音、自动结束和录音生命周期回归。不得在个人手机或聊天应用运行这个测试输入法。
 
 语音调试测试需要 `enhanced/speech-fixture.wav`：16 kHz 单声道 PCM16，合成测试句“今天下午召开会议请注意保护隐私”；混说测试 `enhanced/speech-mixed.wav` 来自上述官方模型归档的 `test_wavs/1.wav`。`build_voice_helper.py --release` 不打包这些测试录音，也不开放测试音频入口。
 
 正式语音服务的包可见性和签名校验会拒绝独立测试客户端。使用 `python enhanced/build_releasetest.py` 构建同签名 instrumentation，安装到 AVD 后执行 `tests/run_release_voice_checks.py --serial emulator-XXXX`，在键盘 UID 下验证实际录音及正式版测试音频禁用。测试 APK 与目标键盘必须同签名；它不在正式发行中。
+
+语音回调遵循 [Android 15 RecognitionService 的会话与归因约定](https://raw.githubusercontent.com/aosp-mirror/platform_frameworks_base/android15-release/core/java/android/speech/RecognitionService.java)：对应 Callback 处理停止/取消，返回识别结果前关闭麦克风。正式包回归包含停止、取消及取消后再次开始，验证连续会话不会互相干扰。
 
 更新回归在旧版 AVD 中通过管理应用点击“检查更新”，下载公开 GitHub 正式资产，依次确认安卓的三个组件更新和首次 Play Protect 扫描。`tests/verify_installed_update.py` 核对安装来源、版本、所有安装 APK 的哈希与键盘首次安装时间；`tests/verify_update_ui.py` 检查管理入口、成功提示和重复检查状态。`tests/verify_github_release.py` 比较全部九个上传文件的服务端哈希及大小。结果见 `tests/results/avd-installed-update-v1.1.json`。
 

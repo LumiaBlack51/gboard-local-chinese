@@ -1,53 +1,53 @@
 {
   "format": 1,
-  "version": "1.1.0",
+  "version": "1.1.1",
   "certificateSha256": "ca8e7c0c1f35a1821fc417499635e5bc8c0a774edaf19e2682f1cb6040154c74",
-  "notes": "离线中英混说、联想关闭按钮、候选翻页修复、回车提交原始拼音、应用内更新。",
+  "notes": "语音点即开始、停顿后直接填入；展开候选与关闭联想分离，未确认拼音时不显示 ×。",
   "components": [
     {
       "package": "com.localx.android.inputmethod.latin",
-      "versionCode": 176027079,
+      "versionCode": 176027080,
       "assets": [
         {
           "name": "base.apk",
-          "sha256": "6907ccc9249396fe1cfc38ef296d95d268606f573b75f46fdcc47116e31e0f41",
+          "sha256": "f152fb645648a26dbda12a2744a679ed99a14aeaf252096717d2a1b1741c991b",
           "size": 549139755
         },
         {
           "name": "split_brella_feature_split.apk",
-          "sha256": "d7fd93e2024a46fb52a163862b71ade0e5ccddb422822e8b96d95b680555012e",
+          "sha256": "96475b38194c2969c83d94fd8fe1fa3022864429479b03aefa95a11c3a9dbb0b",
           "size": 35656040
         },
         {
           "name": "split_config.xxxhdpi.apk",
-          "sha256": "c5345477899d8dd36bc58de87c5de7cc91762c9870260babd362acb15a09a0fd",
+          "sha256": "f88642f784bf66f6e07fe9c4f25bf90ea7df862d52bd3b1fdccfdbceaf7901c1",
           "size": 129884
         },
         {
           "name": "split_tenoranimation_feature_split.apk",
-          "sha256": "9c6a018c1a029dad8394efb4c66c0454a9ced3d15c9ea4fd4ba9876e845527f6",
+          "sha256": "d40d317fc095906ca3e91f396afcb1047ff4903e6d5e1040ad8bcadb2b3d4058",
           "size": 11321708
         }
       ]
     },
     {
       "package": "local.gboard.voice",
-      "versionCode": 2,
+      "versionCode": 3,
       "assets": [
         {
           "name": "voice-helper.apk",
-          "sha256": "e907c05d4629d8e5b4439f486aae2c39f10472513c3c0b8738c09a1a8daa0f0a",
+          "sha256": "b6fe03c595d787c4e33b5157c4a2c87807d4fa2e436d85c6303cae58f932c086",
           "size": 166978955
         }
       ]
     },
     {
       "package": "local.gboard.updater",
-      "versionCode": 2,
+      "versionCode": 3,
       "assets": [
         {
           "name": "updater.apk",
-          "sha256": "4ffc5c888479937484ed5f50a5f1804c9242d766fd5469039bb7772ff1ecdd46",
+          "sha256": "d66433b8f87c533dc2402df9f65384a690514fd60a90eb08ec46c65d42c21328",
           "size": 20817
         }
       ]

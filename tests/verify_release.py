@@ -37,6 +37,6 @@ for component in manifest['components']:
      name='lib/arm64-v8a/libintegrated_shared_object.so'
      assert sha(z.read(name))==sha(original.read(name))
   checks.append({'asset':path.name,'versionCode':component['versionCode'],'sha256':asset['sha256'],'signature_verified':True,'zipalign_16k_verified':True})
-result={'release':'v1.1.0','apks':checks,'keyboard_native_decoder_unchanged':True,'keyboard_and_voice_have_no_internet':True,'debug_and_backup_disabled':True,'debug_test_activity_and_fixtures_excluded':True,'passed':True}
-(ROOT/'tests/results/release-v1.1.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf8')
+result={'release':'v1.1.1','apks':checks,'keyboard_native_decoder_unchanged':True,'keyboard_and_voice_have_no_internet':True,'debug_and_backup_disabled':True,'debug_test_activity_and_fixtures_excluded':True,'passed':True}
+(ROOT/'tests/results/release-v1.1.1.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf8')
 print('Verified all six signed APKs, versions, metadata, permissions and native decoder.')

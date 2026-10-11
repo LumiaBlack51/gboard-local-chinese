@@ -23,7 +23,7 @@ public final class Diagnostics {
       trace(service,"fixture window attached="+service.getWindow().getWindow().getDecorView().isAttachedToWindow()+"; token="+(service.getWindow().getWindow().getDecorView().getWindowToken()!=null));
       try{
         Method factory=Class.forName("oas").getDeclaredMethod("e",int.class,Object.class);factory.setAccessible(true);Object event=factory.invoke(null,-10042,"");
-        boolean handled=VoiceHook.handle(service,event);if(handled)VoiceHook.startFixture();
+        VoiceHook.handle(service,event);
       }catch(Throwable error){android.util.Log.e("LocalVoice","Diagnostic fixture failed",error);}
     }},new IntentFilter("local.gboard.enhanced.TEST_FIXTURE"),"android.permission.DUMP",null,Context.RECEIVER_EXPORTED);
   }

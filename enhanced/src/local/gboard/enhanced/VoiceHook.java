@@ -37,35 +37,37 @@ public final class VoiceHook {
   }
   private static void show(InputMethodService service,EditorInfo editor){
     Run run=new Run();run.service=service;run.editor=editor;run.connection=service.getCurrentInputConnection();active=run;
-    run.status=new TextView(service);run.status.setTextSize(19);run.status.setPadding(36,28,36,28);run.status.setText("支持普通话和英文混说。点击开始后录音，音频不保存。首次载入模型需要几秒。");
-    run.dialog=new AlertDialog.Builder(service).setTitle("本地语音输入").setView(run.status).setPositiveButton("开始",null).setNegativeButton("取消",(d,w)->cancel(run)).create();
+    run.status=new TextView(service);run.status.setTextSize(19);run.status.setPadding(36,28,36,28);
+    run.fixture=Diagnostics.isDebug(service)&&new File(service.getNoBackupFilesDir(),"voice-test.pcm").isFile();
+    if(run.fixture)new File(service.getNoBackupFilesDir(),"voice-test.pcm").delete();
+    run.dialog=new AlertDialog.Builder(service).setTitle("本地语音输入").setView(run.status).setPositiveButton("结束录音",null).setNegativeButton("取消",(d,w)->cancel(run)).create();
     run.dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_ATTACHED_DIALOG);
     run.dialog.getWindow().getAttributes().token=service.getWindow().getWindow().getDecorView().getWindowToken();
     run.dialog.setOnCancelListener(d->cancel(run));run.dialog.show();Diagnostics.trace(service,"dialog shown");
-    run.dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{if(run.started){run.recognizer.stopListening();run.status.setText("正在结束识别…");v.setEnabled(false);}else record(run);});
+    run.dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{if(run.recognizer!=null){run.recognizer.stopListening();run.status.setText("正在结束识别…");v.setEnabled(false);}});
+    record(run);
   }
-  static void startFixture(){Run run=active;if(run!=null&&Diagnostics.isDebug(run.service)&&new File(run.service.getNoBackupFilesDir(),"voice-test.pcm").isFile()){run.fixture=true;new File(run.service.getNoBackupFilesDir(),"voice-test.pcm").delete();run.dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();}}
   private static void cancel(Run run){run.cancel=true;if(run.recognizer!=null){run.recognizer.cancel();run.recognizer.destroy();run.recognizer=null;}if(active==run)active=null;}
   public static void hidden(Object owner){Run run=active;if(run!=null&&run.service==owner){Diagnostics.trace(run.service,"keyboard hidden; cancelling");cancel(run);run.dialog.dismiss();}}
   private static void record(Run run){
-    run.started=true;run.dialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("完成");run.status.setText("正在载入离线语音…");
+    run.started=true;run.status.setText("正在载入离线语音…");
     run.recognizer=SpeechRecognizer.createSpeechRecognizer(run.service,new ComponentName(HELPER,"local.gboard.voice.OfflineRecognitionService"));
     run.recognizer.setRecognitionListener(new RecognitionListener(){
-      public void onReadyForSpeech(Bundle b){if(!run.cancel)run.status.setText("正在听，可混说普通话和英文…");}
+      public void onReadyForSpeech(Bundle b){if(!run.cancel)run.status.setText("正在听，可混说普通话和英文。停顿后自动填入，也可点结束录音。");}
       public void onBeginningOfSpeech(){}
       public void onRmsChanged(float value){}
       public void onBufferReceived(byte[] audio){}
       public void onEndOfSpeech(){if(!run.cancel)run.status.setText("正在结束识别…");}
       public void onPartialResults(Bundle b){ArrayList<String> words=b.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);if(!run.cancel&&words!=null&&!words.isEmpty())run.status.setText(words.get(0));}
       public void onEvent(int type,Bundle b){}
-      public void onError(int error){if(run.cancel)return;Diagnostics.trace(run.service,"recognition error="+error);run.status.setText("离线识别未完成，请取消后重试。");run.started=false;run.dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);if(run.recognizer!=null){run.recognizer.destroy();run.recognizer=null;}}
+      public void onError(int error){if(run.cancel)return;Diagnostics.trace(run.service,"recognition error="+error);Toast.makeText(run.service,"离线识别未完成，请重试",Toast.LENGTH_SHORT).show();cancel(run);run.dialog.dismiss();}
       public void onResults(Bundle b){if(run.cancel)return;ArrayList<String> words=b.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);String text=words==null||words.isEmpty()?"":words.get(0);
         if(run.service.getCurrentInputEditorInfo()!=run.editor){Diagnostics.trace(run.service,"editor changed; cancelled");cancel(run);run.dialog.dismiss();return;}
-        if(!text.isEmpty()&&run.connection!=null){boolean ok=run.connection.commitText(text,1);Diagnostics.trace(run.service,"commit result="+ok+"; chars="+text.length());}else Toast.makeText(run.service,"没有识别到语音",Toast.LENGTH_SHORT).show();
+        if(!text.isEmpty()&&run.connection!=null){boolean ok=run.connection.commitText(text,1);if(ok)EnhancedHook.voiceCommitted(text);Diagnostics.trace(run.service,"commit result="+ok+"; chars="+text.length());}else Toast.makeText(run.service,"没有识别到语音",Toast.LENGTH_SHORT).show();
         active=null;run.recognizer.destroy();run.recognizer=null;run.dialog.dismiss();
       }
     });
-    Intent request=new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).putExtra(RecognizerIntent.EXTRA_LANGUAGE,"zh-CN").putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM).putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE,true).putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS,true).putExtra("local_fixture",run.fixture);
+    Intent request=new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).putExtra(RecognizerIntent.EXTRA_LANGUAGE,"zh-CN").putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM).putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE,true).putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS,true).putExtra("local_fixture",run.fixture).putExtra("local_auto_finish",true);
     run.recognizer.startListening(request);
   }
 }

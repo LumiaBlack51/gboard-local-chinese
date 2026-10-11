@@ -12,7 +12,7 @@ public final class VoiceReleaseInstrumentation extends Instrumentation {
   public void onStart(){Bundle output=new Bundle();try{
     Context target=getTargetContext();Intent launch=new Intent().setClassName(target.getPackageName(),"local.gboard.enhanced.ManagementActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     target.startActivity(launch);SystemClock.sleep(1500);JSONObject checks=new JSONObject();
-    for(String label:new String[]{"fixture_rejected","audio_stop","audio_cancel"}){
+    for(String label:new String[]{"fixture_rejected","audio_stop","audio_cancel","audio_stop_after_cancel"}){
       android.util.Log.i("ReleaseVoiceTest",label);
       JSONObject report=new JSONObject();CountDownLatch done=new CountDownLatch(1);SpeechRecognizer[] recognizer=new SpeechRecognizer[1];boolean[] finished={false};
       runOnMainSync(()->{recognizer[0]=SpeechRecognizer.createSpeechRecognizer(target,new ComponentName("local.gboard.voice","local.gboard.voice.OfflineRecognitionService"));
@@ -29,6 +29,8 @@ public final class VoiceReleaseInstrumentation extends Instrumentation {
       });
       if(!done.await(120,TimeUnit.SECONDS))throw new Exception(label+" timeout");
       runOnMainSync(()->recognizer[0].destroy());
+      // Allow Android's asynchronous service unbind to finish before creating another client.
+      SystemClock.sleep(750);
       if(label.equals("fixture_rejected")){if(report.optInt("error",-1)!=5)throw new Exception("Release fixture guard: "+report);}
       else if(report.has("error")||!report.optBoolean("ready")||!report.optBoolean("audio_started")||(!label.equals("audio_cancel")&&(!report.optBoolean("ended")||!report.optBoolean("results")))||label.equals("audio_cancel")&&!report.optBoolean("cancel_requested"))throw new Exception(label+": "+report);
       checks.put(label,report);

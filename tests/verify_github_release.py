@@ -4,7 +4,7 @@ from pathlib import Path
 p=argparse.ArgumentParser();p.add_argument('--gh',default='gh');a=p.parse_args()
 root=Path(__file__).resolve().parent.parent
 def gh(*args):return json.loads(subprocess.check_output([a.gh,*args],encoding='utf8'))
-release=gh('release','view','v1.1.0','--repo','LumiaBlack51/gboard-local-chinese','--json','assets,isDraft,tagName,url')
+release=gh('release','view','v1.1.1','--repo','LumiaBlack51/gboard-local-chinese','--json','assets,isDraft,tagName,url')
 repo=gh('repo','view','LumiaBlack51/gboard-local-chinese','--json','visibility')
 assert repo['visibility']=='PUBLIC'
 local={x['name']:root/x['file'] for x in json.loads((root/'release-manifest.json').read_text('utf8'))['assets']}

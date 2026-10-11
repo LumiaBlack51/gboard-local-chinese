@@ -1,0 +1,37 @@
+{
+  "release": "1.1.1",
+  "method": "ADB replacement install on AVD; no application data cleared.",
+  "checks": [
+    {
+      "package": "com.localx.android.inputmethod.latin",
+      "asset": "base.apk",
+      "installed_sha256_matches_release": true
+    },
+    {
+      "package": "com.localx.android.inputmethod.latin",
+      "asset": "split_brella_feature_split.apk",
+      "installed_sha256_matches_release": true
+    },
+    {
+      "package": "com.localx.android.inputmethod.latin",
+      "asset": "split_config.xxxhdpi.apk",
+      "installed_sha256_matches_release": true
+    },
+    {
+      "package": "com.localx.android.inputmethod.latin",
+      "asset": "split_tenoranimation_feature_split.apk",
+      "installed_sha256_matches_release": true
+    },
+    {
+      "package": "local.gboard.voice",
+      "asset": "voice-helper.apk",
+      "installed_sha256_matches_release": true
+    },
+    {
+      "package": "local.gboard.updater",
+      "asset": "updater.apk",
+      "installed_sha256_matches_release": true
+    }
+  ],
+  "passed": true
+}

@@ -124,6 +124,12 @@ public final class EnhancedHook {
     else{commit(s,s.raw);RimeBridge.clear(s.id);update(s);}
   }
   public static synchronized void finishActive()throws Exception {if(active!=null&&active.composing)finish(active);}
+  public static synchronized void voiceCommitted(String text){
+    try{if(active==null||!RimeBridge.ready||active.id==0)return;Session s=active;s.dismissed=false;
+      s.context+=text;if(s.context.length()>32)s.context=s.context.substring(s.context.length()-32);
+      RimeBridge.clear(s.id);update(s);
+    }catch(Throwable error){Log.e("LocalChinese","Voice predictions failed",error);}
+  }
   public static synchronized boolean handleEnter(Object event){
     try{Object key=call(event,"g");if(key==null||active==null||!active.composing)return false;int code=(Integer)get(key,"c");if(code!=66&&code!=-10009)return false;return key(active,event);}
     catch(Throwable error){Log.e("LocalChinese","Literal Enter failed",error);return false;}
@@ -180,35 +186,41 @@ public final class EnhancedHook {
   }
   private static final Map<View,BarControl> bars=new WeakHashMap<>();
   private static class BarControl {
-    final java.lang.ref.WeakReference<android.widget.TextView> button;final int padding,size;
-    BarControl(android.widget.TextView b,int p,int s){button=new java.lang.ref.WeakReference<>(b);padding=p;size=s;}
+    final java.lang.ref.WeakReference<android.widget.TextView> button;final int size;
+    BarControl(android.widget.TextView b,int s){button=new java.lang.ref.WeakReference<>(b);size=s;}
   }
-  /** Reserve a real touch target at the strip's right edge, leaving expansion available. */
+  /** A separate child of the candidate strip; never cover or replace its native expansion key. */
   public static synchronized void bindCandidateBar(View bar){
-    if(!(bar.getParent() instanceof android.view.ViewGroup))return;
+    if(!(bar instanceof android.view.ViewGroup))return;
     BarControl previous=bars.get(bar);
     if(previous!=null){android.widget.TextView button=previous.button.get();
-      if(button!=null&&button.getParent()==bar.getParent()){refreshCandidateBars();return;}
-      if(button!=null&&button.getParent() instanceof android.view.ViewGroup){android.view.ViewGroup old=(android.view.ViewGroup)button.getParent();old.removeView(button);if(!(old instanceof android.widget.LinearLayout))old.setPadding(old.getPaddingLeft(),old.getPaddingTop(),previous.padding,old.getPaddingBottom());}
+      if(button!=null&&button.getParent()==bar){refreshCandidateBars();return;}
+      if(button!=null&&button.getParent() instanceof android.view.ViewGroup)((android.view.ViewGroup)button.getParent()).removeView(button);
       bars.remove(bar);
     }
-    android.view.ViewGroup parent=(android.view.ViewGroup)bar.getParent();
     android.widget.TextView close=new android.widget.TextView(bar.getContext());
     close.setText("×");close.setTextSize(25);close.setGravity(android.view.Gravity.CENTER);
     close.setContentDescription("关闭联想候选，恢复工具栏");close.setFocusable(true);
+    close.setVisibility(View.GONE);
     int size=(int)(48*bar.getResources().getDisplayMetrics().density+0.5f);
     android.util.TypedValue color=new android.util.TypedValue();bar.getContext().getTheme().resolveAttribute(android.R.attr.textColorPrimary,color,true);
     if(color.resourceId!=0)close.setTextColor(bar.getContext().getColor(color.resourceId));
-    int originalPadding=parent.getPaddingRight();
-    if(parent instanceof android.widget.LinearLayout)parent.addView(close,new android.widget.LinearLayout.LayoutParams(size,android.view.ViewGroup.LayoutParams.MATCH_PARENT));
-    else{
-      parent.addView(close,new android.view.ViewGroup.LayoutParams(size,size));
-      parent.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{if(close.getVisibility()==View.VISIBLE){int height=bar.getHeight(),top=bar.getTop();close.layout(parent.getWidth()-size,top,parent.getWidth(),top+height);}});
-      close.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{int left=parent.getWidth()-size,top=bar.getTop(),bottom=top+bar.getHeight();if(close.getVisibility()==View.VISIBLE&&(l!=left||t!=top||r!=parent.getWidth()||b!=bottom))close.layout(left,top,parent.getWidth(),bottom);});
-    }
-    bars.put(bar,new BarControl(close,originalPadding,size));
+    ((android.view.ViewGroup)bar).addView(close,new android.widget.LinearLayout.LayoutParams(size,android.view.ViewGroup.LayoutParams.MATCH_PARENT));
+    bars.put(bar,new BarControl(close,size));
     close.setOnClickListener(v->{synchronized(EnhancedHook.class){try{if(active!=null)dismiss(active);}catch(Throwable error){Log.e("LocalChinese","Dismiss failed",error);}}});
     refreshCandidateBars();
+  }
+  public static synchronized int candidateWidth(View bar,int nativeWidth){
+    BarControl control=bars.get(bar);TextView close=control==null?null:control.button.get();
+    return Math.max(1,nativeWidth-(close!=null&&close.getVisibility()==View.VISIBLE?control.size:0));
+  }
+  public static synchronized void layoutDismissButton(View bar){
+    BarControl control=bars.get(bar);TextView close=control==null?null:control.button.get();
+    if(close==null||close.getVisibility()!=View.VISIBLE)return;
+    int expansion=0;
+    try{View more=(View)get(bar,"a");if(more!=null&&more.getVisibility()==View.VISIBLE)expansion=more.getWidth()>0?more.getWidth():more.getMeasuredWidth();}catch(Exception ignored){}
+    int right=Math.max(0,bar.getWidth()-expansion),left=Math.max(0,right-control.size);
+    close.layout(left,0,right,bar.getHeight());
   }
   private static void refreshCandidateBars(){
     if(android.os.Looper.myLooper()!=android.os.Looper.getMainLooper()){
@@ -216,12 +228,13 @@ public final class EnhancedHook {
     }
     for(Map.Entry<View,BarControl> entry:bars.entrySet()){
       android.widget.TextView close=entry.getValue().button.get();if(close==null)continue;
-      android.view.ViewGroup parent=(android.view.ViewGroup)close.getParent();
-      boolean nativeSuggestions=false;
-      try{nativeSuggestions=(Integer)get(entry.getKey(),"f")>0&&active!=null&&!(Boolean)get(active.processor,"n");}catch(Exception ignored){}
-      boolean visible=active!=null&&!active.composing&&(active.suggesting||nativeSuggestions)&&entry.getKey().getVisibility()==View.VISIBLE;
+      boolean nativeSuggestions=false,nativeComposing=false;
+      try{nativeSuggestions=(Integer)get(entry.getKey(),"f")>0;if(active!=null)nativeComposing=(Boolean)get(active.processor,"n");}catch(Exception ignored){}
+      boolean visible=active!=null&&!active.dismissed&&!active.composing&&!nativeComposing&&(active.suggesting||nativeSuggestions)&&entry.getKey().getVisibility()==View.VISIBLE;
+      boolean changed=(close.getVisibility()==View.VISIBLE)!=visible;
       close.setVisibility(visible?View.VISIBLE:View.GONE);
-      if(!(parent instanceof android.widget.LinearLayout))parent.setPadding(parent.getPaddingLeft(),parent.getPaddingTop(),entry.getValue().padding+(visible?entry.getValue().size:0),parent.getPaddingBottom());
+      if(changed){try{call(entry.getKey(),"N");}catch(Exception ignored){}entry.getKey().requestLayout();}
+      layoutDismissButton(entry.getKey());
     }
   }
   private static void move(Session s,int position)throws Exception {

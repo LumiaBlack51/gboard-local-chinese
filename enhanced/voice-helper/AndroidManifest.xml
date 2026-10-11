@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.gboard.voice" android:versionCode="2" android:versionName="1.1.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.gboard.voice" android:versionCode="3" android:versionName="1.1.1">
   <uses-sdk android:minSdkVersion="32" android:targetSdkVersion="35" />
   <uses-permission android:name="android.permission.RECORD_AUDIO" />
   <queries><package android:name="com.localx.android.inputmethod.latin" /><package android:name="local.gboard.voicecheck" /></queries>
