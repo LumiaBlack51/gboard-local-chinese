@@ -21,7 +21,7 @@ public final class VoiceCheckActivity extends Activity {
       public void onError(int error){value("error",error);finishReport();}
       public void onResults(Bundle b){ArrayList<String> words=b.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);value("recognized",words==null||words.isEmpty()?"":words.get(0));value("results",true);finishReport();}
     });
-    recognizer.startListening(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).putExtra(RecognizerIntent.EXTRA_LANGUAGE,"zh-CN").putExtra("local_fixture",fixture));
+    recognizer.startListening(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).putExtra(RecognizerIntent.EXTRA_LANGUAGE,"zh-CN").putExtra("local_fixture",fixture).putExtra("mixed_fixture",getIntent().getBooleanExtra("mixed",false)));
   }
   public void onDestroy(){if(recognizer!=null){recognizer.cancel();recognizer.destroy();recognizer=null;}super.onDestroy();}
 }

@@ -11,7 +11,7 @@
 3. 官方 Fcitx5 Android 与 Rime 插件 ARM64 包 `0.1.3-0-g048f581c`，文件名见依赖清单，放在项目根。基础包提供 Fcitx5 / C++ 库，Rime 插件提供 librime。
 4. 原雾凇归档放在 `enhanced/rime-ice.zip`；执行 `python enhanced/prepare_data.py` 提取词典与运行库，再执行 `python enhanced/build_word_index.py` 生成 GBI3 索引。确切词典原文 SHA-256 见 `enhanced/rime-data/source-hashes.json`。
 5. RIME-LMDG LTS 的 `wanxiang-lts-zh-hans.gram` 放在 `enhanced/rime-data/`，其大小与哈希见依赖清单。
-6. Vosk Android 0.3.75 AAR 放在 `enhanced/vosk-android-0.3.75.aar`，取其中 `jni/arm64-v8a/libvosk.so` 放到 `enhanced/native/lib/arm64-v8a/`。解压 `vosk-model-small-cn-0.22` 内容到 `enhanced/voice-data/`，该目录直接包含 `am`、`conf`、`graph`、`ivector`。
+6. 取得官方 `sherpa-onnx-v1.13.8-android.tar.bz2`。取 ARM64 与 x86_64 的 `libonnxruntime.so`、`libsherpa-onnx-c-api.so` 到对应 `enhanced/native/lib/<ABI>/`。取得官方 `sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20-mobile.tar.bz2`，将量化 encoder、未量化 decoder、量化 joiner 及 tokens 放到 `enhanced/voice-data/`，文件名依次为 `encoder.int8.onnx`、`decoder.onnx`、`joiner.int8.onnx`、`tokens.txt`。
 
 获取自己设备 APK 的示例：
 
@@ -37,14 +37,18 @@ python enhanced/build_baseline.py
 python enhanced/build_enhanced.py
 python enhanced/make_release.py
 python enhanced/build_voice_helper.py --release
+python enhanced/build_updater.py
+python enhanced/release_metadata.py
 ```
 
-输出是 `enhanced/final/` 的四个签名键盘 APK 与 `enhanced/voice-helper/final/voice-helper.apk`。检查 apksigner verify、zipalign 16 KiB 页对齐、两个 APK 无 INTERNET / 无备份 / 无调试标志，及原 `libintegrated_shared_object.so` 内容哈希一致。
+输出是 `enhanced/final/` 的四个键盘 APK、`enhanced/voice-helper/final/voice-helper.apk` 和 `enhanced/updater/out/updater.apk`。检查 apksigner verify、zipalign 16 KiB 页对齐、键盘和语音无 INTERNET / 无备份 / 无调试标志，及原 `libintegrated_shared_object.so` 内容哈希一致。
 
 ## 独立验证
 
-测试源码位于 `enhanced/enginecheck`、`enhanced/voicecheck` 与 `probe`，构建入口为相应 `build_*.py` 或 `probe/build.ps1`。语音调试测试还需要 `enhanced/speech-fixture.wav`：16 kHz 单声道 PCM16，公开测试句“今天下午召开会议请注意保护隐私”。可在本机生成；未上传任何真人录音。
+测试源码位于 `enhanced/testsrc`、`enhanced/enginecheck`、`enhanced/voicecheck` 与 `probe`。`python enhanced/build_enhanced.py --test` 添加仅调试版的 AdapterCheckActivity，运行实际适配器、Rime 与原生候选控件；正式版必须重新运行不带 `--test` 的构建命令，避免保留测试 Activity。其他构建入口为相应 `build_*.py` 或 `probe/build.ps1`。
 
-真机诊断仅在自建测试编辑框运行，禁止对聊天应用发送全局测试按键。正式版不注册合成音频诊断入口。不要为了测试启用讯飞联网。本次 AVD 中原版和增强版 Gboard 的 ARM 翻译运行均出现上游 native crash，因此 AVD 使用独立引擎与语音测试 APK，不把那个故障当成增强版界面通过验证。
+语音调试测试需要 `enhanced/speech-fixture.wav`：16 kHz 单声道 PCM16，合成测试句“今天下午召开会议请注意保护隐私”；混说测试 `enhanced/speech-mixed.wav` 来自上述官方模型归档的 `test_wavs/1.wav`。`build_voice_helper.py --release` 不打包这些测试录音，也不开放测试音频入口。
 
-Release 安装包来自已完成真机测试的本地构建。本仓库把宿主路径和签名设置改成环境配置，未从空环境重新完成全部底包及模型下载构建；不宣称逐字节可复现。
+真机诊断仅在自建测试编辑框运行，禁止对聊天应用发送全局测试按键。不要为了测试启用讯飞联网。本次 AVD 中原版和增强版 Gboard 的 ARM 翻译运行均出现上游 native crash，因此将原生候选控件放在调试 Activity 中验证，并使用独立语音测试 APK；不把那个故障当成完整键盘界面通过验证。
+
+v1.0.0 曾在 Android 16 真机验证；v1.1.0 的新增功能在 AVD 验证，没有重新进行真机测试。仓库把宿主路径和签名设置改成环境配置，未从空环境重新完成全部底包及模型下载构建；不宣称逐字节可复现。

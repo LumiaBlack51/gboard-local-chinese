@@ -20,13 +20,43 @@
     "sha256": "6169f35d48aa1018e6effd16cb6ae07f307964cffe5d8c79b97faf2164693bec"
   },
   {
-    "file": "enhanced/vosk-android-0.3.75.aar",
-    "bytes": 13472638,
-    "sha256": "ab2f8b91ac8051561aa325546b35fed9a68b36b8121bac5c6fb927525c4adfad"
+    "file": "enhanced/voice-data/decoder.onnx",
+    "bytes": 13876452,
+    "sha256": "2e3b5ec371f8899ee6acd829fd753ba45772df57a91bdf37cde3136354e7db7d"
   },
   {
-    "file": "enhanced/vosk-small-cn.zip",
-    "bytes": 43898754,
-    "sha256": "3af8b0e7e0f835ae9d414ce5df580237a3cfb08d586c9fbbb0f7ff29ad5b14ba"
+    "file": "enhanced/voice-data/encoder.int8.onnx",
+    "bytes": 105276499,
+    "sha256": "f559f422d970323e0c266aaa3c56cf6d1a3a4bc0c0822124727686c1e43e9447"
+  },
+  {
+    "file": "enhanced/voice-data/joiner.int8.onnx",
+    "bytes": 3228404,
+    "sha256": "1ed689c5ed19dbaa725d9d191bb4822b5f4855a39e1ffd28cbc1f340d25b2ee0"
+  },
+  {
+    "file": "enhanced/voice-data/tokens.txt",
+    "bytes": 56317,
+    "sha256": "a8e0e4ec53810e433789b54a5c0134a7eaa2ffca595a6334d54c00da858841d3"
+  },
+  {
+    "file": "enhanced/native/lib/arm64-v8a/libonnxruntime.so",
+    "bytes": 22249560,
+    "sha256": "33847ad43bffe204699fd4a27f7f3603452a8cdaf2f9a44983a0bc31ffcf2da1"
+  },
+  {
+    "file": "enhanced/native/lib/arm64-v8a/libsherpa-onnx-c-api.so",
+    "bytes": 4465168,
+    "sha256": "c85e2382e2ca12b0513826be926eaccfea896b4cbf568182e287671ba526f80d"
+  },
+  {
+    "file": "enhanced/native/lib/x86_64/libonnxruntime.so",
+    "bytes": 25581120,
+    "sha256": "087e84297cad64acb823c3d901d6e0cc934e91add7cdb20da802cd1c0bea5c3e"
+  },
+  {
+    "file": "enhanced/native/lib/x86_64/libsherpa-onnx-c-api.so",
+    "bytes": 4927096,
+    "sha256": "631ca2828e47b61d8afe4b3c75a157423cbafaba6f8c0db89c27d21f1b173d9a"
   }
 ]

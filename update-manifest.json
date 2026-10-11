@@ -1,0 +1,56 @@
+{
+  "format": 1,
+  "version": "1.1.0",
+  "certificateSha256": "ca8e7c0c1f35a1821fc417499635e5bc8c0a774edaf19e2682f1cb6040154c74",
+  "notes": "离线中英混说、联想关闭按钮、候选翻页修复、回车提交原始拼音、应用内更新。",
+  "components": [
+    {
+      "package": "com.localx.android.inputmethod.latin",
+      "versionCode": 176027079,
+      "assets": [
+        {
+          "name": "base.apk",
+          "sha256": "6907ccc9249396fe1cfc38ef296d95d268606f573b75f46fdcc47116e31e0f41",
+          "size": 549139755
+        },
+        {
+          "name": "split_brella_feature_split.apk",
+          "sha256": "d7fd93e2024a46fb52a163862b71ade0e5ccddb422822e8b96d95b680555012e",
+          "size": 35656040
+        },
+        {
+          "name": "split_config.xxxhdpi.apk",
+          "sha256": "c5345477899d8dd36bc58de87c5de7cc91762c9870260babd362acb15a09a0fd",
+          "size": 129884
+        },
+        {
+          "name": "split_tenoranimation_feature_split.apk",
+          "sha256": "9c6a018c1a029dad8394efb4c66c0454a9ced3d15c9ea4fd4ba9876e845527f6",
+          "size": 11321708
+        }
+      ]
+    },
+    {
+      "package": "local.gboard.voice",
+      "versionCode": 2,
+      "assets": [
+        {
+          "name": "voice-helper.apk",
+          "sha256": "e907c05d4629d8e5b4439f486aae2c39f10472513c3c0b8738c09a1a8daa0f0a",
+          "size": 166978955
+        }
+      ]
+    },
+    {
+      "package": "local.gboard.updater",
+      "versionCode": 2,
+      "assets": [
+        {
+          "name": "updater.apk",
+          "sha256": "4ffc5c888479937484ed5f50a5f1804c9242d766fd5469039bb7772ff1ecdd46",
+          "size": 20817
+        }
+      ]
+    }
+  ]
+}

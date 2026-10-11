@@ -14,6 +14,7 @@ def run(*args):subprocess.run([str(a) for a in args],check=True)
 if engine:
   sources=[ROOT/'enhanced/enginecheck/EngineCheckActivity.java']+[ROOT/'enhanced/src/local/gboard/enhanced'/n for n in ['RimeBridge.java','WordIndex.java','LocalWords.java','VoiceBridge.java']]
 else:sources=list((ROOT/'enhanced/src').rglob('*.java'))
+if '--test' in sys.argv:sources+=list((ROOT/'enhanced/testsrc').rglob('*.java'))
 run(JAVA/'javac.exe','-encoding','UTF-8','-source','8','-target','8','-cp',ANDROID,'-d',classes,*sources)
 run(JAVA/'jar.exe','cf',directory/'helper.jar','-C',classes,'.')
 run(BT/'d8.bat','--min-api','32','--lib',ANDROID,'--output',dex,directory/'helper.jar',*([] if engine else [ROOT/'enhanced/build/patched.dex']))

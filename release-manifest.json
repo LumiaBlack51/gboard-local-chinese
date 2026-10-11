@@ -1,35 +1,41 @@
 {
-  "tag": "v1.0.0",
+  "tag": "v1.1.0",
   "assets": [
     {
-      "file": "enhanced\\final\\base.apk",
-      "bytes": 503215403,
-      "sha256": "1ccc8590deae7c2498b5e161d16921d6a12052873c51e5d07f7cb29295f47be2",
+      "file": "enhanced/final/base.apk",
+      "bytes": 549139755,
+      "sha256": "6907ccc9249396fe1cfc38ef296d95d268606f573b75f46fdcc47116e31e0f41",
       "name": "base.apk"
     },
     {
-      "file": "enhanced\\final\\split_brella_feature_split.apk",
+      "file": "enhanced/final/split_brella_feature_split.apk",
       "bytes": 35656040,
-      "sha256": "062d6d8701a9aab448122e80159acb59613871d3ad5d05372689703b346293ea",
+      "sha256": "d7fd93e2024a46fb52a163862b71ade0e5ccddb422822e8b96d95b680555012e",
       "name": "split_brella_feature_split.apk"
     },
     {
-      "file": "enhanced\\final\\split_config.xxxhdpi.apk",
+      "file": "enhanced/final/split_config.xxxhdpi.apk",
       "bytes": 129884,
-      "sha256": "5f64c2846826ac6a32eebedc6dcb73b0ee6724cfcf9ada54bc06da8cedb2846f",
+      "sha256": "c5345477899d8dd36bc58de87c5de7cc91762c9870260babd362acb15a09a0fd",
       "name": "split_config.xxxhdpi.apk"
     },
     {
-      "file": "enhanced\\final\\split_tenoranimation_feature_split.apk",
+      "file": "enhanced/final/split_tenoranimation_feature_split.apk",
       "bytes": 11321708,
-      "sha256": "2883ec5c6abc1c829c49412c68b1e9d4ec408ab2f7bacb4c37380431a62883b3",
+      "sha256": "9c6a018c1a029dad8394efb4c66c0454a9ced3d15c9ea4fd4ba9876e845527f6",
       "name": "split_tenoranimation_feature_split.apk"
     },
     {
-      "file": "enhanced\\voice-helper\\final\\voice-helper.apk",
-      "bytes": 54007607,
-      "sha256": "f7dd2fb13840f160387638cb2617448dfa799271777513848855a8886b068693",
+      "file": "enhanced/voice-helper/final/voice-helper.apk",
+      "bytes": 166978955,
+      "sha256": "e907c05d4629d8e5b4439f486aae2c39f10472513c3c0b8738c09a1a8daa0f0a",
       "name": "voice-helper.apk"
+    },
+    {
+      "file": "enhanced/updater/out/updater.apk",
+      "bytes": 20817,
+      "sha256": "4ffc5c888479937484ed5f50a5f1804c9242d766fd5469039bb7772ff1ecdd46",
+      "name": "updater.apk"
     }
   ]
 }

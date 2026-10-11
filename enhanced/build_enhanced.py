@@ -3,7 +3,7 @@ from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
 from build_config import JAVA,BT,ANDROID,APKTOOL,SIGN_ARGS
 from pathlib import Path
-import subprocess,zipfile,struct,sys
+import subprocess,zipfile,struct,sys,shutil
 ROOT=Path(__file__).resolve().parent.parent
 CP=str(ROOT/'tools'/'dexlib2-2.5.2.jar')+';'+str(ROOT/'tools'/'guava-27.1-android.jar')+';'+str(APKTOOL)+';'+str(ROOT/'tools')
 def run(*args):subprocess.run([str(a) for a in args],check=True)
@@ -28,10 +28,36 @@ start=source.index('.method public final e(Ljava/lang/CharSequence;)V')
 end=source.index('.end method',start)
 body=source[start:end].replace('    .locals 4','    .locals 4\n    invoke-static {p0}, Llocal/gboard/enhanced/EnhancedHook;->bindComposingView(Ljava/lang/Object;)V',1)
 (patches/'nho.smali').write_text(source[:start]+body+source[end:],encoding='utf8')
+rel=Path('com/google/android/apps/inputmethod/latin/keyboard/widget/LatinFixedCountCandidatesHolderView.smali')
+source=(ROOT/'gboard-18.4.1/smali/smali'/rel).read_text('utf8')
+start=source.index('.method public final D(Ljava/util/List;Ljava/util/ArrayList;)V');end=source.index('.end method',start)
+body=source[start:end].replace('    return-void','    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/EnhancedHook;->bindCandidateBar(Landroid/view/View;)V\n    return-void')
+source=source[:start]+body+source[end:]
+source+='''
+.method protected onAttachedToWindow()V
+    .locals 0
+    invoke-super {p0}, Landroid/widget/LinearLayout;->onAttachedToWindow()V
+    invoke-static {p0}, Llocal/gboard/enhanced/EnhancedHook;->bindCandidateBar(Landroid/view/View;)V
+    return-void
+.end method
+.method protected onVisibilityChanged(Landroid/view/View;I)V
+    .locals 0
+    invoke-super {p0, p1, p2}, Landroid/widget/LinearLayout;->onVisibilityChanged(Landroid/view/View;I)V
+    invoke-static {p0}, Llocal/gboard/enhanced/EnhancedHook;->bindCandidateBar(Landroid/view/View;)V
+    return-void
+.end method
+'''
+(patches/'LatinFixedCountCandidatesHolderView.smali').write_text(source,encoding='utf8')
 source=(ROOT/'gboard-18.4.1'/'smali'/'smali'/'pbb.smali').read_text(encoding='utf8')
 anchor='.method public final aw(Loas;)Z\n    .locals 26\n'
 assert source.count(anchor)==1
 source=source.replace(anchor,anchor+'''
+    invoke-static/range {p1 .. p1}, Llocal/gboard/enhanced/EnhancedHook;->handleEnter(Ljava/lang/Object;)Z
+    move-result v0
+    if-eqz v0, :local_enter_fallthrough
+    const/4 v0, 0x1
+    return v0
+    :local_enter_fallthrough
     invoke-static/range {p0 .. p1}, Llocal/gboard/enhanced/VoiceHook;->handle(Ljava/lang/Object;Ljava/lang/Object;)Z
     move-result v0
     if-eqz v0, :local_voice_fallthrough
@@ -47,8 +73,11 @@ source=source[:body_start]+'    invoke-static/range {p0 .. p0}, Llocal/gboard/en
 (patches/'pbb.smali').write_text(source,encoding='utf8')
 run(JAVA/'javac.exe','-cp',APKTOOL,ROOT/'tools'/'Assemble.java')
 run(JAVA/'java.exe','-cp',str(APKTOOL)+';'+str(ROOT/'tools'),'Assemble',patches,work/'patched.dex')
-classes=work/'classes';classes.mkdir(exist_ok=True)
+classes=work/'classes'
+if classes.exists():shutil.rmtree(classes)
+classes.mkdir(exist_ok=True)
 sources=list((ROOT/'enhanced'/'src').rglob('*.java'))
+if '--test' in sys.argv:sources+=list((ROOT/'enhanced/testsrc').rglob('*.java'))
 run(JAVA/'javac.exe','-encoding','UTF-8','-source','8','-target','8','-cp',ANDROID,'-d',classes,*sources)
 run(JAVA/'jar.exe','cf',work/'helper.jar','-C',classes,'.')
 dex=work/'helper-dex';dex.mkdir(exist_ok=True)
@@ -65,8 +94,9 @@ with zipfile.ZipFile(base) as z,zipfile.ZipFile(unsigned,'w') as out:
     if info.filename.startswith('META-INF/'):continue
     content=(fixed/info.filename).read_bytes() if info.filename in ['classes.dex','classes2.dex'] else z.read(info)
     if info.filename=='AndroidManifest.xml':
-      sys.path.insert(0,str(ROOT));from add_activity import add_activity,add_voice_access
-      content=add_voice_access(add_activity(content,'local.gboard.enhanced.VoicePermissionActivity'))
+      sys.path.insert(0,str(ROOT));from add_activity import add_activity,add_voice_access,management_launcher
+      content=management_launcher(add_voice_access(add_activity(content,'local.gboard.enhanced.VoicePermissionActivity')))
+      if '--test' in sys.argv:content=add_activity(content,'local.gboard.enhanced.AdapterCheckActivity',True)
     out.writestr(info,content)
   out.write(dex/'classes.dex','classes5.dex',compress_type=zipfile.ZIP_DEFLATED)
   for name in ['libgboard_local_rime.so','librime.so','libFcitx5Core.so','libFcitx5Config.so','libFcitx5Utils.so','libc++_shared.so']:

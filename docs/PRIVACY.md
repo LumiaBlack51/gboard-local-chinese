@@ -4,8 +4,10 @@
 
 编辑框带 `IME_FLAG_NO_PERSONALIZED_LEARNING`，或为密码类型时，中文使用 `local_pinyin_private`，其 `enable_user_dict` 为 false。单独设置 Rime 的 incognito 选项不足以阻止学习，因此使用独立方案。测试确认该模式不改变普通学习词库。手工配置的 Android 系统词典与普通学习词库不同，其备份受手机系统设置管理。
 
-语音通过指定 `local.gboard.voice/.OfflineRecognitionService` 使用本地 Vosk；不调用系统默认识别服务。服务核验调用 UID 的签名，两个应用需要同一密钥签名。音频不保存，不写用户语音记录。结束、取消、键盘隐藏和编辑框变化均清理或丢弃会话结果。
+语音通过指定 `local.gboard.voice/.OfflineRecognitionService` 使用本地 Sherpa-ONNX 双语模型；不调用系统默认识别服务。服务核验调用 UID 的签名，两个应用需要同一密钥签名。音频不保存，不写用户语音记录。结束、取消、键盘隐藏和编辑框变化均清理或丢弃会话结果。
 
 调试版的合成音频入口仅接受拥有 DUMP 权限的调用，并限制到自建测试编辑框。正式版关闭 debuggable，不注册此入口；语音 APK 不包含合成测试音频。仓库包含诊断源码，以便复核，但没有手机截图、ADB 日志、设备序列号、词库数据库、密钥或访问令牌。
 
 原 Gboard 为闭源软件，保留其前端和英文逻辑。这里的无网络权限检查和新增代码的本地处理验证，并不等于对全部原 Gboard 代码完成独立隐私审计。
+
+1.1.0 新增 `local.gboard.updater`，独立 UID，仅用户点击检查或安装时连接 GitHub。它请求 INTERNET 和 REQUEST_INSTALL_PACKAGES，不请求麦克风、不提供输入法、不接收输入内容。管理界面核验配套更新应用签名；更新器核验发布清单的签名身份、大小及 SHA-256，并核验各组件主 APK 的包名、版本与证书。Android 安装器最终校验所有 split 签名，并在用户确认后原子提交三组件。取消或下载校验失败不会替换原版本；不自动后台检查。

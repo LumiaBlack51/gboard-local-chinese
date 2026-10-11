@@ -30,14 +30,14 @@ public final class VoiceHook {
       int variation=editor.inputType&0xfff;
       if((editor.imeOptions&EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING)!=0||variation==0x81||variation==0x91||variation==0xe1||variation==0x12){Toast.makeText(service,"隐私或密码输入中不启用麦克风",Toast.LENGTH_SHORT).show();return true;}
       if(service.checkSelfPermission(Manifest.permission.RECORD_AUDIO)!=PackageManager.PERMISSION_GRANTED){service.startActivity(new Intent(service,VoicePermissionActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));return true;}
-      if(service.getPackageManager().checkSignatures(service.getPackageName(),HELPER)!=PackageManager.SIGNATURE_MATCH){Toast.makeText(service,"请安装配套的中文离线语音服务",Toast.LENGTH_LONG).show();return true;}
+      if(service.getPackageManager().checkSignatures(service.getPackageName(),HELPER)!=PackageManager.SIGNATURE_MATCH){Toast.makeText(service,"请安装配套的中英离线语音服务",Toast.LENGTH_LONG).show();return true;}
       if(service.getPackageManager().checkPermission(Manifest.permission.RECORD_AUDIO,HELPER)!=PackageManager.PERMISSION_GRANTED){service.startActivity(new Intent().setComponent(new ComponentName(HELPER,"local.gboard.voice.PermissionActivity")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));return true;}
       if(active!=null)return true;EnhancedHook.finishActive();show(service,editor);return true;
     }catch(Throwable failure){if(active!=null&&active.service==owner){cancel(active);active=null;}android.util.Log.e("LocalVoice","Voice panel failed",failure);Toast.makeText((Context)owner,"本地语音暂不可用",Toast.LENGTH_SHORT).show();return true;}
   }
   private static void show(InputMethodService service,EditorInfo editor){
     Run run=new Run();run.service=service;run.editor=editor;run.connection=service.getCurrentInputConnection();active=run;
-    run.status=new TextView(service);run.status.setTextSize(19);run.status.setPadding(36,28,36,28);run.status.setText("普通话离线识别。点击开始后录音，音频不保存。首次载入模型需要几秒。");
+    run.status=new TextView(service);run.status.setTextSize(19);run.status.setPadding(36,28,36,28);run.status.setText("支持普通话和英文混说。点击开始后录音，音频不保存。首次载入模型需要几秒。");
     run.dialog=new AlertDialog.Builder(service).setTitle("本地语音输入").setView(run.status).setPositiveButton("开始",null).setNegativeButton("取消",(d,w)->cancel(run)).create();
     run.dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_ATTACHED_DIALOG);
     run.dialog.getWindow().getAttributes().token=service.getWindow().getWindow().getDecorView().getWindowToken();
@@ -51,7 +51,7 @@ public final class VoiceHook {
     run.started=true;run.dialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("完成");run.status.setText("正在载入离线语音…");
     run.recognizer=SpeechRecognizer.createSpeechRecognizer(run.service,new ComponentName(HELPER,"local.gboard.voice.OfflineRecognitionService"));
     run.recognizer.setRecognitionListener(new RecognitionListener(){
-      public void onReadyForSpeech(Bundle b){if(!run.cancel)run.status.setText("正在听，请说普通话…");}
+      public void onReadyForSpeech(Bundle b){if(!run.cancel)run.status.setText("正在听，可混说普通话和英文…");}
       public void onBeginningOfSpeech(){}
       public void onRmsChanged(float value){}
       public void onBufferReceived(byte[] audio){}

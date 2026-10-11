@@ -18,11 +18,13 @@ manifest.write_text(manifest_source,encoding='utf8')
 run(BT/'aapt.exe','package','-f','-M',manifest,'-S',base/'res','-I',ANDROID,'-F',out/'unsigned.apk')
 with zipfile.ZipFile(out/'unsigned.apk','a') as z:
   z.write(dex/'classes.dex','classes.dex',compress_type=zipfile.ZIP_DEFLATED)
-  for name in ['libvosk.so','libgboard_local_voice.so']:z.write(ROOT/'enhanced/native/lib/arm64-v8a'/name,'lib/arm64-v8a/'+name,compress_type=zipfile.ZIP_STORED)
+  for abi in ['arm64-v8a','x86_64']:
+    for name in ['libonnxruntime.so','libsherpa-onnx-c-api.so','libgboard_local_voice.so']:z.write(ROOT/'enhanced/native/lib'/abi/name,'lib/'+abi+'/'+name,compress_type=zipfile.ZIP_STORED)
   for f in (ROOT/'enhanced/voice-data').rglob('*'):
     if f.is_file():z.write(f,'assets/local-voice/'+f.relative_to(ROOT/'enhanced/voice-data').as_posix(),compress_type=zipfile.ZIP_DEFLATED)
-  z.write(ROOT/'enhanced/VOSK-LICENSE','assets/licenses/VOSK-LICENSE',compress_type=zipfile.ZIP_DEFLATED)
+  for name in ['SHERPA-LICENSE','VOICE-MODEL-LICENSE.md']:z.write(ROOT/'enhanced'/name,'assets/licenses/'+name,compress_type=zipfile.ZIP_DEFLATED)
   if not release:z.write(ROOT/'enhanced/speech-fixture.wav','assets/speech-fixture.wav',compress_type=zipfile.ZIP_STORED)
+  if not release:z.write(ROOT/'enhanced/speech-mixed.wav','assets/speech-mixed.wav',compress_type=zipfile.ZIP_STORED)
 run(BT/'zipalign.exe','-P','16','-f','4',out/'unsigned.apk',out/'aligned.apk')
 run(BT/'apksigner.bat','sign',*SIGN_ARGS,'--out',out/'voice-helper.apk',out/'aligned.apk')
 run(BT/'apksigner.bat','verify',out/'voice-helper.apk');print(out/'voice-helper.apk')

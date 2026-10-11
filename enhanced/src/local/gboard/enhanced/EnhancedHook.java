@@ -19,7 +19,7 @@ public final class EnhancedHook {
   }
   private static class Session {
     final Object processor;boolean privateMode;long id;String raw="";int caret;
-    List<Object> candidates=Collections.emptyList();int page;boolean composing,suggesting;String context="";
+    List<Object> candidates=Collections.emptyList();int page;boolean composing,suggesting,dismissed;String context="";
     Session(Object p){processor=p;}
   }
   private static Field field(Class<?> cls,String name)throws Exception {
@@ -49,11 +49,13 @@ public final class EnhancedHook {
         EditorInfo editor=(EditorInfo)get(event,"b");
         int variation=editor.inputType&0xfff;
         s.privateMode=(editor.imeOptions&EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING)!=0||variation==0x81||variation==0x91||variation==0xe1||variation==0x12;
-        s.raw="";s.context="";s.composing=false;s.suggesting=false;s.candidates=Collections.emptyList();active=s;return false;
+        s.raw="";s.context="";s.composing=false;s.suggesting=false;s.dismissed=false;s.candidates=Collections.emptyList();active=s;refreshCandidateBars();return false;
       }
       if(!RimeBridge.ready)return false;
       if(s.id==0){s.id=RimeBridge.create(s.privateMode);if(s.id==0)return false;}
       if(type==4){active=s;return key(s,get(event,"i"));}
+      // User selection/cursor movement invalidates predictions from the old position.
+      if(type==18&&!s.composing&&!(Boolean)call(Class.forName("owv"),"c",get(event,"e"))){dismiss(s);return false;}
       if(type==8&&(s.composing||s.suggesting)){publish(s,(Integer)get(event,"m"));return true;}
       if(type==10||type==14||type==22){
         Object candidate=get(event,"j");if(candidate==null)return false;
@@ -67,6 +69,7 @@ public final class EnhancedHook {
       }
       if(type==15||type==20||type==25||type==26){
         if(s.composing)finish(s);
+        if(s.suggesting)dismiss(s);
         if(type==25||type==26){RimeBridge.destroy(s.id);s.id=0;if(active==s)active=null;}
         return false;
       }
@@ -90,6 +93,7 @@ public final class EnhancedHook {
     int code=(Integer)get(key,"c");Object value=get(key,"e");
     String text=value instanceof CharSequence?value.toString():"";
     if(text.length()==1&&((text.charAt(0)>='a'&&text.charAt(0)<='z')||text.charAt(0)=='\'')){
+      s.dismissed=false;
       if(!s.composing){
         // An in-progress composition that started before initialization stays
         // with the original decoder until it has been committed or cleared.
@@ -98,11 +102,14 @@ public final class EnhancedHook {
       }
       RimeBridge.key(s.id,text.charAt(0));update(s);return true;
     }
-    if(!s.composing)return false;
+    if(!s.composing){if(s.suggesting)dismiss(s);return false;}
     if(code==67){RimeBridge.key(s.id,0xff08);update(s);return true;}
     if(code==21||code==22){move(s,s.caret+(code==21?-1:1));return true;}
     if(code==62){chooseFirst(s);return true;}
-    if(code==66){finish(s);return false;}
+    if(code==66||code==-10009){
+      // Enter confirms the literal spelling; a subsequent Enter performs the editor action.
+      String literal=s.raw;RimeBridge.clear(s.id);commit(s,literal);s.dismissed=true;s.context="";update(s);return true;
+    }
     if(text.length()==1){finish(s);return false;}
     return false;
   }
@@ -117,6 +124,10 @@ public final class EnhancedHook {
     else{commit(s,s.raw);RimeBridge.clear(s.id);update(s);}
   }
   public static synchronized void finishActive()throws Exception {if(active!=null&&active.composing)finish(active);}
+  public static synchronized boolean handleEnter(Object event){
+    try{Object key=call(event,"g");if(key==null||active==null||!active.composing)return false;int code=(Integer)get(key,"c");if(code!=66&&code!=-10009)return false;return key(active,event);}
+    catch(Throwable error){Log.e("LocalChinese","Literal Enter failed",error);return false;}
+  }
   private static void update(Session s)throws Exception {
     String[] result=RimeBridge.state(s.id);s.raw=result[0];s.caret=Integer.parseInt(result[1]);
     if(!result[2].isEmpty())commit(s,result[2]);
@@ -128,10 +139,11 @@ public final class EnhancedHook {
     for(int i=4;i<Math.min(result.length,6);i++)if(seen.add(result[i]))list.add(candidate(new Candidate(s,i-4,result[i]),list.size()));
     if(s.composing)for(WordIndex.Entry e:WordIndex.complete(s.raw))if(seen.add(e.word))list.add(candidate(new Candidate(s,-1,e.word,e.code),list.size()));
     for(int i=6;i<result.length;i++)if(seen.add(result[i]))list.add(candidate(new Candidate(s,i-4,result[i]),list.size()));
-    if(!s.composing)for(WordIndex.Entry e:WordIndex.following(s.context))if(seen.add(e.word))list.add(candidate(new Candidate(s,-2,e.word),list.size()));
+    if(!s.composing&&!s.dismissed)for(WordIndex.Entry e:WordIndex.following(s.context))if(seen.add(e.word))list.add(candidate(new Candidate(s,-2,e.word),list.size()));
     s.suggesting=!s.composing&&!list.isEmpty();
     s.candidates=list;s.page=0;
     call(s.processor,"aJ",!list.isEmpty());
+    refreshCandidateBars();
     // Normal candidate requests flow through dispatch(type=8).
     if(list.isEmpty())sendCandidates(s,Collections.emptyList(),false);
   }
@@ -145,13 +157,72 @@ public final class EnhancedHook {
   }
   private static Object getStatic(String cls,String name)throws Exception{return field(Class.forName(cls),name).get(null);}
   private static void publish(Session s,int count)throws Exception {
-    int end=Math.min(s.page+Math.max(1,count),s.candidates.size());
+    int start=s.page;
+    int end=start+(int)Math.min((long)Math.max(0,count),(long)s.candidates.size()-start);
     List<Object> page=new ArrayList<>(s.candidates.subList(s.page,end));s.page=end;
-    sendCandidates(s,page,end<s.candidates.size());
+    // Gboard retains previously loaded pages. Re-selecting each batch's first item
+    // moves the viewport to that item and can cascade to the final page.
+    sendCandidates(s,page,end<s.candidates.size(),start==0&&!page.isEmpty()?page.get(0):null);
   }
   private static void sendCandidates(Session s,List<Object> list,boolean more)throws Exception {
-    Object e=call(Class.forName("otf"),"a",list,list.isEmpty()?null:list.get(0),more,s.processor);
+    sendCandidates(s,list,more,null);
+  }
+  private static void sendCandidates(Session s,List<Object> list,boolean more,Object selected)throws Exception {
+    Object e=call(Class.forName("otf"),"a",list,selected,more,s.processor);
     call(get(s.processor,"A"),"a",e);
+  }
+  private static void dismiss(Session s)throws Exception {
+    if(s.composing)return;
+    // Also clear native next-word predictions (for example after a voice commit).
+    call(s.processor,"at",true);
+    s.dismissed=true;s.suggesting=false;s.context="";s.page=0;s.candidates=Collections.emptyList();
+    call(s.processor,"aJ",false);sendCandidates(s,Collections.emptyList(),false);refreshCandidateBars();
+  }
+  private static final Map<View,BarControl> bars=new WeakHashMap<>();
+  private static class BarControl {
+    final java.lang.ref.WeakReference<android.widget.TextView> button;final int padding,size;
+    BarControl(android.widget.TextView b,int p,int s){button=new java.lang.ref.WeakReference<>(b);padding=p;size=s;}
+  }
+  /** Reserve a real touch target at the strip's right edge, leaving expansion available. */
+  public static synchronized void bindCandidateBar(View bar){
+    if(!(bar.getParent() instanceof android.view.ViewGroup))return;
+    BarControl previous=bars.get(bar);
+    if(previous!=null){android.widget.TextView button=previous.button.get();
+      if(button!=null&&button.getParent()==bar.getParent()){refreshCandidateBars();return;}
+      if(button!=null&&button.getParent() instanceof android.view.ViewGroup){android.view.ViewGroup old=(android.view.ViewGroup)button.getParent();old.removeView(button);if(!(old instanceof android.widget.LinearLayout))old.setPadding(old.getPaddingLeft(),old.getPaddingTop(),previous.padding,old.getPaddingBottom());}
+      bars.remove(bar);
+    }
+    android.view.ViewGroup parent=(android.view.ViewGroup)bar.getParent();
+    android.widget.TextView close=new android.widget.TextView(bar.getContext());
+    close.setText("×");close.setTextSize(25);close.setGravity(android.view.Gravity.CENTER);
+    close.setContentDescription("关闭联想候选，恢复工具栏");close.setFocusable(true);
+    int size=(int)(48*bar.getResources().getDisplayMetrics().density+0.5f);
+    android.util.TypedValue color=new android.util.TypedValue();bar.getContext().getTheme().resolveAttribute(android.R.attr.textColorPrimary,color,true);
+    if(color.resourceId!=0)close.setTextColor(bar.getContext().getColor(color.resourceId));
+    int originalPadding=parent.getPaddingRight();
+    if(parent instanceof android.widget.LinearLayout)parent.addView(close,new android.widget.LinearLayout.LayoutParams(size,android.view.ViewGroup.LayoutParams.MATCH_PARENT));
+    else{
+      parent.addView(close,new android.view.ViewGroup.LayoutParams(size,size));
+      parent.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{if(close.getVisibility()==View.VISIBLE){int height=bar.getHeight(),top=bar.getTop();close.layout(parent.getWidth()-size,top,parent.getWidth(),top+height);}});
+      close.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{int left=parent.getWidth()-size,top=bar.getTop(),bottom=top+bar.getHeight();if(close.getVisibility()==View.VISIBLE&&(l!=left||t!=top||r!=parent.getWidth()||b!=bottom))close.layout(left,top,parent.getWidth(),bottom);});
+    }
+    bars.put(bar,new BarControl(close,originalPadding,size));
+    close.setOnClickListener(v->{synchronized(EnhancedHook.class){try{if(active!=null)dismiss(active);}catch(Throwable error){Log.e("LocalChinese","Dismiss failed",error);}}});
+    refreshCandidateBars();
+  }
+  private static void refreshCandidateBars(){
+    if(android.os.Looper.myLooper()!=android.os.Looper.getMainLooper()){
+      new android.os.Handler(android.os.Looper.getMainLooper()).post(()->{synchronized(EnhancedHook.class){refreshCandidateBars();}});return;
+    }
+    for(Map.Entry<View,BarControl> entry:bars.entrySet()){
+      android.widget.TextView close=entry.getValue().button.get();if(close==null)continue;
+      android.view.ViewGroup parent=(android.view.ViewGroup)close.getParent();
+      boolean nativeSuggestions=false;
+      try{nativeSuggestions=(Integer)get(entry.getKey(),"f")>0&&active!=null&&!(Boolean)get(active.processor,"n");}catch(Exception ignored){}
+      boolean visible=active!=null&&!active.composing&&(active.suggesting||nativeSuggestions)&&entry.getKey().getVisibility()==View.VISIBLE;
+      close.setVisibility(visible?View.VISIBLE:View.GONE);
+      if(!(parent instanceof android.widget.LinearLayout))parent.setPadding(parent.getPaddingLeft(),parent.getPaddingTop(),entry.getValue().padding+(visible?entry.getValue().size:0),parent.getPaddingBottom());
+    }
   }
   private static void move(Session s,int position)throws Exception {
     RimeBridge.caret(s.id,Math.max(0,Math.min(s.raw.length(),position)));update(s);
