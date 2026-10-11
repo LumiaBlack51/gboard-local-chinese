@@ -1,0 +1,10 @@
+{
+  "all_nine_uploaded_asset_hashes_and_sizes_match": true,
+  "redundant_install_disabled": true,
+  "management_launcher_opens_updater": true,
+  "repository_is_public": true,
+  "reported_version": "1.1.1",
+  "release": "1.1.1",
+  "passed": true,
+  "checking_github_reports_latest_version": true
+}
