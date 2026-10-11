@@ -5,6 +5,7 @@
   <application android:label="Offline voice test" android:debuggable="true" android:allowBackup="false" android:theme="@android:style/Theme.Material.Light.NoActionBar">
     <activity android:name=".VoiceCheckActivity" android:exported="true" />
     <activity android:name=".HookCheckActivity" android:exported="true" />
+    <activity android:name=".LensCheckActivity" android:exported="true" />
     <service android:name=".HookCheckService" android:exported="true" android:permission="android.permission.BIND_INPUT_METHOD">
       <intent-filter><action android:name="android.view.InputMethod" /></intent-filter>
       <meta-data android:name="android.view.im" android:resource="@xml/test_ime" />

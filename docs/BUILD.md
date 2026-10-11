@@ -59,6 +59,8 @@ python enhanced/release_metadata.py
 
 更新回归在旧版 AVD 中通过管理应用点击“检查更新”，下载公开 GitHub 正式资产，依次确认安卓的三个组件更新和首次 Play Protect 扫描。`tests/verify_installed_update.py` 核对安装来源、版本、所有安装 APK 的哈希与键盘首次安装时间；`tests/verify_update_ui.py` 检查管理入口、成功提示和重复检查状态。`tests/verify_github_release.py` 比较全部九个上传文件的服务端哈希及大小。1.2.0 另以同签名 RetentionInstrumentation 在更新前后比较本地 Rime 用户文件与设置，并验证旧更新器升级和新更新器同版本修复两条路径。全部 instrumentation 仅用于 AVD，不随正式包发布。
 
+`tests/run_updater_result_checks.py` 使用同签名 UpdaterResultInstrumentation，在实际更新器 UID 发送合成系统拒绝与取消状态给私有 InstallReceiver，并检查打开的页面即时刷新。测试会恢复此前的结果记录，不安装 APK；实际系统安装验证仍由另外的更新回归覆盖。独立测试 IME 的 LensCheckActivity 用合成拼音检查 ComposingLens 在输入法窗口中的显示与输入连接保留。
+
 真机诊断仅在自建测试编辑框运行，禁止对聊天应用发送全局测试按键。不要为了测试启用讯飞联网。本次 AVD 中原版和增强版 Gboard 的 ARM 翻译运行均出现上游 native crash，因此将原生候选控件放在调试 Activity 中验证，并使用独立语音测试 APK；不把那个故障当成完整键盘界面通过验证。
 
 v1.0.0 曾在 Android 16 真机验证；v1.1.0 的新增功能在 AVD 验证，没有重新进行真机测试。仓库把宿主路径和签名设置改成环境配置，未从空环境重新完成全部底包及模型下载构建；不宣称逐字节可复现。

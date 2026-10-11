@@ -19,7 +19,7 @@ for package,version,paths in groups:
   items.append({'name':path.name,'sha256':sha,'size':size})
   assets.append({'file':path.relative_to(ROOT).as_posix(),'bytes':size,'sha256':sha,'name':path.name})
  components.append({'package':package,'versionCode':version,'assets':items})
-save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'空格滑动编辑拼音、逐字触感和点选放大；中文 26 键离线手写及独立手写板；显示已安装版本，核验安装结果并可重新安装修复。语音仍点即开始。','components':components})
+save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'空格滑动编辑拼音、逐字触感和点选放大；中文 26 键离线手写及独立手写板。更新器核验实际安装文件，及时刷新成功或失败结果，支持重新安装修复。语音仍点即开始。','components':components})
 save('release-manifest.json',{'tag':'v'+VERSION,'assets':assets})
 (ROOT/'SHA256SUMS.txt').write_text(''.join(a['sha256']+'  '+a['name']+'\n' for a in assets),encoding='ascii')
 source={}

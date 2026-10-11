@@ -3,4 +3,5 @@
   <application android:label="AVD release voice checks" android:allowBackup="false" />
   <instrumentation android:name=".VoiceReleaseInstrumentation" android:targetPackage="com.localx.android.inputmethod.latin" android:functionalTest="true" />
   <instrumentation android:name=".RetentionInstrumentation" android:targetPackage="com.localx.android.inputmethod.latin" android:functionalTest="true" />
+  <instrumentation android:name=".UpdaterResultInstrumentation" android:targetPackage="local.gboard.updater" android:functionalTest="true" />
 </manifest>

@@ -17,6 +17,8 @@ public final class UpdateActivity extends Activity {
   static final String REPO="LumiaBlack51/gboard-local-chinese",KEYBOARD="com.localx.android.inputmethod.latin",VOICE="local.gboard.voice",SELF="local.gboard.updater";
   private TextView status,current;private Button check,install;private JSONArray components;private JSONObject release;private Thread worker;private volatile boolean closed;
   private final Map<String,String> urls=new HashMap<>();
+  private SharedPreferences updates;
+  private final SharedPreferences.OnSharedPreferenceChangeListener resultListener=(prefs,key)->{if("last_result".equals(key))runOnUiThread(this::showInstallResult);};
   private void message(String text){runOnUiThread(()->{if(!closed)status.setText(text);});}
   public void onCreate(Bundle state){super.onCreate(state);
     LinearLayout layout=new LinearLayout(this);layout.setOrientation(1);int pad=(int)(20*getResources().getDisplayMetrics().density);layout.setPadding(pad,pad,pad,pad);
@@ -26,6 +28,7 @@ public final class UpdateActivity extends Activity {
     check=new Button(this);check.setText("检查更新");layout.addView(check);check.setOnClickListener(v->check());
     install=new Button(this);install.setText("下载并安装更新");install.setEnabled(false);layout.addView(install);install.setOnClickListener(v->beginInstall());
     setContentView(layout);
+    updates=getSharedPreferences("updates",0);
   }
   private void background(Runnable task){check.setEnabled(false);install.setEnabled(false);worker=new Thread(()->{try{task.run();}finally{runOnUiThread(()->{if(!closed)check.setEnabled(true);});}},"ExplicitGitHubUpdate");worker.start();}
   private long installed(String pkg){try{return getPackageManager().getPackageInfo(pkg,0).getLongVersionCode();}catch(PackageManager.NameNotFoundException e){return 0;}}
@@ -92,5 +95,7 @@ public final class UpdateActivity extends Activity {
   }catch(Exception e){message("更新失败："+e.getMessage()+"\n已安装版本可继续使用。");runOnUiThread(()->{if(!closed)install.setEnabled(true);});}
   finally{if(!committed)for(int id:sessions)try{installer.abandonSession(id);}catch(Exception ignored){}}});}
   public void onDestroy(){closed=true;if(worker!=null)worker.interrupt();super.onDestroy();}
-  public void onResume(){super.onResume();current.setText(InstalledRelease.versions(this));String last=getSharedPreferences("updates",0).getString("last_result",null);if(last!=null)status.setText(last);}
+  private void showInstallResult(){String last=updates.getString("last_result",null);if(last!=null&&!closed){current.setText(InstalledRelease.versions(this));status.setText(last);if(components!=null)install.setEnabled(true);}}
+  public void onResume(){super.onResume();updates.registerOnSharedPreferenceChangeListener(resultListener);current.setText(InstalledRelease.versions(this));showInstallResult();}
+  public void onPause(){updates.unregisterOnSharedPreferenceChangeListener(resultListener);super.onPause();}
 }
