@@ -246,7 +246,7 @@ public final class EnhancedHook {
   }
   static synchronized boolean chineseActive(){return active!=null;}
   static synchronized boolean composing(){return active!=null&&active.composing;}
-  static synchronized boolean handwritingReady(){return active!=null&&RimeBridge.ready;}
+  static synchronized boolean handwritingReady(){try{return active!=null&&RimeBridge.ready&&(active.composing||!(Boolean)get(active.processor,"n"));}catch(Exception ignored){return false;}}
   static synchronized Object token(){return active;}
   static synchronized String raw(){return active==null?"":active.raw;}
   static synchronized int caret(){return active==null?0:active.caret;}

@@ -1,0 +1,28 @@
+{
+  "caller": "Shipped keyboard UID, same-signature test instrumentation",
+  "checks": {
+    "fixture_rejected": {
+      "error": 5
+    },
+    "audio_stop": {
+      "ready": true,
+      "audio_started": true,
+      "ended": true,
+      "results": true,
+      "recognized": ""
+    },
+    "audio_cancel": {
+      "ready": true,
+      "audio_started": true,
+      "cancel_requested": true
+    },
+    "audio_stop_after_cancel": {
+      "ready": true,
+      "audio_started": true,
+      "ended": true,
+      "results": true,
+      "recognized": ""
+    }
+  },
+  "passed": true
+}

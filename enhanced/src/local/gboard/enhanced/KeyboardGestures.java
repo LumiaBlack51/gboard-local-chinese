@@ -15,7 +15,7 @@ public final class KeyboardGestures {
   private static class Key {View view;int code;String text="";Rect bounds=new Rect();}
   private static class State {
     final WeakReference<View> root;final Drawable original;final InkDrawable drawing;
-    Rect letters=new Rect();boolean bypass,space,spaceDragged,letter,captured,ink,board,blocked;float downX,downY,step;int startCaret;long downTime;int generation;
+    Rect letters=new Rect(),deletion=new Rect();boolean bypass,space,spaceDragged,letter,captured,ink,board,blocked;float downX,downY,step;int startCaret;long downTime;int generation;
     MotionEvent down;Runnable hold;Key key;String rawBefore="";Object session;
     final List<List<PointF>> strokes=new ArrayList<>();List<PointF> stroke;
     State(View v){root=new WeakReference<>(v);original=v.getForeground();drawing=new InkDrawable(this);}
@@ -27,7 +27,7 @@ public final class KeyboardGestures {
       if(code==62||code==67||text.length()==1&&Character.isLetter(text.charAt(0))&&text.charAt(0)<128){Key k=new Key();k.view=view;k.code=code;k.text=text;return k;}}
   }catch(Exception ignored){}return null;}
   private static void keys(View v,View root,List<Key> found){Key k=key(v);if(k!=null){Rect r=new Rect();if(v.getGlobalVisibleRect(r)){int[] xy=new int[2];root.getLocationOnScreen(xy);r.offset(-xy[0],-xy[1]);k.bounds=r;found.add(k);}return;}if(v instanceof ViewGroup){ViewGroup group=(ViewGroup)v;for(int i=0;i<group.getChildCount();i++)keys(group.getChildAt(i),root,found);}}
-  private static List<Key> keys(View root,State s){List<Key> keys=new ArrayList<>();keys(root,root,keys);s.letters.setEmpty();int letters=0;for(Key k:keys)if(k.text.length()==1&&Character.isLetter(k.text.charAt(0))){s.letters.union(k.bounds);letters++;}if(letters<20)s.letters.setEmpty();return keys;}
+  private static List<Key> keys(View root,State s){List<Key> keys=new ArrayList<>();keys(root,root,keys);s.letters.setEmpty();s.deletion.setEmpty();int letters=0;for(Key k:keys){if(k.code==67)s.deletion.union(k.bounds);if(k.text.length()==1&&Character.isLetter(k.text.charAt(0))){s.letters.union(k.bounds);letters++;}}if(letters<20)s.letters.setEmpty();return keys;}
   public static void attach(View root){if(roots.containsKey(root))return;State state=new State(root);roots.put(root,state);root.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->render(v,state));root.post(()->render(root,state));}
   private static void render(View root,State state){if(root==null)return;if(!EnhancedHook.chineseActive()){state.board=false;if(root.getForeground()==state.drawing){root.setForeground(state.original);root.invalidate();}return;}keys(root,state);state.board=LocalSettings.handwriting(root.getContext())&&LocalSettings.board(root.getContext());
     state.board=state.board&&EnhancedHook.handwritingReady();root.setForeground((state.board||!state.strokes.isEmpty())&&!state.letters.isEmpty()?state.drawing:state.original);root.invalidate();}
@@ -43,7 +43,7 @@ public final class KeyboardGestures {
       if(action==MotionEvent.ACTION_DOWN){stopHold(s);recycleDown(s);s.down=MotionEvent.obtain(event);s.downTime=event.getDownTime();s.downX=event.getX();s.downY=event.getY();s.captured=s.ink=s.blocked=false;s.space=s.spaceDragged=s.letter=false;s.stroke=null;s.session=EnhancedHook.token();s.rawBefore=EnhancedHook.raw();s.startCaret=EnhancedHook.caret();
         List<Key> keys=keys(root,s);render(root,s);s.key=null;for(Key k:keys)if(k.bounds.contains((int)s.downX,(int)s.downY)){s.key=k;break;}
         float density=root.getResources().getDisplayMetrics().density;s.step=14*density;
-        if(s.board&&s.letters.contains((int)s.downX,(int)s.downY)){if(exitBounds(s).contains((int)s.downX,(int)s.downY)){LocalSettings.board(root.getContext(),false);s.captured=s.blocked=true;return true;}beginInk(root,s,event,false);return true;}
+        if(s.board&&s.letters.contains((int)s.downX,(int)s.downY)&&!s.deletion.contains((int)s.downX,(int)s.downY)){if(exitBounds(s).contains((int)s.downX,(int)s.downY)){LocalSettings.board(root.getContext(),false);s.captured=s.blocked=true;return true;}beginInk(root,s,event,false);return true;}
         s.space=s.key!=null&&s.key.code==62&&EnhancedHook.composing();
         s.letter=s.key!=null&&s.key.text.length()==1&&Character.isLetter(s.key.text.charAt(0))&&LocalSettings.handwriting(root.getContext())&&EnhancedHook.handwritingReady();
         if(s.letter&&!s.strokes.isEmpty()){beginInk(root,s,event,false);return true;}
@@ -78,9 +78,11 @@ public final class KeyboardGestures {
   private static class InkDrawable extends Drawable {
     final State state;final Paint ink=new Paint(Paint.ANTI_ALIAS_FLAG);InkDrawable(State s){state=s;}
     public void draw(Canvas canvas){View root=state.root.get();if(root==null)return;if(state.original!=null){state.original.setBounds(getBounds());state.original.draw(canvas);}float density=root.getResources().getDisplayMetrics().density;
-      if(state.board){ink.setColor(Color.rgb(38,40,44));ink.setStyle(Paint.Style.FILL);canvas.drawRect(state.letters,ink);ink.setColor(0xffaaaaaa);ink.setStrokeWidth(density);canvas.drawLine(state.letters.exactCenterX(),state.letters.top,state.letters.exactCenterX(),state.letters.bottom,ink);canvas.drawLine(state.letters.left,state.letters.exactCenterY(),state.letters.right,state.letters.exactCenterY(),ink);ink.setTextSize(14*density);canvas.drawText("26键",exitBounds(state).left+6*density,exitBounds(state).bottom-5*density,ink);}
+      if(state.board){canvas.save();if(!state.deletion.isEmpty())canvas.clipOutRect(state.deletion);ink.setColor(Color.rgb(38,40,44));ink.setStyle(Paint.Style.FILL);canvas.drawRect(state.letters,ink);ink.setColor(0xffaaaaaa);ink.setStrokeWidth(density);canvas.drawLine(state.letters.exactCenterX(),state.letters.top,state.letters.exactCenterX(),state.letters.bottom,ink);canvas.drawLine(state.letters.left,state.letters.exactCenterY(),state.letters.right,state.letters.exactCenterY(),ink);ink.setTextSize(14*density);canvas.drawText("26键",exitBounds(state).left+6*density,exitBounds(state).bottom-5*density,ink);canvas.restore();}
       ink.setColor(0xff66b9ff);ink.setStrokeWidth(3*density);ink.setStrokeCap(Paint.Cap.ROUND);ink.setStrokeJoin(Paint.Join.ROUND);ink.setStyle(Paint.Style.STROKE);
+      canvas.save();if(state.board&&!state.deletion.isEmpty())canvas.clipOutRect(state.deletion);
       for(List<PointF> stroke:state.strokes){if(stroke.isEmpty())continue;Path path=new Path();path.moveTo(stroke.get(0).x,stroke.get(0).y);for(int i=1;i<stroke.size();i++)path.lineTo(stroke.get(i).x,stroke.get(i).y);if(stroke.size()==1)canvas.drawPoint(stroke.get(0).x,stroke.get(0).y,ink);else canvas.drawPath(path,ink);}
+      canvas.restore();
     }
     public void setAlpha(int alpha){}public void setColorFilter(ColorFilter filter){}public int getOpacity(){return PixelFormat.TRANSLUCENT;}
   }
