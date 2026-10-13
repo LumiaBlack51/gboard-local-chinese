@@ -1,0 +1,22 @@
+{
+  "default_keyboard_100_candidate_115": true,
+  "native_key_default_size_preserved": true,
+  "keyboard_independent_scaling": true,
+  "repeated_measure_does_not_compound": true,
+  "theme_size_change_uses_new_baseline": true,
+  "unrelated_keys_not_scaled": true,
+  "native_candidate_xml_found": true,
+  "native_candidate_child_count": 1,
+  "native_candidate_layout": 2131625382,
+  "native_candidate_label_found": true,
+  "native_candidate_grows_15_percent": true,
+  "native_height_scaling_not_compounded": true,
+  "native_height_reset_restores_baseline": true,
+  "recycled_candidates_do_not_compound": true,
+  "detached_candidate_width_uses_same_font": true,
+  "max_candidate_font_applied": true,
+  "upper_limit_clamped": true,
+  "lower_limit_clamped": true,
+  "font_preferences_saved": true,
+  "passed": true
+}

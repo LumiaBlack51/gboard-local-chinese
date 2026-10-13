@@ -10,18 +10,23 @@ import local.gboard.enhanced.VoiceHook;
 /** AVD-only test IME exercises the actual shipped voice panel in an attached IME window. */
 public final class HookCheckService extends InputMethodService {
   public static boolean startsImmediately;
+  public static boolean panelKeepsEditorFocus,restartUpdatedEditor,commitRejected;private boolean launched;
   private TextView keyboard;
   public static final class VoiceEvent {public int a(){return -10042;}}
   public View onCreateInputView(){TextView view=new TextView(this);view.setText("AVD voice hook test");view.setGravity(Gravity.CENTER);view.setMinHeight(150);keyboard=view;return view;}
   public void onStartInputView(EditorInfo editor,boolean restarting){super.onStartInputView(editor,restarting);
-    if(!"local.gboard.voicecheck".equals(editor.packageName))return;
+    if(!"local.gboard.voicecheck".equals(editor.packageName)||launched)return;
     new Handler(Looper.getMainLooper()).postDelayed(()->{try{
       if(getCurrentInputEditorInfo()!=editor||!isInputViewShown())return;
       if(getSharedPreferences("checks",0).getBoolean("lens",false)){checkLens();return;}
       try(FileOutputStream out=new FileOutputStream(new File(getNoBackupFilesDir(),"voice-test.pcm"))){out.write(1);}
       VoiceHook.handle(this,new VoiceEvent());Field f=VoiceHook.class.getDeclaredField("active");f.setAccessible(true);Object run=f.get(null);
-      if(run!=null){Field started=run.getClass().getDeclaredField("started");started.setAccessible(true);startsImmediately=started.getBoolean(run);}
+      if(run!=null){launched=true;Field started=run.getClass().getDeclaredField("started");started.setAccessible(true);startsImmediately=started.getBoolean(run);Field dialog=run.getClass().getDeclaredField("dialog");dialog.setAccessible(true);panelKeepsEditorFocus=(((android.app.AlertDialog)dialog.get(run)).getWindow().getAttributes().flags&WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)!=0;}
     }catch(Exception error){android.util.Log.e("HookCheck","Failed",error);}},700);
+  }
+  public void onStartInput(EditorInfo editor,boolean restarting){VoiceHook.inputStarted(this,editor,restarting);super.onStartInput(editor,restarting);if(!restarting){launched=false;startsImmediately=panelKeepsEditorFocus=restartUpdatedEditor=false;}else if(launched)restartUpdatedEditor=true;}
+  public InputConnection getCurrentInputConnection(){InputConnection current=super.getCurrentInputConnection();if(current==null||!getSharedPreferences("checks",0).getBoolean("reject_commit",false))return current;
+    return new InputConnectionWrapper(current,false){public boolean commitText(CharSequence text,int cursor){if(!commitRejected){commitRejected=true;return false;}return super.commitText(text,cursor);}};
   }
   public void onFinishInput(){VoiceHook.hidden(this);super.onFinishInput();}
   public void onWindowHidden(){VoiceHook.hidden(this);super.onWindowHidden();}

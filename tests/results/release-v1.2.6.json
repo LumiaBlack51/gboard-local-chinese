@@ -1,0 +1,54 @@
+{
+  "release": "v1.2.6",
+  "apks": [
+    {
+      "asset": "base.apk",
+      "versionCode": 176027087,
+      "sha256": "b24273628262ef93a0bf388faef3a1dd2a957e3c83331667053c231e80625d56",
+      "signature_verified": true,
+      "zipalign_16k_verified": true
+    },
+    {
+      "asset": "split_brella_feature_split.apk",
+      "versionCode": 176027087,
+      "sha256": "355b6c919085c687dc20ebf6535b96ef647b64a2f8b696578cc3212d35ec49ef",
+      "signature_verified": true,
+      "zipalign_16k_verified": true
+    },
+    {
+      "asset": "split_config.xxxhdpi.apk",
+      "versionCode": 176027087,
+      "sha256": "5ff8c00556f85c7a77a15105926902f727d4633c0dc13ca3a1c79f6eb03cc3b8",
+      "signature_verified": true,
+      "zipalign_16k_verified": true
+    },
+    {
+      "asset": "split_tenoranimation_feature_split.apk",
+      "versionCode": 176027087,
+      "sha256": "7a8730798fd6ec74fb9afd2d606c510f7651d2a4d452d6febb46043e327669f5",
+      "signature_verified": true,
+      "zipalign_16k_verified": true
+    },
+    {
+      "asset": "voice-helper.apk",
+      "versionCode": 4,
+      "sha256": "556fef3e175778e79fda9237aed6e9e87f02659ff0b636fe04ca43edc0dd33a3",
+      "signature_verified": true,
+      "zipalign_16k_verified": true
+    },
+    {
+      "asset": "updater.apk",
+      "versionCode": 10,
+      "sha256": "48984374163e603142000774c2651c05d5ab3f69990273ad5ae013dfda909045",
+      "signature_verified": true,
+      "zipalign_16k_verified": true
+    }
+  ],
+  "keyboard_native_decoder_unchanged": true,
+  "keyboard_and_voice_have_no_internet": true,
+  "debug_and_backup_disabled": true,
+  "debug_test_activity_and_fixtures_excluded": true,
+  "bundled_handwriting_model_hash_verified": true,
+  "voice_has_no_start_confirmation": true,
+  "passed": true
+}

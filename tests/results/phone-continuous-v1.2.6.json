@@ -1,0 +1,13 @@
+{
+  "version": "1.2.6",
+  "method": "Formal phone keyboard, temporary private probe editor; two physical horizontal strokes with second starting during the first ghost fade.",
+  "continuous_committed_text": "一一",
+  "settings_restored": {
+    "board": false,
+    "continuous": false,
+    "keyboard_font": 110,
+    "candidate_font": 125
+  },
+  "keyboard_gestures_sha256": "6943113d36c88956c90291a660449f76dd42fea9d03eca57ba358f6b5e29fe06",
+  "passed": true
+}

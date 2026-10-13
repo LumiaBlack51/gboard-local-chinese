@@ -1,0 +1,14 @@
+{
+  "version": "1.2.5",
+  "method": "Formal IME in private disposable probe editor; screenshot inspection of candidate text.",
+  "keyboard_font_restored_percent": 110,
+  "candidate_font_restored_percent": 125,
+  "candidate_max_font_150_no_overlap_observed": true,
+  "max_font_example_pinyin": "xiang",
+  "max_font_evidence": "artifacts/phone-candidates-150-v1.2.5.png",
+  "five_candidate_handwriting_strip_no_overlap_observed": true,
+  "handwriting_evidence": "artifacts/phone-handwriting-v1.2.5.png",
+  "handwriting_horizontal_stroke_selected_and_committed": "一",
+  "font_sizes_sha256": "7b657da1197164604a86ff178774991373962fd750e78bebbccca79865f61f15",
+  "passed": true
+}

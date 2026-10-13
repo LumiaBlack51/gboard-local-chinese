@@ -19,7 +19,7 @@ for package,version,paths in groups:
   items.append({'name':path.name,'sha256':sha,'size':size})
   assets.append({'file':path.relative_to(ROOT).as_posix(),'bytes':size,'sha256':sha,'name':path.name})
  components.append({'package':package,'versionCode':version,'assets':items})
-save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'空格滑动编辑拼音、逐字触感和点选放大；中文 26 键离线手写及独立手写板。更新器核验实际安装文件，及时刷新成功或失败结果，支持重新安装修复。语音仍点即开始。','components':components})
+save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'修复部分手机把独立语音服务静音导致无文字：改由输入法录音，经内存管道离线识别。修正手写起笔丢点、底排坐标偏移和长笔画截断；新增可选连写、逐笔渐淡和停笔自动填入。包含前几版的字号、候选重叠和触摸修复。','components':components})
 save('release-manifest.json',{'tag':'v'+VERSION,'assets':assets})
 (ROOT/'SHA256SUMS.txt').write_text(''.join(a['sha256']+'  '+a['name']+'\n' for a in assets),encoding='ascii')
 source={}

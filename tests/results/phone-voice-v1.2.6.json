@@ -1,0 +1,14 @@
+{
+  "version": "1.2.6",
+  "method": "Formal IME and voice service; synthetic Mandarin WAV played acoustically by disposable probe, captured through the phone microphone, then committed to its temporary editor. No personal recording saved.",
+  "before_helper_microphone_silenced": true,
+  "after_ime_microphone_silenced": false,
+  "automatic_endpoint_text": "今天下午召开会议请注意保护隐私",
+  "manual_stop_text": "今天下午召开会议请注意保护隐私",
+  "sources": {
+    "enhanced/src/local/gboard/enhanced/VoiceHook.java": "eb6039cff4f2bd3ec6b864916c39e32fc3c9518ea878122202121e8e5adfb7a0",
+    "enhanced/src/local/gboard/enhanced/MicrophonePipe.java": "e4cfc4971eba695fa6fbe5551b3ab8b457087d0a0d58ada3a57dc00d2f2efdfd",
+    "enhanced/voice-helper/OfflineRecognitionService.java": "5aae8b9d17b5531ebc607b93c0070fabb0ebc45d762e8dceee7eaf249949dfc5"
+  },
+  "passed": true
+}

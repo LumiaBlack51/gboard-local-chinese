@@ -1,53 +1,53 @@
 {
   "format": 1,
-  "version": "1.2.2",
+  "version": "1.2.6",
   "certificateSha256": "ca8e7c0c1f35a1821fc417499635e5bc8c0a774edaf19e2682f1cb6040154c74",
-  "notes": "空格滑动编辑拼音、逐字触感和点选放大；中文 26 键离线手写及独立手写板。更新器核验实际安装文件，及时刷新成功或失败结果，支持重新安装修复。语音仍点即开始。",
+  "notes": "修复部分手机把独立语音服务静音导致无文字：改由输入法录音，经内存管道离线识别。修正手写起笔丢点、底排坐标偏移和长笔画截断；新增可选连写、逐笔渐淡和停笔自动填入。包含前几版的字号、候选重叠和触摸修复。",
   "components": [
     {
       "package": "com.localx.android.inputmethod.latin",
-      "versionCode": 176027083,
+      "versionCode": 176027087,
       "assets": [
         {
           "name": "base.apk",
-          "sha256": "e599426ec369bbed5edb29538fad542429ed53ffe07890af664e80ec13cdda73",
+          "sha256": "b24273628262ef93a0bf388faef3a1dd2a957e3c83331667053c231e80625d56",
           "size": 572864207
         },
         {
           "name": "split_brella_feature_split.apk",
-          "sha256": "358252b53b12277d74d6dbc9f4e9ef6124203ebee804901dd470d85ca6a4e60d",
+          "sha256": "355b6c919085c687dc20ebf6535b96ef647b64a2f8b696578cc3212d35ec49ef",
           "size": 35656040
         },
         {
           "name": "split_config.xxxhdpi.apk",
-          "sha256": "83744e670ea4a5237c213595cba779f46bc27ff8e6c42083015712cb6bbc0fa2",
+          "sha256": "5ff8c00556f85c7a77a15105926902f727d4633c0dc13ca3a1c79f6eb03cc3b8",
           "size": 129884
         },
         {
           "name": "split_tenoranimation_feature_split.apk",
-          "sha256": "4a2191b3c37fc0c104ad0641ae07c713936e9a1b662362d6534853e695f385fa",
+          "sha256": "7a8730798fd6ec74fb9afd2d606c510f7651d2a4d452d6febb46043e327669f5",
           "size": 11321708
         }
       ]
     },
     {
       "package": "local.gboard.voice",
-      "versionCode": 3,
+      "versionCode": 4,
       "assets": [
         {
           "name": "voice-helper.apk",
-          "sha256": "b6fe03c595d787c4e33b5157c4a2c87807d4fa2e436d85c6303cae58f932c086",
+          "sha256": "556fef3e175778e79fda9237aed6e9e87f02659ff0b636fe04ca43edc0dd33a3",
           "size": 166978955
         }
       ]
     },
     {
       "package": "local.gboard.updater",
-      "versionCode": 6,
+      "versionCode": 10,
       "assets": [
         {
           "name": "updater.apk",
-          "sha256": "26c8585f31c8a68c985c8067fa6bcf8f083ae9fc532484372c05db0bfe82c8a5",
+          "sha256": "48984374163e603142000774c2651c05d5ab3f69990273ad5ae013dfda909045",
           "size": 20817
         }
       ]

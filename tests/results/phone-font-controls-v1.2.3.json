@@ -1,0 +1,7 @@
+{
+  "version": "1.2.3",
+  "keyboard_and_candidate_plus_buttons_work": true,
+  "minus_buttons_restore_100_and_115": true,
+  "controls_and_percentages_visible_on_phone": true,
+  "passed": true
+}

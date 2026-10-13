@@ -1,0 +1,128 @@
+{
+  "version": "1.2.4",
+  "sources": {
+    "enhanced/src/local/gboard/enhanced/VoiceHook.java": "273b15cf96ec0609c21fd6c1c7d1b069af00086543c76ae2ac175460a96e53e1",
+    "enhanced/src/local/gboard/enhanced/KeyboardGestures.java": "9ee9ad03c84bae7a5d0783a3482a037ef73ac9d4f65ac04cb8d6a51f80b0ec6f"
+  },
+  "checks": {
+    "gestures": {
+      "lower_edge_c_290": true,
+      "lower_edge_c_303": true,
+      "lower_edge_c_325": true,
+      "lower_edge_v_290": true,
+      "lower_edge_v_303": true,
+      "lower_edge_v_325": true,
+      "lower_edge_b_290": true,
+      "lower_edge_b_303": true,
+      "lower_edge_b_325": true,
+      "lower_edge_n_290": true,
+      "lower_edge_n_303": true,
+      "lower_edge_n_325": true,
+      "space_center_still_confirms": true,
+      "composing_space_down_is_captured": true,
+      "space_moves_three_characters": true,
+      "one_haptic_per_crossed_character": true,
+      "native_drag_cancelled": true,
+      "no_duplicate_haptic_within_character": true,
+      "space_reverse_moves_right": true,
+      "drag_release_does_not_confirm": true,
+      "typing_inserts_at_moved_caret": true,
+      "caret_clamped_to_start": true,
+      "boundary_does_not_vibrate": true,
+      "boundary_reverse_moves_without_dead_travel": true,
+      "tap_caret": 3,
+      "tap_selects_correct_pinyin_position": true,
+      "tap_opens_magnified_pinyin": true,
+      "space_fine_tunes_after_magnification": true,
+      "editing_repairs_pinyin": true,
+      "short_space_tap_still_confirms": true,
+      "confirmation_closes_magnifier": true,
+      "original_soft_keyboard_routes_pinyin_drag": true,
+      "qwerty_stroke_does_not_emit_letters": true,
+      "horizontal_stroke_candidates": [
+        "一",
+        "七",
+        "士"
+      ],
+      "offline_horizontal_stroke_recognized": true,
+      "handwriting_candidate_commits_text": true,
+      "standalone_board_has_overlay": true,
+      "board_keeps_native_delete_visible": true,
+      "delete_undoes_last_handwriting_stroke": true,
+      "undo_all_restores_normal_candidates": true,
+      "board_exit_button_restores_qwerty_without_letter": true,
+      "ordinary_letter_tap_passes_to_native": true,
+      "cancel_does_not_confirm_pinyin": true,
+      "native_composition_not_interrupted_by_handwriting": true,
+      "english_clears_chinese_gesture_state": true,
+      "english_drag_passes_to_native": true,
+      "model_candidates_二": [
+        "二",
+        "丰",
+        "一",
+        "下",
+        "冫"
+      ],
+      "multi_stroke_二_in_top_five": true,
+      "model_candidates_人": [
+        "入",
+        "厶",
+        "人",
+        "日",
+        "川"
+      ],
+      "multi_stroke_人_in_top_five": true,
+      "model_candidates_木": [
+        "木",
+        "夫",
+        "术",
+        "枯",
+        "甫"
+      ],
+      "multi_stroke_木_in_top_five": true,
+      "model_candidates_中": [
+        "中",
+        "由",
+        "丰",
+        "牛",
+        "冈"
+      ],
+      "multi_stroke_中_in_top_five": true,
+      "passed": true
+    },
+    "restart": {
+      "starts_without_confirmation": true,
+      "recognized": "今天下午召开会议请注意保护隐私",
+      "direct_commit_without_confirmation": true,
+      "panel_closed_after_result": true,
+      "timeout": false,
+      "panel_keeps_editor_focus": true,
+      "same_editor_restart": true,
+      "failed_commit_retains_text": false,
+      "passed": true
+    },
+    "retry": {
+      "starts_without_confirmation": true,
+      "recognized": "今天下午召开会议请注意保护隐私",
+      "direct_commit_without_confirmation": false,
+      "panel_closed_after_result": true,
+      "timeout": false,
+      "panel_keeps_editor_focus": true,
+      "same_editor_restart": false,
+      "failed_commit_retains_text": true,
+      "passed": true
+    },
+    "normal": {
+      "starts_without_confirmation": true,
+      "recognized": "今天下午召开会议请注意保护隐私",
+      "direct_commit_without_confirmation": true,
+      "panel_closed_after_result": true,
+      "timeout": false,
+      "panel_keeps_editor_focus": true,
+      "same_editor_restart": false,
+      "failed_commit_retains_text": false,
+      "passed": true
+    }
+  },
+  "passed": true
+}

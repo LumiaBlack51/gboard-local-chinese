@@ -20,10 +20,24 @@ import android.widget.TextView;
 public final class MainActivity extends Activity {
     private EditText input;
     private TextView status;
+    private android.media.MediaPlayer speech;
+    private void speechTest(){if(!getIntent().getBooleanExtra("speech_test",false))return;
+        input.postDelayed(()->{if(!hasWindowFocus())return;try{
+            speech=new android.media.MediaPlayer();
+            speech.setAudioAttributes(new android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_ALARM).setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH).build());
+            android.media.AudioManager audio=(android.media.AudioManager)getSystemService(AUDIO_SERVICE);
+            for(android.media.AudioDeviceInfo device:audio.getDevices(android.media.AudioManager.GET_DEVICES_OUTPUTS))if(device.getType()==android.media.AudioDeviceInfo.TYPE_BUILTIN_SPEAKER){speech.setPreferredDevice(device);break;}
+            android.content.res.AssetFileDescriptor fd=getAssets().openFd("speech-fixture.wav");
+            speech.setVolume(0.3f,0.3f);speech.setDataSource(fd.getFileDescriptor(),fd.getStartOffset(),fd.getLength());fd.close();
+            speech.setOnCompletionListener(player->{player.release();speech=null;});speech.prepare();speech.start();
+        }catch(Exception e){android.util.Log.e("LocalProbe","Synthetic playback failed",e);}},getIntent().getIntExtra("speech_delay_ms",6000));
+    }
+    @Override protected void onDestroy(){if(speech!=null){speech.release();speech=null;}super.onDestroy();}
 
     @Override protected void onNewIntent(android.content.Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+        speechTest();
         if (intent.hasExtra("private")) setPrivate(intent.getBooleanExtra("private", true));
         input.postDelayed(() -> {
             if (!hasWindowFocus()) return;
@@ -83,6 +97,7 @@ public final class MainActivity extends Activity {
         layout.addView(dictionaryResult);
         setContentView(layout);
         setPrivate(getIntent().getBooleanExtra("private", true));
+        speechTest();
         String dictionaryAction = getIntent().getStringExtra("dictionary_action");
         if (dictionaryAction != null) {
             dictionaryResult.setText(updatePublicDictionary(dictionaryAction));

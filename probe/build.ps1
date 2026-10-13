@@ -9,6 +9,11 @@ $taskJava = Join-Path $env:JAVA_HOME 'bin'
 $taskOut = Join-Path $taskRoot 'out'
 New-Item -ItemType Directory -Force -Path $taskOut,(Join-Path $taskOut 'classes'),(Join-Path $taskOut 'dex') | Out-Null
 
+$taskAssets = Join-Path $taskRoot 'assets'
+New-Item -ItemType Directory -Force -Path $taskAssets | Out-Null
+$taskFixture = Join-Path $taskRoot '..\enhanced\speech-fixture.wav'
+if (Test-Path -LiteralPath $taskFixture) { Copy-Item -LiteralPath $taskFixture -Destination (Join-Path $taskAssets 'speech-fixture.wav') }
+
 $taskSources = @(Get-ChildItem -LiteralPath (Join-Path $taskRoot 'src\local\gboard\probe') -Filter '*.java' | ForEach-Object { $_.FullName })
 & (Join-Path $taskJava 'javac.exe') -encoding UTF-8 -source 8 -target 8 -classpath $taskAndroid -d (Join-Path $taskOut 'classes') $taskSources
 if ($LASTEXITCODE) { throw 'javac failed' }
@@ -16,7 +21,7 @@ if ($LASTEXITCODE) { throw 'javac failed' }
 if ($LASTEXITCODE) { throw 'jar failed' }
 & (Join-Path $taskTools 'd8.bat') --min-api 26 --lib $taskAndroid --output (Join-Path $taskOut 'dex') (Join-Path $taskOut 'classes.jar')
 if ($LASTEXITCODE) { throw 'd8 failed' }
-& (Join-Path $taskTools 'aapt.exe') package -f -M (Join-Path $taskRoot 'AndroidManifest.xml') -S (Join-Path $taskRoot 'res') -I $taskAndroid -F (Join-Path $taskOut 'unsigned.apk')
+& (Join-Path $taskTools 'aapt.exe') package -f -M (Join-Path $taskRoot 'AndroidManifest.xml') -S (Join-Path $taskRoot 'res') -A (Join-Path $taskRoot 'assets') -I $taskAndroid -F (Join-Path $taskOut 'unsigned.apk')
 if ($LASTEXITCODE) { throw 'aapt failed' }
 Push-Location (Join-Path $taskOut 'dex')
 try { & (Join-Path $taskTools 'aapt.exe') add (Join-Path $taskOut 'unsigned.apk') classes.dex; if ($LASTEXITCODE) { throw 'aapt add failed' } }

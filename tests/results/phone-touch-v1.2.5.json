@@ -1,0 +1,214 @@
+{
+  "version": "1.2.5",
+  "method": "Formal keyboard, private disposable probe editor, observed phone geometry.",
+  "before_fix": {
+    "n_center_produced_j": true,
+    "evidence": "artifacts/phone-probe-n-before.png"
+  },
+  "checks": [
+    {
+      "key": "c",
+      "position": "upper",
+      "screen": [
+        510,
+        2240
+      ],
+      "actual": "c",
+      "passed": true
+    },
+    {
+      "key": "v",
+      "position": "upper",
+      "screen": [
+        635,
+        2240
+      ],
+      "actual": "v",
+      "passed": true
+    },
+    {
+      "key": "b",
+      "position": "upper",
+      "screen": [
+        760,
+        2240
+      ],
+      "actual": "b",
+      "passed": true
+    },
+    {
+      "key": "n",
+      "position": "upper",
+      "screen": [
+        890,
+        2240
+      ],
+      "actual": "n",
+      "passed": true
+    },
+    {
+      "key": "c",
+      "position": "center",
+      "screen": [
+        510,
+        2300
+      ],
+      "actual": "c",
+      "passed": true
+    },
+    {
+      "key": "v",
+      "position": "center",
+      "screen": [
+        635,
+        2300
+      ],
+      "actual": "v",
+      "passed": true
+    },
+    {
+      "key": "b",
+      "position": "center",
+      "screen": [
+        760,
+        2300
+      ],
+      "actual": "b",
+      "passed": true
+    },
+    {
+      "key": "n",
+      "position": "center",
+      "screen": [
+        890,
+        2300
+      ],
+      "actual": "n",
+      "passed": true
+    },
+    {
+      "key": "c",
+      "position": "lower",
+      "screen": [
+        510,
+        2380
+      ],
+      "actual": "c",
+      "passed": true
+    },
+    {
+      "key": "v",
+      "position": "lower",
+      "screen": [
+        635,
+        2380
+      ],
+      "actual": "v",
+      "passed": true
+    },
+    {
+      "key": "b",
+      "position": "lower",
+      "screen": [
+        760,
+        2380
+      ],
+      "actual": "b",
+      "passed": true
+    },
+    {
+      "key": "n",
+      "position": "lower",
+      "screen": [
+        890,
+        2380
+      ],
+      "actual": "n",
+      "passed": true
+    },
+    {
+      "key": "c",
+      "position": "gap",
+      "screen": [
+        510,
+        2410
+      ],
+      "actual": "c",
+      "passed": true
+    },
+    {
+      "key": "v",
+      "position": "gap",
+      "screen": [
+        635,
+        2410
+      ],
+      "actual": "v",
+      "passed": true
+    },
+    {
+      "key": "b",
+      "position": "gap",
+      "screen": [
+        760,
+        2410
+      ],
+      "actual": "b",
+      "passed": true
+    },
+    {
+      "key": "n",
+      "position": "gap",
+      "screen": [
+        890,
+        2410
+      ],
+      "actual": "n",
+      "passed": true
+    },
+    {
+      "key": "c",
+      "position": "space_edge",
+      "screen": [
+        510,
+        2460
+      ],
+      "actual": "c",
+      "passed": true
+    },
+    {
+      "key": "v",
+      "position": "space_edge",
+      "screen": [
+        635,
+        2460
+      ],
+      "actual": "v",
+      "passed": true
+    },
+    {
+      "key": "b",
+      "position": "space_edge",
+      "screen": [
+        760,
+        2460
+      ],
+      "actual": "b",
+      "passed": true
+    },
+    {
+      "key": "n",
+      "position": "space_edge",
+      "screen": [
+        890,
+        2460
+      ],
+      "actual": "n",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "keyboard_gestures_sha256": "0212a5cbc20867c66f8df9e86e584d669daaee1d5e6823de71371e9232432049",
+  "space_center_selects_chinese": true,
+  "consecutive_cvbn": true
+}

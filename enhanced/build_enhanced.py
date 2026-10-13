@@ -75,6 +75,31 @@ for method,hook in [('onAttachedToWindow()V','attach'),('onDetachedFromWindow()V
   start=source.index(method);body_start=source.index('\n',source.index('.locals',start))+1
   source=source[:body_start]+'    invoke-static {p0}, Llocal/gboard/enhanced/KeyboardGestures;->'+hook+'(Landroid/view/View;)V\n'+source[body_start:]
 (patches/'SoftKeyboardView.smali').write_text(source,encoding='utf8')
+rel=Path('com/google/android/libraries/inputmethod/widgets/SoftKeyView.smali')
+source=(ROOT/'gboard-18.4.1/smali/smali'/rel).read_text('utf8')
+# Apply before native width measurement; restore around native label/theme scaling
+# so recycled candidates, height changes and repeated layout never compound factors.
+for signature in ['.method private final b(F)V','.method private final z(Lcom/google/android/libraries/inputmethod/metadata/SoftKeyDef;)V']:
+  assert source.count(signature)==1
+  start=source.index(signature);end=source.index('.end method',start)
+  body=source[start:end];entry=body.index('\n',body.index('.locals'))+1
+  body=body[:entry]+'    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/FontSizes;->restore(Landroid/view/View;)V\n'+body[entry:]
+  body=body.replace('    return-void','    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/FontSizes;->apply(Landroid/view/View;)V\n    return-void')
+  source=source[:start]+body+source[end:]
+anchor='.method protected final onMeasure(II)V\n    .locals 1\n'
+assert source.count(anchor)==1
+source=source.replace(anchor,anchor+'    invoke-static {p0}, Llocal/gboard/enhanced/FontSizes;->apply(Landroid/view/View;)V\n')
+(patches/'SoftKeyView.smali').write_text(source,encoding='utf8')
+rel=Path('com/google/android/libraries/inputmethod/widgets/text/AutoCenterScaleTextView.smali')
+source=(ROOT/'gboard-18.4.1/smali/smali'/rel).read_text('utf8')
+anchor='.method protected final onMeasure(II)V\n    .locals 13\n'
+assert source.count(anchor)==1
+source=source.replace(anchor,anchor+'    invoke-static {p0, p1}, Llocal/gboard/enhanced/FontSizes;->fitCandidateText(Landroid/widget/TextView;I)V\n')
+start=source.index('.method protected onDraw(Landroid/graphics/Canvas;)V');end=source.index('.end method',start)
+body=source[start:end].replace('    .locals 2','    .locals 3\n    invoke-static {p0, p1}, Llocal/gboard/enhanced/FontSizes;->clipCandidateText(Landroid/view/View;Landroid/graphics/Canvas;)I\n    move-result v2',1)
+body=body.replace('    return-void','    invoke-static {p1, v2}, Llocal/gboard/enhanced/FontSizes;->restoreCanvas(Landroid/graphics/Canvas;I)V\n    return-void')
+source=source[:start]+body+source[end:]
+(patches/'AutoCenterScaleTextView.smali').write_text(source,encoding='utf8')
 source=(ROOT/'gboard-18.4.1'/'smali'/'smali'/'pbb.smali').read_text(encoding='utf8')
 anchor='.method public final aw(Loas;)Z\n    .locals 26\n'
 assert source.count(anchor)==1
@@ -97,6 +122,8 @@ for method in ['onFinishInput()V','onWindowHidden()V']:
   source=source[:body_start]+'    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/VoiceHook;->hidden(Ljava/lang/Object;)V\n'+source[body_start:]
 start=source.index('.method public final onStartInputView(Landroid/view/inputmethod/EditorInfo;Z)V');body_start=source.index('\n',source.index('.locals',start))+1
 source=source[:body_start]+'    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/Diagnostics;->install(Ljava/lang/Object;)V\n'+source[body_start:]
+start=source.index('.method public final onStartInput(Landroid/view/inputmethod/EditorInfo;Z)V');body_start=source.index('\n',source.index('.locals',start))+1
+source=source[:body_start]+'    invoke-static/range {p0 .. p2}, Llocal/gboard/enhanced/VoiceHook;->inputStarted(Ljava/lang/Object;Landroid/view/inputmethod/EditorInfo;Z)V\n'+source[body_start:]
 (patches/'pbb.smali').write_text(source,encoding='utf8')
 run(JAVA/'javac.exe','-cp',APKTOOL,ROOT/'tools'/'Assemble.java')
 run(JAVA/'java.exe','-cp',str(APKTOOL)+';'+str(ROOT/'tools'),'Assemble',patches,work/'patched.dex')
@@ -126,6 +153,7 @@ with zipfile.ZipFile(base) as z,zipfile.ZipFile(unsigned,'w') as out:
       if '--test' in sys.argv:
         content=add_activity(content,'local.gboard.enhanced.AdapterCheckActivity',True)
         content=add_activity(content,'local.gboard.enhanced.GestureCheckActivity',True)
+        content=add_activity(content,'local.gboard.enhanced.FontSizeCheckActivity',True)
     out.writestr(info,content)
   out.write(dex/'classes.dex','classes5.dex',compress_type=zipfile.ZIP_DEFLATED)
   for name in ['libgboard_local_rime.so','librime.so','libFcitx5Core.so','libFcitx5Config.so','libFcitx5Utils.so','libc++_shared.so','libgboard_local_handwriting.so']:

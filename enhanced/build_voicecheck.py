@@ -12,6 +12,8 @@ run(JAVA/'javac.exe','-encoding','UTF-8','-source','8','-target','8','-cp',ANDRO
 run(JAVA/'jar.exe','cf',out/'client.jar','-C',classes,'.')
 run(BT/'d8.bat','--min-api','32','--lib',ANDROID,'--output',dex,out/'client.jar')
 run(BT/'aapt.exe','package','-f','-M',base/'AndroidManifest.xml','-S',base/'res','-I',ANDROID,'-F',out/'unsigned.apk')
-with zipfile.ZipFile(out/'unsigned.apk','a') as z:z.write(dex/'classes.dex','classes.dex',compress_type=zipfile.ZIP_DEFLATED)
+with zipfile.ZipFile(out/'unsigned.apk','a') as z:
+  z.write(dex/'classes.dex','classes.dex',compress_type=zipfile.ZIP_DEFLATED)
+  z.write(ROOT/'enhanced/speech-fixture.wav','assets/speech-fixture.wav',compress_type=zipfile.ZIP_STORED)
 run(BT/'zipalign.exe','-f','4',out/'unsigned.apk',out/'aligned.apk')
 run(BT/'apksigner.bat','sign',*SIGN_ARGS,'--out',out/'voicecheck.apk',out/'aligned.apk')

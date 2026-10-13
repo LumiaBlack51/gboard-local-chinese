@@ -1,0 +1,40 @@
+{
+  "version": "1.2.6",
+  "sources": {
+    "enhanced/voice-helper/OfflineRecognitionService.java": "5aae8b9d17b5531ebc607b93c0070fabb0ebc45d762e8dceee7eaf249949dfc5",
+    "enhanced/voicecheck/VoiceCheckActivity.java": "e34e67d2785ff648ee11393fdebb8a190f1b7f9a4f5a02756fca819d4c0f0622"
+  },
+  "checks": {
+    "eof": {
+      "fixture": true,
+      "ready": true,
+      "audio_started": true,
+      "pipe": true,
+      "ended": true,
+      "recognized": "今天下午召开会议请注意保护隐私",
+      "endpoint_finished": false,
+      "results": true
+    },
+    "stop_during_model_start": {
+      "fixture": true,
+      "ready": true,
+      "audio_started": true,
+      "pipe": true,
+      "ended": true,
+      "recognized": "今天下午召开会议请注意保护隐私",
+      "endpoint_finished": false,
+      "results": true
+    },
+    "endpoint": {
+      "fixture": true,
+      "ready": true,
+      "audio_started": true,
+      "pipe": true,
+      "ended": true,
+      "recognized": "今天下午召开会议请注意保护隐私",
+      "endpoint_finished": false,
+      "results": true
+    }
+  },
+  "passed": true
+}
