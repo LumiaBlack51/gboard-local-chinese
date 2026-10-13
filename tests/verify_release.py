@@ -6,9 +6,9 @@ from build_config import ROOT,BT
 def run(*args):return subprocess.check_output([str(x) for x in args],encoding='utf8',errors='replace')
 def sha(data):return hashlib.sha256(data).hexdigest()
 manifest=json.loads((ROOT/'update-manifest.json').read_text('utf8'))
-paths={p.name:p for folder in ['enhanced/final','enhanced/voice-helper/final','enhanced/updater/out'] for p in (ROOT/folder).glob('*.apk')}
+paths={p.name:p for folder in ['enhanced/final','enhanced/voice-helper/final','enhanced/updater/out','enhanced/proofread/final'] for p in (ROOT/folder).glob('*.apk')}
 checks=[]
-for component in manifest['components']:
+for component in manifest['components']+manifest.get('optionalComponents',[]):
  for asset in component['assets']:
   path=paths[asset['name']]
   assert path.stat().st_size==asset['size'] and sha(path.read_bytes())==asset['sha256']
@@ -42,4 +42,4 @@ for component in manifest['components']:
   checks.append({'asset':path.name,'versionCode':component['versionCode'],'sha256':asset['sha256'],'signature_verified':True,'zipalign_16k_verified':True})
 result={'release':'v'+manifest['version'],'apks':checks,'keyboard_native_decoder_unchanged':True,'keyboard_and_voice_have_no_internet':True,'debug_and_backup_disabled':True,'debug_test_activity_and_fixtures_excluded':True,'bundled_handwriting_model_hash_verified':True,'voice_has_no_start_confirmation':True,'passed':True}
 (ROOT/'tests/results'/('release-v'+manifest['version']+'.json')).write_text(json.dumps(result,indent=2)+'\n',encoding='utf8')
-print('Verified all six signed APKs, versions, metadata, permissions and native decoder.')
+print('Verified all seven signed APKs, versions, metadata, permissions and native decoder.')

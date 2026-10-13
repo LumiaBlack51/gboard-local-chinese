@@ -17,7 +17,7 @@ def adb(*args):
     return subprocess.check_output([a.adb, '-s', a.serial, *args], encoding='utf8', timeout=45)
 
 checks = []
-for component in manifest['components']:
+for component in manifest['components']+manifest.get('optionalComponents',[]):
     package = component['package']
     dump = adb('shell', 'dumpsys', 'package', package)
     assert 'versionCode=' + str(component['versionCode']) + ' ' in dump
@@ -44,4 +44,4 @@ report = {'version': manifest['version'],
           'default_input_method_is_enhanced_keyboard': True, 'passed': True}
 (root / 'tests/results' / ('phone-installed-v' + manifest['version'] + '.json')).write_text(
     json.dumps(report, indent=2) + '\n', encoding='utf8')
-print('Phone: six installed APK hashes, versions, first installation time and default IME verified.')
+print('Phone: seven installed APK hashes, versions, first installation time and default IME verified.')

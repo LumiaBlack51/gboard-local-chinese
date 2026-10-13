@@ -1,0 +1,9 @@
+{
+  "legacy_three_components_accepted": true,
+  "proofreading_extension_accepted": true,
+  "missing_extension_rejected": true,
+  "unknown_extension_rejected": true,
+  "verification_failure_shown_without_reopening": true,
+  "cancellation_shown_without_reopening": true,
+  "passed": true
+}

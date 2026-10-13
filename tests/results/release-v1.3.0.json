@@ -1,0 +1,61 @@
+{
+  "release": "v1.3.0",
+  "apks": [
+    {
+      "asset": "base.apk",
+      "versionCode": 176027088,
+      "sha256": "9d2ffcdd30f2caf156c791215804c085936152f9167c73e40a5433590001f6ab",
+      "signature_verified": true,
+      "zipalign_16k_verified": true
+    },
+    {
+      "asset": "split_brella_feature_split.apk",
+      "versionCode": 176027088,
+      "sha256": "35f2f23cb7f17f8712914efda19bb3fcff01dd4a0beb5579851a19559cabefdf",
+      "signature_verified": true,
+      "zipalign_16k_verified": true
+    },
+    {
+      "asset": "split_config.xxxhdpi.apk",
+      "versionCode": 176027088,
+      "sha256": "af7afae510c887fe795cf6103c8df76228f080e140409052eb092e265ef8c393",
+      "signature_verified": true,
+      "zipalign_16k_verified": true
+    },
+    {
+      "asset": "split_tenoranimation_feature_split.apk",
+      "versionCode": 176027088,
+      "sha256": "9eb982fa8a256304739b1c89c1b140eb25c598752b03e3ff767dec6e39b27c05",
+      "signature_verified": true,
+      "zipalign_16k_verified": true
+    },
+    {
+      "asset": "voice-helper.apk",
+      "versionCode": 5,
+      "sha256": "b0491f6a007a04db538695c9d3ef47a5f5eb2b6eb12fcf0a9292217e38d5309b",
+      "signature_verified": true,
+      "zipalign_16k_verified": true
+    },
+    {
+      "asset": "updater.apk",
+      "versionCode": 11,
+      "sha256": "a3d7bfb5c0cbc06df638a045a6d6fbf92912d3a2fbcf33e5a29c30c05bf06bfe",
+      "signature_verified": true,
+      "zipalign_16k_verified": true
+    },
+    {
+      "asset": "proofread.apk",
+      "versionCode": 1,
+      "sha256": "1c1747d4dbdd32f99f4069a8f7d07f9fcb8e5ea677a9cd5dcd078c796c37d2cd",
+      "signature_verified": true,
+      "zipalign_16k_verified": true
+    }
+  ],
+  "keyboard_native_decoder_unchanged": true,
+  "keyboard_and_voice_have_no_internet": true,
+  "debug_and_backup_disabled": true,
+  "debug_test_activity_and_fixtures_excluded": true,
+  "bundled_handwriting_model_hash_verified": true,
+  "voice_has_no_start_confirmation": true,
+  "passed": true
+}

@@ -1,10 +1,11 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.gboard.voice" android:versionCode="4" android:versionName="1.2.6">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.gboard.voice" android:versionCode="5" android:versionName="1.3.0">
   <uses-sdk android:minSdkVersion="32" android:targetSdkVersion="35" />
   <uses-permission android:name="android.permission.RECORD_AUDIO" />
   <queries><package android:name="com.localx.android.inputmethod.latin" /><package android:name="local.gboard.voicecheck" /></queries>
   <permission android:name="local.gboard.voice.ACCESS" android:protectionLevel="signature" />
   <application android:label="中英离线语音服务" android:allowBackup="false" android:debuggable="true" android:theme="@android:style/Theme.Material.Light.NoActionBar">
     <activity android:name=".PermissionActivity" android:exported="true" android:permission="local.gboard.voice.ACCESS" />
+    <service android:name=".WarmupService" android:exported="true" android:permission="local.gboard.voice.ACCESS" />
     <service android:name=".OfflineRecognitionService" android:exported="true" android:permission="android.permission.BIND_SPEECH_RECOGNITION_SERVICE">
       <intent-filter><action android:name="android.speech.RecognitionService" /></intent-filter>
       <meta-data android:name="android.speech" android:resource="@xml/recognizer" />

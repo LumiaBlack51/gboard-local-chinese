@@ -15,6 +15,8 @@ import org.json.*;
 /** User initiated GitHub updates in a separate UID with no keyboard or microphone access. */
 public final class UpdateActivity extends Activity {
   static final String REPO="LumiaBlack51/gboard-local-chinese",KEYBOARD="com.localx.android.inputmethod.latin",VOICE="local.gboard.voice",SELF="local.gboard.updater";
+  static final String PROOF="local.gboard.proofread";
+  static JSONArray allComponents(JSONObject manifest)throws JSONException{JSONArray result=new JSONArray();JSONArray core=manifest.getJSONArray("components"),optional=manifest.optJSONArray("optionalComponents");for(int i=0;i<core.length();i++)result.put(core.get(i));if(optional!=null)for(int i=0;i<optional.length();i++)result.put(optional.get(i));return result;}
   private TextView status,current;private Button check,install;private JSONArray components;private JSONObject release;private Thread worker;private volatile boolean closed;
   private final Map<String,String> urls=new HashMap<>();
   private SharedPreferences updates;
@@ -52,7 +54,7 @@ public final class UpdateActivity extends Activity {
     if(latest.optBoolean("draft")||latest.optBoolean("prerelease"))throw new IOException("没有正式版本");
     urls.clear();JSONArray assets=latest.getJSONArray("assets");for(int i=0;i<assets.length();i++){JSONObject a=assets.getJSONObject(i);String address=a.getString("browser_download_url");if(!address.startsWith("https://github.com/"+REPO+"/releases/download/"))throw new IOException("更新来源不匹配");urls.put(a.getString("name"),address);}
     if(!urls.containsKey("update-manifest.json")){message("当前发布版本尚未提供应用内更新包。请稍后再次检查。");return;}
-    release=json(urls.get("update-manifest.json"));validateManifest(release,signer(),urls.keySet());components=release.getJSONArray("components");boolean newer=false;
+    release=json(urls.get("update-manifest.json"));validateManifest(release,signer(),urls.keySet());components=allComponents(release);boolean newer=false;
     StringBuilder versions=new StringBuilder("最新版本：").append(release.getString("version"));
     for(int i=0;i<components.length();i++){JSONObject part=components.getJSONObject(i);long current=installed(part.getString("package")),next=part.getLong("versionCode");if(current>next)throw new IOException("服务器版本比已安装版本旧，拒绝降级");if(current<next)newer=true;}
     if(newer){message(versions+"\n"+release.optString("notes")+"\n尚未安装这个版本。点击下载并安装更新，完成系统安装后才会生效。词库和设置保留。");runOnUiThread(()->{if(!closed){install.setText("下载并安装更新");install.setEnabled(true);}});}
@@ -66,6 +68,7 @@ public final class UpdateActivity extends Activity {
       for(int j=0;j<assets.length();j++){JSONObject a=assets.getJSONObject(j);String name=a.getString("name");if(!name.matches("[a-zA-Z0-9_.-]+\\.apk")||!names.contains(name)||!files.add(name)||!a.getString("sha256").matches("[0-9a-f]{64}")||a.getLong("size")<=0||a.getLong("size")>1073741824)throw new IOException("更新文件无效");}
     }
     if(!files.containsAll(Arrays.asList("base.apk","split_brella_feature_split.apk","split_config.xxxhdpi.apk","split_tenoranimation_feature_split.apk","voice-helper.apk","updater.apk")))throw new IOException("更新文件不完整");
+    JSONArray optional=manifest.optJSONArray("optionalComponents");if(optional!=null){if(optional.length()>1)throw new IOException("未知扩展组件");for(int i=0;i<optional.length();i++){JSONObject p=optional.getJSONObject(i);JSONArray assets=p.getJSONArray("assets");if(!PROOF.equals(p.getString("package"))||p.getLong("versionCode")<=0||assets.length()!=1)throw new IOException("校对组件身份无效");JSONObject asset=assets.getJSONObject(0);if(!"proofread.apk".equals(asset.getString("name"))||!names.contains("proofread.apk")||!asset.getString("sha256").matches("[0-9a-f]{64}")||asset.getLong("size")<=0||asset.getLong("size")>536870912)throw new IOException("校对组件文件无效");}}
   }
   private void beginInstall(){if(components==null)return;if(!getPackageManager().canRequestPackageInstalls()){
     message("请在系统页面允许此应用安装更新，然后返回继续。");startActivityForResult(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,Uri.parse("package:"+SELF)),11);return;

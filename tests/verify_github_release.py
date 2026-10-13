@@ -13,4 +13,4 @@ assets={x['name']:x for x in release['assets']};assert assets.keys()==local.keys
 for name,path in local.items():
  asset=assets[name];assert asset['state']=='uploaded' and asset['size']==path.stat().st_size
  assert asset['digest']=='sha256:'+hashlib.sha256(path.read_bytes()).hexdigest(),name
-print('All nine uploaded assets match local SHA-256 and size; repository is public.')
+print('All ten uploaded assets match local SHA-256 and size; repository is public.')

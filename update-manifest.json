@@ -1,54 +1,67 @@
 {
   "format": 1,
-  "version": "1.2.6",
+  "version": "1.3.0",
   "certificateSha256": "ca8e7c0c1f35a1821fc417499635e5bc8c0a774edaf19e2682f1cb6040154c74",
-  "notes": "修复部分手机把独立语音服务静音导致无文字：改由输入法录音，经内存管道离线识别。修正手写起笔丢点、底排坐标偏移和长笔画截断；新增可选连写、逐笔渐淡和停笔自动填入。包含前几版的字号、候选重叠和触摸修复。",
+  "notes": "中英离线语音校对、英文大小写整理；候选栏支持叉、展开及两者并列，默认替换为叉。包含独立校对组件；首次打开「中英本地校对」完成准备。旧更新器先升级核心组件，再检查一次安装校对组件。",
   "components": [
     {
       "package": "com.localx.android.inputmethod.latin",
-      "versionCode": 176027087,
+      "versionCode": 176027088,
       "assets": [
         {
           "name": "base.apk",
-          "sha256": "b24273628262ef93a0bf388faef3a1dd2a957e3c83331667053c231e80625d56",
+          "sha256": "9d2ffcdd30f2caf156c791215804c085936152f9167c73e40a5433590001f6ab",
           "size": 572864207
         },
         {
           "name": "split_brella_feature_split.apk",
-          "sha256": "355b6c919085c687dc20ebf6535b96ef647b64a2f8b696578cc3212d35ec49ef",
+          "sha256": "35f2f23cb7f17f8712914efda19bb3fcff01dd4a0beb5579851a19559cabefdf",
           "size": 35656040
         },
         {
           "name": "split_config.xxxhdpi.apk",
-          "sha256": "5ff8c00556f85c7a77a15105926902f727d4633c0dc13ca3a1c79f6eb03cc3b8",
+          "sha256": "af7afae510c887fe795cf6103c8df76228f080e140409052eb092e265ef8c393",
           "size": 129884
         },
         {
           "name": "split_tenoranimation_feature_split.apk",
-          "sha256": "7a8730798fd6ec74fb9afd2d606c510f7651d2a4d452d6febb46043e327669f5",
+          "sha256": "9eb982fa8a256304739b1c89c1b140eb25c598752b03e3ff767dec6e39b27c05",
           "size": 11321708
         }
       ]
     },
     {
       "package": "local.gboard.voice",
-      "versionCode": 4,
+      "versionCode": 5,
       "assets": [
         {
           "name": "voice-helper.apk",
-          "sha256": "556fef3e175778e79fda9237aed6e9e87f02659ff0b636fe04ca43edc0dd33a3",
+          "sha256": "b0491f6a007a04db538695c9d3ef47a5f5eb2b6eb12fcf0a9292217e38d5309b",
           "size": 166978955
         }
       ]
     },
     {
       "package": "local.gboard.updater",
-      "versionCode": 10,
+      "versionCode": 11,
       "assets": [
         {
           "name": "updater.apk",
-          "sha256": "48984374163e603142000774c2651c05d5ab3f69990273ad5ae013dfda909045",
+          "sha256": "a3d7bfb5c0cbc06df638a045a6d6fbf92912d3a2fbcf33e5a29c30c05bf06bfe",
           "size": 20817
+        }
+      ]
+    }
+  ],
+  "optionalComponents": [
+    {
+      "package": "local.gboard.proofread",
+      "versionCode": 1,
+      "assets": [
+        {
+          "name": "proofread.apk",
+          "sha256": "1c1747d4dbdd32f99f4069a8f7d07f9fcb8e5ea677a9cd5dcd078c796c37d2cd",
+          "size": 169486431
         }
       ]
     }

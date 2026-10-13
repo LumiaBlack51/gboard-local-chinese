@@ -59,6 +59,33 @@ source+='''
 .end method
 '''
 (patches/'LatinFixedCountCandidatesHolderView.smali').write_text(source,encoding='utf8')
+# Chinese uses FixedSizeCandidatesHolderView, a different upstream layout from Latin.
+rel=Path('com/google/android/libraries/inputmethod/widgets/FixedSizeCandidatesHolderView.smali')
+source=(ROOT/'gboard-18.4.1/smali/smali_classes3'/rel).read_text('utf8')
+for signature in ['.method public final z(Ljava/util/List;Ljava/util/ArrayList;)V','.method protected final onLayout(ZIIII)V']:
+  start=source.index(signature);end=source.index('.end method',start)
+  hook='bindCandidateBar' if ' z(' in signature else 'layoutDismissButton'
+  body=source[start:end].replace('    return-void','    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/EnhancedHook;->'+hook+'(Landroid/view/View;)V\n    return-void')
+  source=source[:start]+body+source[end:]
+for signature,register in [('.method public final B(I)V','p1'),('.method public final z(Ljava/util/List;Ljava/util/ArrayList;)V','v0')]:
+  start=source.index(signature);end=source.index('.end method',start);body=source[start:end]
+  anchor='    invoke-virtual {p0}, Lcom/google/android/libraries/inputmethod/widgets/FixedSizeCandidatesHolderView;->D()Z'
+  assert body.count(anchor)==1
+  body=body.replace(anchor,'    invoke-static {p0, '+register+'}, Llocal/gboard/enhanced/EnhancedHook;->candidateWidth(Landroid/view/View;I)I\n    move-result '+register+'\n'+anchor)
+  if ' B(' in signature:
+    anchor='    invoke-virtual {p1, v4}, Landroid/view/View;->setVisibility(I)V'
+    assert body.count(anchor)==1
+    body=body.replace(anchor,'    invoke-static {p0, v4}, Llocal/gboard/enhanced/EnhancedHook;->candidateExpansionVisibility(Landroid/view/View;I)I\n    move-result v4\n'+anchor)
+  source=source[:start]+body+source[end:]
+source+='''
+.method protected onAttachedToWindow()V
+    .locals 0
+    invoke-super {p0}, Landroid/widget/LinearLayout;->onAttachedToWindow()V
+    invoke-static {p0}, Llocal/gboard/enhanced/EnhancedHook;->bindCandidateBar(Landroid/view/View;)V
+    return-void
+.end method
+'''
+(patches/'FixedSizeCandidatesHolderView.smali').write_text(source,encoding='utf8')
 rel=Path('com/google/android/libraries/inputmethod/widgets/SoftKeyboardView.smali')
 source=(ROOT/'gboard-18.4.1/smali/smali'/rel).read_text('utf8')
 anchor='.method public final dispatchTouchEvent(Landroid/view/MotionEvent;)Z\n    .locals 4\n'
@@ -121,7 +148,7 @@ for method in ['onFinishInput()V','onWindowHidden()V']:
   start=source.index('.method public final '+method);body_start=source.index('\n',source.index('.locals',start))+1
   source=source[:body_start]+'    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/VoiceHook;->hidden(Ljava/lang/Object;)V\n'+source[body_start:]
 start=source.index('.method public final onStartInputView(Landroid/view/inputmethod/EditorInfo;Z)V');body_start=source.index('\n',source.index('.locals',start))+1
-source=source[:body_start]+'    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/Diagnostics;->install(Ljava/lang/Object;)V\n'+source[body_start:]
+source=source[:body_start]+'    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/Diagnostics;->install(Ljava/lang/Object;)V\n    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/VoiceHook;->shown(Ljava/lang/Object;)V\n'+source[body_start:]
 start=source.index('.method public final onStartInput(Landroid/view/inputmethod/EditorInfo;Z)V');body_start=source.index('\n',source.index('.locals',start))+1
 source=source[:body_start]+'    invoke-static/range {p0 .. p2}, Llocal/gboard/enhanced/VoiceHook;->inputStarted(Ljava/lang/Object;Landroid/view/inputmethod/EditorInfo;Z)V\n'+source[body_start:]
 (patches/'pbb.smali').write_text(source,encoding='utf8')
@@ -140,13 +167,13 @@ raw=work/'original-dex';raw.mkdir(exist_ok=True)
 fixed=work/'fixed-dex';fixed.mkdir(exist_ok=True)
 base=ROOT/'enhanced'/'baseline'/'base.apk'
 with zipfile.ZipFile(base) as z:
-  for name in ['classes.dex','classes2.dex']:(raw/name).write_bytes(z.read(name))
+  for name in ['classes.dex','classes2.dex','classes3.dex']:(raw/name).write_bytes(z.read(name))
 run(JAVA/'java.exe','-Xmx2G','-cp',CP,'DexTool',raw,fixed,work/'patched.dex')
 unsigned=work/'enhanced.apk'
 with zipfile.ZipFile(base) as z,zipfile.ZipFile(unsigned,'w') as out:
   for info in z.infolist():
     if info.filename.startswith('META-INF/'):continue
-    content=(fixed/info.filename).read_bytes() if info.filename in ['classes.dex','classes2.dex'] else z.read(info)
+    content=(fixed/info.filename).read_bytes() if info.filename in ['classes.dex','classes2.dex','classes3.dex'] else z.read(info)
     if info.filename=='AndroidManifest.xml':
       sys.path.insert(0,str(ROOT));from add_activity import add_activity,add_voice_access,management_launcher
       content=management_launcher(add_voice_access(add_activity(content,'local.gboard.enhanced.VoicePermissionActivity')))

@@ -1,0 +1,10 @@
+{
+  "device": "Snapdragon 8 Elite Android phone",
+  "formal_signed_packages": true,
+  "recognition_broker_prebind_before_microphone_click": true,
+  "microphone_and_recording_panel_appear_after_click": true,
+  "recognized_text_committed_and_panel_closed": true,
+  "sentence_terminator_observed": true,
+  "fixed_fixture_accuracy_verified": false,
+  "limitation": "Acoustic playback was affected by surrounding speech. No personal audio or recognized content is saved in this report. This is a pipeline check, not an ASR accuracy test."
+}

@@ -1,0 +1,95 @@
+[
+  {
+    "file": "t5tiny/config.json",
+    "url": "https://huggingface.co/visheratin/t5-efficient-tiny-grammar-correction/resolve/a98f126664317cf2e68d33234c7072fdd6b289f3/config.json",
+    "bytes": 728,
+    "sha256": "0919c7f98a166258a31c8787b3692e898e2138d4b7ef644d901df70d4ecfa12c"
+  },
+  {
+    "file": "t5tiny/pytorch_model.bin",
+    "url": "https://huggingface.co/visheratin/t5-efficient-tiny-grammar-correction/resolve/a98f126664317cf2e68d33234c7072fdd6b289f3/pytorch_model.bin",
+    "bytes": 62311002,
+    "sha256": "90ddeb20517df53f91ecda2a310465ebdf2eef5e6115d4dad5602c35b8c941e8"
+  },
+  {
+    "file": "t5tiny/tokenizer.json",
+    "url": "https://huggingface.co/visheratin/t5-efficient-tiny-grammar-correction/resolve/a98f126664317cf2e68d33234c7072fdd6b289f3/tokenizer.json",
+    "bytes": 2422164,
+    "sha256": "d7af4599a1914d04aaf44839418757f40ccca4c78033edeba369484978378335"
+  },
+  {
+    "file": "t5tiny/tokenizer_config.json",
+    "url": "https://huggingface.co/visheratin/t5-efficient-tiny-grammar-correction/resolve/a98f126664317cf2e68d33234c7072fdd6b289f3/tokenizer_config.json",
+    "bytes": 2425,
+    "sha256": "fb20bc34a5b9e424c29d0aa8cf4754a7f0e42cf8ff5ba304dec219c54854dba9"
+  },
+  {
+    "file": "t5tiny/special_tokens_map.json",
+    "url": "https://huggingface.co/visheratin/t5-efficient-tiny-grammar-correction/resolve/a98f126664317cf2e68d33234c7072fdd6b289f3/special_tokens_map.json",
+    "bytes": 2201,
+    "sha256": "5c87151ef0f72a99d1f766a4c418bd2a1f90aaa30a8e22fe5eca9641daebb64f"
+  },
+  {
+    "file": "t5tiny/README.md",
+    "url": "https://huggingface.co/visheratin/t5-efficient-tiny-grammar-correction/resolve/a98f126664317cf2e68d33234c7072fdd6b289f3/README.md",
+    "bytes": 892,
+    "sha256": "a3b7c63e0fd486b16eee7c8685fd9aacc3a51045d1c38f3f14f7d680e4584553"
+  },
+  {
+    "file": "macbert/config.json",
+    "url": "https://huggingface.co/shibing624/macbert4csc-base-chinese/resolve/615e6e09ef9a69ec487bc7c641ec3a311e2c11b9/config.json",
+    "bytes": 659,
+    "sha256": "648c8a2b51c12551f94bae19a66c21a59c9bd8aa0ebb99f2a0af7236cdb99daa"
+  },
+  {
+    "file": "macbert/model.safetensors",
+    "url": "https://huggingface.co/shibing624/macbert4csc-base-chinese/resolve/615e6e09ef9a69ec487bc7c641ec3a311e2c11b9/model.safetensors",
+    "bytes": 409189104,
+    "sha256": "73df11fd36fb7595aa29fb04182bebe108793357cb577c0bbe35f9ab0a8635e4"
+  },
+  {
+    "file": "macbert/vocab.txt",
+    "url": "https://huggingface.co/shibing624/macbert4csc-base-chinese/resolve/615e6e09ef9a69ec487bc7c641ec3a311e2c11b9/vocab.txt",
+    "bytes": 109540,
+    "sha256": "45bbac6b341c319adc98a532532882e91a9cefc0329aa57bac9ae761c27b291c"
+  },
+  {
+    "file": "macbert/tokenizer_config.json",
+    "url": "https://huggingface.co/shibing624/macbert4csc-base-chinese/resolve/615e6e09ef9a69ec487bc7c641ec3a311e2c11b9/tokenizer_config.json",
+    "bytes": 330,
+    "sha256": "64523a761a0a0f58999c71432f6ff26c7d3c413d46e54180ba5ceb2e1b5cd042"
+  },
+  {
+    "file": "macbert/special_tokens_map.json",
+    "url": "https://huggingface.co/shibing624/macbert4csc-base-chinese/resolve/615e6e09ef9a69ec487bc7c641ec3a311e2c11b9/special_tokens_map.json",
+    "bytes": 112,
+    "sha256": "303df45a03609e4ead04bc3dc1536d0ab19b5358db685b6f3da123d05ec200e3"
+  },
+  {
+    "file": "macbert/README.md",
+    "url": "https://huggingface.co/shibing624/macbert4csc-base-chinese/resolve/615e6e09ef9a69ec487bc7c641ec3a311e2c11b9/README.md",
+    "bytes": 6259,
+    "sha256": "3e977aef5f9c5b69d1c8f7710283b0323f7869571f7f3d23588f3f6d14adc389"
+  },
+  {
+    "file": "onnxruntime-qnn.aar",
+    "url": "https://repo1.maven.org/maven2/com/microsoft/onnxruntime/onnxruntime-android-qnn/1.29.0/onnxruntime-android-qnn-1.29.0.aar",
+    "extract": "ort-qnn",
+    "bytes": 9419194,
+    "sha256": "cc4cfd72a47703aee65d8e6ce7448fa7488e3fff6556f9d6d354ec1687347cfd"
+  },
+  {
+    "file": "ort-cpu.aar",
+    "url": "https://repo1.maven.org/maven2/com/microsoft/onnxruntime/onnxruntime-android/1.29.0/onnxruntime-android-1.29.0.aar",
+    "extract": "ort-cpu",
+    "bytes": 51897836,
+    "sha256": "e97540ca78fe36f6fe2013f82843414fb843b6c7681fb04644cba5e1406662dd"
+  },
+  {
+    "file": "qnn-runtime.aar",
+    "url": "https://repo1.maven.org/maven2/com/qualcomm/qti/qnn-runtime/2.42.0/qnn-runtime-2.42.0.aar",
+    "extract": "qnn-runtime",
+    "bytes": 63074692,
+    "sha256": "ecb69bd6a7b1be4717ef10805199fb49ec6b60ca3f481d3068ed9605fba91d5b"
+  }
+]

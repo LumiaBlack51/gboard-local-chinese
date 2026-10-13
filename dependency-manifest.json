@@ -55,6 +55,36 @@
     "sha256": "e16153d1ff267cd479aea260d6f71a3edda8b4ba06db2d121513adda65a4449e"
   },
   {
+    "file": "enhanced/proofread-data/en-decoder.onnx",
+    "bytes": 21129862,
+    "sha256": "f49f40b6a8ad1a95a148b8cfaa54fc9bbc61047d232d8f29d5be9cfb0a56c41d"
+  },
+  {
+    "file": "enhanced/proofread-data/en-encoder.onnx",
+    "bytes": 11557249,
+    "sha256": "003783cffc51519c263337a8f37bd826aa28a7cd17d4caf669fec147592a0ff2"
+  },
+  {
+    "file": "enhanced/proofread-data/en-tokenizer.json",
+    "bytes": 2422164,
+    "sha256": "d7af4599a1914d04aaf44839418757f40ccca4c78033edeba369484978378335"
+  },
+  {
+    "file": "enhanced/proofread-data/zh-qdq.onnx",
+    "bytes": 135626520,
+    "sha256": "3246646b5a2870e0240771146e86eb36dc064ffa932b3eb6e58b653315aa7439"
+  },
+  {
+    "file": "enhanced/proofread-data/zh-readings.tsv",
+    "bytes": 79714,
+    "sha256": "ab80cd0003b534962fd4a277f9375b67c0d4395083f171872e39aeb772f12a43"
+  },
+  {
+    "file": "enhanced/proofread-data/zh-vocab.txt",
+    "bytes": 109540,
+    "sha256": "45bbac6b341c319adc98a532532882e91a9cefc0329aa57bac9ae761c27b291c"
+  },
+  {
     "file": "enhanced/native/lib/arm64-v8a/libgboard_local_handwriting.so",
     "bytes": 5909040,
     "sha256": "03ccc05b799de658121d5db18fb486b71568352521497108a97db4d3d27a71c7"

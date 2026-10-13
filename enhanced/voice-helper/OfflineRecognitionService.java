@@ -10,6 +10,11 @@ import local.gboard.enhanced.VoiceBridge;
 /** Explicit local-only RecognitionService, with signature-checked clients. */
 public final class OfflineRecognitionService extends RecognitionService {
   private Run active;
+  // Android's speech broker can bind on OEM systems that delay ordinary helper services.
+  public void onCheckRecognitionSupport(Intent request,android.content.AttributionSource caller,SupportCallback callback){
+    if(getPackageManager().checkSignatures(caller.getUid(),android.os.Process.myUid())!=PackageManager.SIGNATURE_MATCH){callback.onError(SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS);return;}
+    new Thread(()->{try{VoiceBridge.prepare(getApplicationContext());callback.onSupportResult(new RecognitionSupport.Builder().addInstalledOnDeviceLanguage("zh-CN").addInstalledOnDeviceLanguage("en-US").build());}catch(Exception e){callback.onError(SpeechRecognizer.ERROR_CLIENT);}},"OfflineSpeech-Prepare").start();
+  }
   private static class Run {volatile boolean stop,cancel;boolean autoFinish,endpointFinished;volatile AudioRecord audio;ParcelFileDescriptor input;Callback callback;Context attributed;}
   protected void onStartListening(Intent request,Callback callback){
     if((getApplicationInfo().flags&ApplicationInfo.FLAG_DEBUGGABLE)!=0)android.util.Log.i("OfflineSpeech","caller="+callback.getCallingUid()+"; service="+android.os.Process.myUid()+"; signatures="+getPackageManager().checkSignatures(callback.getCallingUid(),android.os.Process.myUid()));
@@ -41,7 +46,8 @@ public final class OfflineRecognitionService extends RecognitionService {
   }
   private void decode(Run run,boolean fixture,String sample){long recognizer=0;AudioRecord audio=null;StringBuilder committed=new StringBuilder();
     try {
-      recognizer=VoiceBridge.create(VoiceBridge.prepare(getApplicationContext()));if(recognizer==0)throw new IOException("Model unavailable");if(run.cancel)return;
+      long started=SystemClock.elapsedRealtime();recognizer=VoiceBridge.create(VoiceBridge.prepare(getApplicationContext()));if(recognizer==0)throw new IOException("Model unavailable");if(run.cancel)return;
+      android.util.Log.i("OfflineSpeech","recognizer_ready_ms="+(SystemClock.elapsedRealtime()-started));
       if(run.input!=null){
         run.callback.readyForSpeech(new Bundle());run.callback.beginningOfSpeech();
         // stopListening closes the producer. Drain all captured PCM through EOF,

@@ -19,7 +19,7 @@ public final class EnhancedHook {
   }
   private static class Session {
     final Object processor;boolean privateMode;long id;String raw="";int caret;
-    List<Object> candidates=Collections.emptyList();int page;boolean composing,suggesting,dismissed,handwriting;String context="";
+    List<Object> candidates=Collections.emptyList();int page;boolean composing,suggesting,dismissed,handwriting,openingCandidates;String context="";
     Session(Object p){processor=p;}
   }
   private static Field field(Class<?> cls,String name)throws Exception {
@@ -68,6 +68,9 @@ public final class EnhancedHook {
         return true;
       }
       if(type==15||type==20||type==25||type==26){
+        // The native expansion command also sends a decoder-reset event.
+        // Keep the same candidates while its panel is being opened.
+        if(type==15&&(s.openingCandidates||isExpansionEvent(get(event,"i")))){s.openingCandidates=false;return true;}
         if(s.handwriting)cancelInk();
         if(s.composing)finish(s);
         if(s.suggesting)dismiss(s);
@@ -91,6 +94,7 @@ public final class EnhancedHook {
     }else{commit(s,chosen.text);update(s);}
   }
   private static boolean key(Session s,Object event)throws Exception {
+    s.openingCandidates=isExpansionEvent(event);if(s.openingCandidates)return false;
     Object key=call(event,"g");if(key==null)return false;
     int code=(Integer)get(key,"c");Object value=get(key,"e");
     String text=value instanceof CharSequence?value.toString():"";
@@ -191,14 +195,15 @@ public final class EnhancedHook {
   private static final Map<View,BarControl> bars=new WeakHashMap<>();
   private static class BarControl {
     final java.lang.ref.WeakReference<android.widget.TextView> button;final int size;
+    java.lang.ref.WeakReference<View> replaced=new java.lang.ref.WeakReference<>(null);
     BarControl(android.widget.TextView b,int s){button=new java.lang.ref.WeakReference<>(b);size=s;}
   }
-  /** A separate child of the candidate strip; never cover or replace its native expansion key. */
+  /** Keep native expansion handling intact; the extra close control owns its own touch area. */
   public static synchronized void bindCandidateBar(View bar){
     if(!(bar instanceof android.view.ViewGroup))return;
     BarControl previous=bars.get(bar);
     if(previous!=null){android.widget.TextView button=previous.button.get();
-      if(button!=null&&button.getParent()==bar){refreshCandidateBars();return;}
+      if(button!=null&&button.getParent()==bar){android.view.ViewGroup group=(android.view.ViewGroup)bar;if(group.getChildAt(group.getChildCount()-1)!=button)group.bringChildToFront(button);refreshCandidateBars();return;}
       if(button!=null&&button.getParent() instanceof android.view.ViewGroup)((android.view.ViewGroup)button.getParent()).removeView(button);
       bars.remove(bar);
     }
@@ -216,9 +221,17 @@ public final class EnhancedHook {
   }
   public static synchronized int candidateWidth(View bar,int nativeWidth){
     BarControl control=bars.get(bar);TextView close=control==null?null:control.button.get();
+    // Native Q() may still reserve the invisible arrow until its visibility listener runs.
+    try{View more=control==null?null:control.replaced.get();if(more!=null&&(Boolean)get(bar,"b"))nativeWidth+=more.getWidth()>0?more.getWidth():more.getMeasuredWidth();}catch(Exception ignored){}
     return Math.max(1,nativeWidth-(close!=null&&close.getVisibility()==View.VISIBLE?control.size:0));
   }
+  public static synchronized int candidateExpansionVisibility(View bar,int nativeVisibility){
+    BarControl control=bars.get(bar);TextView close=control==null?null:control.button.get();
+    return close!=null&&close.getVisibility()==View.VISIBLE&&LocalSettings.candidateControls(bar.getContext())==LocalSettings.CANDIDATE_REPLACE?View.INVISIBLE:nativeVisibility;
+  }
   public static synchronized void layoutDismissButton(View bar){
+    // Native candidate binding and visibility changes can settle after dispatch returns.
+    if(!refreshingBars)refreshCandidateBars();
     BarControl control=bars.get(bar);TextView close=control==null?null:control.button.get();
     if(close==null||close.getVisibility()!=View.VISIBLE)return;
     int expansion=0;
@@ -226,20 +239,48 @@ public final class EnhancedHook {
     int right=Math.max(0,bar.getWidth()-expansion),left=Math.max(0,right-control.size);
     close.layout(left,0,right,bar.getHeight());
   }
-  private static void refreshCandidateBars(){
+  private static boolean refreshingBars;
+  private static TextView candidateLabel(View root,View except){if(root==except)return null;if(root instanceof TextView&&((TextView)root).length()>0)return (TextView)root;if(root instanceof android.view.ViewGroup){android.view.ViewGroup group=(android.view.ViewGroup)root;for(int i=0;i<group.getChildCount();i++){TextView label=candidateLabel(group.getChildAt(i),except);if(label!=null)return label;}}return null;}
+  private static boolean fixedChineseBar(View bar){return bar.getClass().getName().equals("com.google.android.libraries.inputmethod.widgets.FixedSizeCandidatesHolderView");}
+  static synchronized void refreshCandidateBars(){
     if(android.os.Looper.myLooper()!=android.os.Looper.getMainLooper()){
       new android.os.Handler(android.os.Looper.getMainLooper()).post(()->{synchronized(EnhancedHook.class){refreshCandidateBars();}});return;
     }
-    for(Map.Entry<View,BarControl> entry:bars.entrySet()){
+    if(refreshingBars)return;refreshingBars=true;
+    try{for(Map.Entry<View,BarControl> entry:bars.entrySet()){
       android.widget.TextView close=entry.getValue().button.get();if(close==null)continue;
+      TextView label=candidateLabel(entry.getKey(),close);if(label!=null)close.setTextColor(label.getCurrentTextColor());
       boolean nativeSuggestions=false,nativeComposing=false;
-      try{nativeSuggestions=(Integer)get(entry.getKey(),"f")>0;if(active!=null)nativeComposing=(Boolean)get(active.processor,"n");}catch(Exception ignored){}
-      boolean visible=active!=null&&!active.dismissed&&!active.composing&&!active.handwriting&&!nativeComposing&&(active.suggesting||nativeSuggestions)&&entry.getKey().getVisibility()==View.VISIBLE;
+      try{nativeSuggestions=(Integer)get(entry.getKey(),fixedChineseBar(entry.getKey())?"e":"f")>0;if(active!=null)nativeComposing=(Boolean)get(active.processor,"n");}catch(Exception ignored){}
+      boolean predictions=active!=null&&!active.dismissed&&!active.composing&&!active.handwriting&&(active.suggesting||!nativeComposing&&nativeSuggestions)&&entry.getKey().getVisibility()==View.VISIBLE;
+      int mode=LocalSettings.candidateControls(entry.getKey().getContext());
+      boolean visible=predictions&&mode!=LocalSettings.CANDIDATE_EXPAND;
+      BarControl control=entry.getValue();View replaced=control.replaced.get();
+      boolean replace=predictions&&mode==LocalSettings.CANDIDATE_REPLACE;
+      boolean arrowChanged=false;
+      try{View more=(View)get(entry.getKey(),"a");
+        if(replaced!=null&&(!replace||more!=replaced)){
+          control.replaced=new java.lang.ref.WeakReference<>(null);
+          if(replaced.getVisibility()==View.INVISIBLE){replaced.setVisibility(View.VISIBLE);arrowChanged=true;}
+        }
+        if(replace&&more!=null&&more.getVisibility()==View.VISIBLE){control.replaced=new java.lang.ref.WeakReference<>(more);more.setVisibility(View.INVISIBLE);arrowChanged=true;}
+      }catch(Exception ignored){}
       boolean changed=(close.getVisibility()==View.VISIBLE)!=visible;
       close.setVisibility(visible?View.VISIBLE:View.GONE);
-      if(changed){try{call(entry.getKey(),"N");}catch(Exception ignored){}entry.getKey().requestLayout();}
+      if(changed||arrowChanged){try{call(entry.getKey(),fixedChineseBar(entry.getKey())?"H":"N");}catch(Exception ignored){}entry.getKey().requestLayout();}
       layoutDismissButton(entry.getKey());
-    }
+    }}finally{refreshingBars=false;}
+  }
+  private static boolean isExpansionEvent(Object event){
+    if(event==null)return false;
+    try{int code=(Integer)call(event,"a");
+      // Gboard 18.4.1 sends this toolbar expansion command after replacing its view definition.
+      if(code==-10044)return true;Object source=get(event,"c");
+      for(View bar:bars.keySet())try{Object more=get(bar,"a");if(more==null)continue;Object def=get(more,"e");if(def==null)continue;
+        if(source==def)return true;Object[] actions=(Object[])get(def,"f");if(actions==null)continue;
+        for(Object action:actions){if(action==null)continue;Object[] keys=(Object[])get(action,"d");if(keys!=null)for(Object key:keys)if(key!=null&&(Integer)get(key,"c")==code)return true;}
+      }catch(Exception ignored){}
+    }catch(Exception ignored){}return false;
   }
   private static void move(Session s,int position)throws Exception {
     RimeBridge.caret(s.id,Math.max(0,Math.min(s.raw.length(),position)));update(s);

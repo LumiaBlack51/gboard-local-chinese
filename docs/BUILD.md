@@ -76,3 +76,11 @@ v1.0.0 曾在 Android 16 真机验证；v1.1.0 的新增功能在 AVD 验证，�
 `tests/run_voice_pipe.py --adb PATH --serial emulator-XXXX` 验证跨进程合成 PCM、奇数字节块、EOF、载入模型时提前停止，以及端点处理。测试客户端需要 `build_voicecheck.py` 打包的合成 fixture。`tests/run_input_fixes.py` 增加连写与采样回归，包括淡出像素变化、旧笔迹与新字分离、底排原始坐标、起笔曲线以及超过 512 点仍保留末端。
 
 手机只安装正式键盘/服务及临时 probe。probe 可带 `speech_test=true` 和 `speech_delay_ms=6000` 在延迟后播放合成测试句，用设备麦克风验证真实声学链路；测试通过报警音频用途和 30% 播放音量避免已连接蓝牙与扬声器媒体音量为零影响，未修改系统音量或蓝牙配置。不用于准确率评测，结束后移除 probe 和测试截图。检查录音系统状态时只保存本次测试的静音标记，不发布系统音频历史。
+
+## 1.3.0 中英校对
+
+先运行 `python enhanced/download_proofreading.py` 验证并下载 `proofread-inputs.json` 的固定模型和 Maven AAR；安装构建依赖 torch、transformers、onnx、onnxruntime、sentencepiece、protobuf。执行 `python enhanced/prepare_proofreading.py --sources artifacts/proofreading --output enhanced/proofread-data --work artifacts/proofreading/onnx-work` 导出量化模型，再 `python enhanced/build_proofread.py --release` 生成 `enhanced/proofread/final/proofread.apk`。模型导出必须比较浮点和量化输出。许可证和上游模型卡随 APK 提供。版本常量位于 `release_version.py`，组件 manifest 也需同步。
+
+`tests/run_proofreading.py --adb PATH --serial PHONE --backend auto` 只向临时同签名 probe 传入其源码内的固定合成文本；在准备完成的正式校对组件上测试。`cpu`/`npu` 可对比耗时。GPU 对这张图未通过全图执行检查，正式包不附带未使用的 GPU 库。`tests/VoiceTextTest.java` 覆盖大小写和保护规则；AVD 的 HookCheckActivity 带 `--ez undo true` 验证真实 IME 窗口中的撤销及光标/选区保护。
+
+更新清单保留原三个 `components`，校对位于 `optionalComponents`，兼容旧更新器。新版更新器统一验证并安装七个 APK；旧版忽略扩展，升级更新器后再检查一次。

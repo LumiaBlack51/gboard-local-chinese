@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.gboard.proofread" android:versionCode="1" android:versionName="1.3.0">
+  <uses-sdk android:minSdkVersion="32" android:targetSdkVersion="35" />
+  <permission android:name="local.gboard.proofread.ACCESS" android:protectionLevel="signature" />
+  <queries><package android:name="com.localx.android.inputmethod.latin" /></queries>
+  <application android:label="中英本地校对" android:allowBackup="false" android:debuggable="false" android:extractNativeLibs="true">
+    <activity android:name=".SetupActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity>
+    <uses-native-library android:name="libcdsprpc.so" android:required="false" />
+    <service android:name=".ProofreadingService" android:exported="true" android:permission="local.gboard.proofread.ACCESS" />
+  </application>
+</manifest>

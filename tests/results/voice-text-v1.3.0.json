@@ -1,0 +1,8 @@
+{
+  "VoiceText_policy_checks": 23,
+  "sentence_end_and_question_punctuation": true,
+  "url_code_and_existing_punctuation_preserved": true,
+  "maximum_proofread_wait_ms": 2500,
+  "tested_with_JDK17": true,
+  "passed": true
+}

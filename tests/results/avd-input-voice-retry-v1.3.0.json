@@ -1,0 +1,11 @@
+{
+  "starts_without_confirmation": true,
+  "recognized": "今天下午召开会议请注意保护隐私。",
+  "direct_commit_without_confirmation": false,
+  "panel_closed_after_result": true,
+  "timeout": false,
+  "panel_keeps_editor_focus": true,
+  "same_editor_restart": false,
+  "failed_commit_retains_text": true,
+  "passed": true
+}

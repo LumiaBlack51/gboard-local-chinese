@@ -35,7 +35,7 @@ def add_voice_access(raw):
     attrs=[] if value is None else [struct.pack('<IIIHBBI',ns,name,string(value),8,0,3,string(value))]
     return struct.pack('<HHIII',0x102,16,36+len(attrs)*20,0,0xffffffff)+struct.pack('<IIHHHHHH',0xffffffff,string(tag),20,20,len(attrs),0,0,0)+b''.join(attrs)
   def end(tag):return struct.pack('<HHIIIII',0x103,16,24,0,0xffffffff,0xffffffff,string(tag))
-  additions=[start('uses-permission','local.gboard.voice.ACCESS'),end('uses-permission'),start('queries'),start('package','local.gboard.voice'),end('package'),start('package','local.gboard.updater'),end('package'),end('queries')]
+  additions=[start('uses-permission','local.gboard.voice.ACCESS'),end('uses-permission'),start('uses-permission','local.gboard.proofread.ACCESS'),end('uses-permission'),start('queries'),start('package','local.gboard.voice'),end('package'),start('package','local.gboard.proofread'),end('package'),start('package','local.gboard.updater'),end('package'),end('queries')]
   ci=next(i for i,c in enumerate(chunks) if struct.unpack_from('<H',c)[0]==0x102 and strings[U32(c,20)]=='application')
   chunks[pi]=encode_pool(strings,flags);chunks[ci:ci]=additions
   body=b''.join(chunks);return struct.pack('<HHI',3,8,8+len(body))+body

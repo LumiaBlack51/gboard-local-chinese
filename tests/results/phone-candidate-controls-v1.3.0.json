@@ -1,0 +1,12 @@
+{
+  "synthetic_only": true,
+  "device": "Snapdragon 8 Elite Android phone",
+  "method": "Formal signed keyboard; synthetic probe editor; visual inspection",
+  "replace_mode_cross_visible": true,
+  "cross_dismisses_predictions": true,
+  "both_controls_visible_and_separate": true,
+  "native_expansion_opens_prediction_panel": true,
+  "expand_only_has_no_cross": true,
+  "restored_mode": "replace",
+  "passed": true
+}
