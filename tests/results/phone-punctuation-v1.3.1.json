@@ -1,0 +1,88 @@
+{
+  "synthetic_only": true,
+  "cold_prepare_ms": 500,
+  "cases": [
+    {
+      "input": "今天下午开会请大家准时参加不要迟到",
+      "output": "今天下午开会，请大家准时参加，不要迟到。",
+      "ms": 8
+    },
+    {
+      "input": "我买了苹果香蕉和橘子然后回家做饭",
+      "output": "我买了苹果、香蕉和橘子，然后回家做饭。",
+      "ms": 4
+    },
+    {
+      "input": "你今天晚上有时间吗我们一起去吃饭好不好",
+      "output": "你今天晚上有时间吗？我们一起去吃饭好不好？",
+      "ms": 3
+    },
+    {
+      "input": "如果明天下雨我们就在家看书如果天气好我们就出去散步",
+      "output": "如果明天下雨，我们就在家看书。如果天气好，我们就出去散步。",
+      "ms": 5
+    },
+    {
+      "input": "张伟教授说订单编号B27不要改成B72",
+      "output": "张伟教授说，订单编号B27不要改成B72。",
+      "ms": 3
+    },
+    {
+      "input": "WHEN YOU ARRIVE PLEASE CALL ME",
+      "output": "WHEN YOU ARRIVE, PLEASE CALL ME.",
+      "ms": 2
+    },
+    {
+      "input": "我的GPU型号是RTX4090明天可以开会吗",
+      "output": "我的GPU型号是RTX4090，明天可以开会吗？",
+      "ms": 3
+    },
+    {
+      "input": "HELLO HOW ARE YOU I AM FINE THANK YOU",
+      "output": "HELLO HOW ARE YOU I AM FINE THANK YOU",
+      "ms": 2
+    },
+    {
+      "input": "明天15:30开会",
+      "output": "明天15:30开会",
+      "ms": 0
+    },
+    {
+      "input": "网址https://example.com不要改",
+      "output": "网址https://example.com不要改",
+      "ms": 0
+    },
+    {
+      "input": "你好！明天见。",
+      "output": "你好！明天见。",
+      "ms": 3
+    },
+    {
+      "input": "B27",
+      "output": "B27",
+      "ms": 0
+    }
+  ],
+  "audio_pipe": [
+    {
+      "early_stop": false,
+      "ready": true,
+      "recognized": "今天下午召开会议，请注意保护隐私。"
+    },
+    {
+      "early_stop": true,
+      "ready": true,
+      "recognized": "今天下午召开会议，请注意保护隐私。"
+    }
+  ],
+  "passed": true,
+  "version": "1.3.1",
+  "device_model": "PLQ110",
+  "voice_apk_sha256": "da00c1bc21fe04c1dd882328779d054b12b3a11ada61b8572576ed68f5225796",
+  "sources": {
+    "enhanced/src/local/gboard/enhanced/VoicePunctuation.java": "53b232f407229f5efbbf89cc232d852b976de85a30e3e644350e3fc02c2f7b33",
+    "enhanced/src/local/gboard/enhanced/VoiceBridge.java": "e0cbfc5975753d0039d8833505d727f61eb10ec3cf754ed2b1ec6453f88915af",
+    "enhanced/native/voice.cpp": "bbc15ed1ca5255febd7189b90eff033b7c3f9d8392aa8a14758b1ae6c33a399c",
+    "enhanced/voice-helper/OfflineRecognitionService.java": "0b6aa888b6c9cccfeba3cdca8671af2e7c1f7e7339cf2010b751c34d56f567c1"
+  }
+}
