@@ -5,11 +5,25 @@ import org.json.JSONObject;
 /** All audio stays in memory and is decoded by one Mandarin/English model. */
 public final class VoiceBridge {
   private static long model;
+  private static long punctuation;
   public static synchronized long prepare(Context app)throws IOException {
     if(model!=0)return model;
     File dir=new File(app.getNoBackupFilesDir(),"voice-zh-en-2023-02-20");copy(app,"local-voice",dir);
     System.loadLibrary("onnxruntime");System.loadLibrary("sherpa-onnx-c-api");System.loadLibrary("gboard_local_voice");
-    model=model(dir.getAbsolutePath());if(model==0)throw new IOException("无法载入离线语音模型");return model;
+    model=model(dir.getAbsolutePath());if(model==0)throw new IOException("无法载入离线语音模型");
+    // Warm both models through the same speech broker; never open the microphone.
+    try{preparePunctuation(app);}catch(Exception error){android.util.Log.w("OfflineSpeech","Punctuation unavailable",error);}
+    return model;
+  }
+  private static void preparePunctuation(Context app)throws IOException{
+    if(punctuation!=0)return;
+    File dir=new File(app.getNoBackupFilesDir(),"punctuation-ct-2024-04-12-int8");copy(app,"local-punctuation",dir);
+    punctuation=punctuationModel(new File(dir,"model.int8.onnx").getAbsolutePath());
+    if(punctuation==0)throw new IOException("无法载入离线标点模型");
+  }
+  public static synchronized String punctuate(Context app,String text){
+    try{prepare(app);preparePunctuation(app);return VoicePunctuation.restore(text,s->addPunctuation(punctuation,s));}
+    catch(Exception error){android.util.Log.w("OfflineSpeech","Using recognition text without model punctuation",error);return text;}
   }
   private static void copy(Context app,String name,File dest)throws IOException {
     String[] children=app.getAssets().list(name);
@@ -30,6 +44,8 @@ public final class VoiceBridge {
     buffer.append(text);
   }
   public static native long model(String path);
+  private static native long punctuationModel(String path);
+  private static native String addPunctuation(long model,String text);
   public static native long create(long model);
   public static native boolean accept(long recognizer,short[] samples,int length);
   public static native String result(long recognizer,int mode);

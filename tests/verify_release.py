@@ -39,6 +39,9 @@ for component in manifest['components']+manifest.get('optionalComponents',[]):
     assert sha(z.read('assets/local-handwriting/handwriting-zh_CN.model'))=='e16153d1ff267cd479aea260d6f71a3edda8b4ba06db2d121513adda65a4449e'
     assert 'lib/arm64-v8a/libgboard_local_handwriting.so' in z.namelist()
     helper=z.read('classes5.dex');assert '结束录音'.encode() in helper and '点击开始后录音'.encode() not in helper
+   if path.name=='voice-helper.apk':
+    assert sha(z.read('assets/local-punctuation/model.int8.onnx'))=='65a3fb9f5ad7bfb96bf69e0dc4481df97f6ee60513c1d94ce981ba6effd524b1'
+    assert 'assets/licenses/PUNCTUATION-LICENSE' in z.namelist()
   checks.append({'asset':path.name,'versionCode':component['versionCode'],'sha256':asset['sha256'],'signature_verified':True,'zipalign_16k_verified':True})
 result={'release':'v'+manifest['version'],'apks':checks,'keyboard_native_decoder_unchanged':True,'keyboard_and_voice_have_no_internet':True,'debug_and_backup_disabled':True,'debug_test_activity_and_fixtures_excluded':True,'bundled_handwriting_model_hash_verified':True,'voice_has_no_start_confirmation':True,'passed':True}
 (ROOT/'tests/results'/('release-v'+manifest['version']+'.json')).write_text(json.dumps(result,indent=2)+'\n',encoding='utf8')

@@ -22,4 +22,4 @@ Only high-confidence, same-reading Han substitutions are accepted. Chinese numer
 
 GPU/NPU initialization errors fall back to CPU and never discard recognized text. The quantized Chinese graph could not run fully on Adreno in testing, so the unused GPU library is omitted from the release. Accelerator speed measurements are latency measurements, not measured battery savings. General Qwen models were evaluated but excluded because of size and unreliable rewriting.
 
-The keyboard supplies a final sentence terminator independently of the optional model. It recognizes common question endings, preserves existing punctuation and leaves bare codes/URLs unchanged. It does not infer internal Chinese commas or claim full punctuation restoration.
+The keyboard supplies a final sentence terminator independently of the optional model. It recognizes common question endings, preserves existing punctuation and leaves bare codes/URLs unchanged. Since 1.3.1, the voice helper first runs a separate offline punctuation model before optional proofreading; see [punctuation sources](PUNCTUATION-SOURCES.md). The keyboard sentence terminator remains a fallback.

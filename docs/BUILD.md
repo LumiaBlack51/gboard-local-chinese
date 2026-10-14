@@ -84,3 +84,9 @@ v1.0.0 曾在 Android 16 真机验证；v1.1.0 的新增功能在 AVD 验证，�
 `tests/run_proofreading.py --adb PATH --serial PHONE --backend auto` 只向临时同签名 probe 传入其源码内的固定合成文本；在准备完成的正式校对组件上测试。`cpu`/`npu` 可对比耗时。GPU 对这张图未通过全图执行检查，正式包不附带未使用的 GPU 库。`tests/VoiceTextTest.java` 覆盖大小写和保护规则；AVD 的 HookCheckActivity 带 `--ez undo true` 验证真实 IME 窗口中的撤销及光标/选区保护。
 
 更新清单保留原三个 `components`，校对位于 `optionalComponents`，兼容旧更新器。新版更新器统一验证并安装七个 APK；旧版忽略扩展，升级更新器后再检查一次。
+
+## 1.3.1 离线自动标点
+
+执行 `python enhanced/download_punctuation.py` 下载并核验固定量化模型；`python enhanced/build_native.py` 构建 Sherpa-ONNX 标点 C API 的 JNI 包装，再执行 `python enhanced/build_voice_helper.py --release`。模型放在独立语音包的 `assets/local-punctuation`，不依赖可选校对。
+
+用 JDK 17 编译运行 `tests/VoicePunctuationTest.java` 和 `tests/VoiceTextTest.java`。`python tests/build_punctuation_check.py` 构建临时同签名 instrumentation，目标为正式语音包；在明确选择的设备安装后执行 `adb -s SERIAL shell am instrument -w local.gboard.punctuationcheck/.PunctuationInstrumentation`。测试仅使用源码内的固定合成文本，不读取用户语音、词库或输入历史。测试包不在 Release 中，完成后卸载。真机键盘测试使用临时 probe 编辑框与合成音频声学回放。

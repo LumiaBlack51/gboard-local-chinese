@@ -30,7 +30,7 @@ for label, extras in [('eof', []), ('stop_during_model_start', ['--ez', 'early_s
         if result.returncode == 0:
             report = json.loads(result.stdout)
             assert report.get('pipe') and report.get('ready'), report
-            assert report.get('recognized') == '今天下午召开会议请注意保护隐私', report
+            assert report.get('recognized') == '今天下午召开会议，请注意保护隐私。', report
             assert 'error' not in report, report
             checks[label] = report
             print(label + ': passed', flush=True)

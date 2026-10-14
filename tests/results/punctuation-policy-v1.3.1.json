@@ -1,0 +1,14 @@
+{
+  "version": "1.3.1",
+  "checks": [
+    "VoicePunctuation: 21 checks passed",
+    "VoiceText: 23 checks passed"
+  ],
+  "sources": {
+    "enhanced/src/local/gboard/enhanced/VoicePunctuation.java": "53b232f407229f5efbbf89cc232d852b976de85a30e3e644350e3fc02c2f7b33",
+    "enhanced/src/local/gboard/enhanced/VoiceBridge.java": "e0cbfc5975753d0039d8833505d727f61eb10ec3cf754ed2b1ec6453f88915af",
+    "enhanced/native/voice.cpp": "bbc15ed1ca5255febd7189b90eff033b7c3f9d8392aa8a14758b1ae6c33a399c",
+    "enhanced/voice-helper/OfflineRecognitionService.java": "0b6aa888b6c9cccfeba3cdca8671af2e7c1f7e7339cf2010b751c34d56f567c1"
+  },
+  "passed": true
+}

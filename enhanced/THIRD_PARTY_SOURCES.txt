@@ -12,3 +12,5 @@ Simplified Chinese handwriting model: Tegaki 0.3, LGPL 2.1, https://github.com/t
 Handwriting licenses and the complete editable model source link are bundled in assets/licenses/HANDWRITING-SOURCES.md.
 Android RecognitionService attribution implementation checked against https://github.com/aosp-mirror/platform_frameworks_base/blob/master/core/java/android/speech/RecognitionService.java
 Source and signed APKs are published at https://github.com/LumiaBlack51/gboard-local-chinese ; private input data and signing material are excluded.
+
+Punctuation model: Sherpa-ONNX int8 CT-Transformer zh-en vocab272727, 2024-04-12; Alibaba ModelScope upstream (Apache-2.0). See PUNCTUATION-SOURCES.md and PUNCTUATION-LICENSE.

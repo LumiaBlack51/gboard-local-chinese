@@ -1,46 +1,46 @@
 {
-  "tag": "v1.3.0",
+  "tag": "v1.3.1",
   "assets": [
     {
       "file": "enhanced/final/base.apk",
       "bytes": 572864207,
-      "sha256": "9d2ffcdd30f2caf156c791215804c085936152f9167c73e40a5433590001f6ab",
+      "sha256": "3cd1e400eefeb30c87eb75fb9812e8866f8c50872a3d57708634e28ea82c2a12",
       "name": "base.apk"
     },
     {
       "file": "enhanced/final/split_brella_feature_split.apk",
       "bytes": 35656040,
-      "sha256": "35f2f23cb7f17f8712914efda19bb3fcff01dd4a0beb5579851a19559cabefdf",
+      "sha256": "30a484e43e83c2a366f756f5992010b0d3492b3ce6da07f4b1e71f62ebe37c61",
       "name": "split_brella_feature_split.apk"
     },
     {
       "file": "enhanced/final/split_config.xxxhdpi.apk",
       "bytes": 129884,
-      "sha256": "af7afae510c887fe795cf6103c8df76228f080e140409052eb092e265ef8c393",
+      "sha256": "6b48903e8c013bf970656b017ddc07d84dbfe208bdcef083eca08817594fdaca",
       "name": "split_config.xxxhdpi.apk"
     },
     {
       "file": "enhanced/final/split_tenoranimation_feature_split.apk",
       "bytes": 11321708,
-      "sha256": "9eb982fa8a256304739b1c89c1b140eb25c598752b03e3ff767dec6e39b27c05",
+      "sha256": "dab4859cb0082881ac29fbea22856403489d8b0eb1fab82551ae2f2bf9f2a173",
       "name": "split_tenoranimation_feature_split.apk"
     },
     {
       "file": "enhanced/voice-helper/final/voice-helper.apk",
-      "bytes": 166978955,
-      "sha256": "b0491f6a007a04db538695c9d3ef47a5f5eb2b6eb12fcf0a9292217e38d5309b",
+      "bytes": 242521734,
+      "sha256": "da00c1bc21fe04c1dd882328779d054b12b3a11ada61b8572576ed68f5225796",
       "name": "voice-helper.apk"
     },
     {
       "file": "enhanced/updater/out/updater.apk",
       "bytes": 20817,
-      "sha256": "a3d7bfb5c0cbc06df638a045a6d6fbf92912d3a2fbcf33e5a29c30c05bf06bfe",
+      "sha256": "fe1e41b89118ee1cad0be2651621317e0c7c982c73639027cb5a421ff87bdd1b",
       "name": "updater.apk"
     },
     {
       "file": "enhanced/proofread/final/proofread.apk",
       "bytes": 169486431,
-      "sha256": "1c1747d4dbdd32f99f4069a8f7d07f9fcb8e5ea677a9cd5dcd078c796c37d2cd",
+      "sha256": "b25f40b4abbe034c14fb0b9097f4953e434b7fcd096045f955bd7425298189ee",
       "name": "proofread.apk"
     }
   ]

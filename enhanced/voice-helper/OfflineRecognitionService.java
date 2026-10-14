@@ -85,7 +85,11 @@ public final class OfflineRecognitionService extends RecognitionService {
       // Close the microphone before results reset the framework's audio attribution session.
       run.audio=null;if(audio!=null){try{audio.stop();}catch(Exception ignored){}audio.release();audio=null;}
       VoiceBridge.append(committed,VoiceBridge.parse(VoiceBridge.result(recognizer,2),"text"));VoiceBridge.destroy(recognizer);recognizer=0;
-      if(run.cancel)return;clear(run);run.callback.endOfSpeech();Bundle result=words(committed.toString());result.putBoolean("local_endpoint_finished",run.endpointFinished);run.callback.results(result);
+      if(run.cancel)return;run.callback.endOfSpeech();
+      long punctStart=SystemClock.elapsedRealtime();
+      String punctuated=VoiceBridge.punctuate(getApplicationContext(),committed.toString());
+      android.util.Log.i("OfflineSpeech","punctuation_ms="+(SystemClock.elapsedRealtime()-punctStart));
+      if(run.cancel)return;clear(run);Bundle result=words(punctuated);result.putBoolean("local_endpoint_finished",run.endpointFinished);run.callback.results(result);
     }catch(Throwable error){android.util.Log.e("OfflineSpeech","Recognition failed",error);if(!run.cancel)try{run.callback.error(SpeechRecognizer.ERROR_AUDIO);}catch(Exception ignored){}}
     finally{closeInput(run);run.audio=null;if(audio!=null){try{audio.stop();}catch(Exception ignored){}audio.release();}if(recognizer!=0)VoiceBridge.destroy(recognizer);clear(run);if((getApplicationInfo().flags&ApplicationInfo.FLAG_DEBUGGABLE)!=0)android.util.Log.i("OfflineSpeech","run closed; cancelled="+run.cancel+"; stopped="+run.stop);}
   }

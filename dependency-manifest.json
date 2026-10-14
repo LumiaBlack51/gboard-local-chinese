@@ -40,6 +40,11 @@
     "sha256": "a8e0e4ec53810e433789b54a5c0134a7eaa2ffca595a6334d54c00da858841d3"
   },
   {
+    "file": "enhanced/punctuation-data/model.int8.onnx",
+    "bytes": 75519198,
+    "sha256": "65a3fb9f5ad7bfb96bf69e0dc4481df97f6ee60513c1d94ce981ba6effd524b1"
+  },
+  {
     "file": "enhanced/handwriting-data/COPYING",
     "bytes": 26430,
     "sha256": "a190dc9c8043755d90f8b0a75fa66b9e42d4af4c980bf5ddc633f0124db3cee7"

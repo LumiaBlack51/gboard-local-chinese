@@ -6,6 +6,16 @@
 static std::string utf(JNIEnv* e,jstring s){const char* p=e->GetStringUTFChars(s,nullptr);std::string r(p);e->ReleaseStringUTFChars(s,p);return r;}
 static jstring text(JNIEnv* e,const char* s){int n=s?strlen(s):0;jbyteArray b=e->NewByteArray(n);e->SetByteArrayRegion(b,0,n,(const jbyte*)s);jclass c=e->FindClass("java/lang/String");jstring r=(jstring)e->NewObject(c,e->GetMethodID(c,"<init>","([BLjava/lang/String;)V"),b,e->NewStringUTF("UTF-8"));e->DeleteLocalRef(b);e->DeleteLocalRef(c);return r;}
 struct Run {const SherpaOnnxOnlineRecognizer* model;const SherpaOnnxOnlineStream* stream;bool finished=false;};
+extern "C" JNIEXPORT jlong JNICALL Java_local_gboard_enhanced_VoiceBridge_punctuationModel(JNIEnv* e,jclass,jstring path){
+  std::string file=utf(e,path);SherpaOnnxOfflinePunctuationConfig c{};
+  c.model.ct_transformer=file.c_str();c.model.num_threads=2;c.model.provider="cpu";
+  return (jlong)SherpaOnnxCreateOfflinePunctuation(&c);
+}
+extern "C" JNIEXPORT jstring JNICALL Java_local_gboard_enhanced_VoiceBridge_addPunctuation(JNIEnv* e,jclass,jlong model,jstring input){
+  if(!model)return input;std::string source=utf(e,input);
+  const char* output=SherpaOfflinePunctuationAddPunct((const SherpaOnnxOfflinePunctuation*)model,source.c_str());
+  if(!output)return input;jstring result=text(e,output);SherpaOfflinePunctuationFreeText(output);return result;
+}
 static void decode(Run* r){while(SherpaOnnxIsOnlineStreamReady(r->model,r->stream))SherpaOnnxDecodeOnlineStream(r->model,r->stream);}
 extern "C" JNIEXPORT jlong JNICALL Java_local_gboard_enhanced_VoiceBridge_model(JNIEnv* e,jclass,jstring path){
   std::string dir=utf(e,path),encoder=dir+"/encoder.int8.onnx",decoder=dir+"/decoder.onnx",joiner=dir+"/joiner.int8.onnx",tokens=dir+"/tokens.txt";
