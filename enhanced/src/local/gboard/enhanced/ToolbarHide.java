@@ -67,8 +67,16 @@ public final class ToolbarHide {
       LinearLayout child=findRow(group.getChildAt(i));if(child!=null)best=child;
     }
     if(best!=null)return best;
-    if(node instanceof LinearLayout&&((LinearLayout)node).getOrientation()==LinearLayout.HORIZONTAL
-      &&contains(node,"voice","语音")&&contains(node,"settings","设置"))return (LinearLayout)node;
+    if(node instanceof LinearLayout&&((LinearLayout)node).getOrientation()==LinearLayout.HORIZONTAL&&group.getChildCount()>=2){
+      int matches=0;
+      if(contains(node,"voice","语音"))matches++;
+      if(contains(node,"settings","设置")||contains(node,"preferences","偏好"))matches++;
+      if(contains(node,"clipboard","剪贴板"))matches++;
+      if(contains(node,"emoji","表情"))matches++;
+      if(contains(node,"theme","主题"))matches++;
+      if(contains(node,"gif","动图"))matches++;
+      if(matches>=2)return (LinearLayout)node;
+    }
     return null;
   }
   private static boolean contains(View node,String english,String chinese){
