@@ -42,7 +42,7 @@ public final class NumericMode {
     root.postDelayed(()->{
       if(!pending||token!=generation||!root.isAttachedToWindow())return;
       View switchKey=findSwitch(root);
-      if(switchKey==null){schedule(root,token,attempt+1);return;}
+      if(switchKey==null||switchKey.getWidth()==0||switchKey.getHeight()==0){schedule(root,token,attempt+1);return;}
       pending=false;
       android.graphics.Rect bounds=new android.graphics.Rect(0,0,switchKey.getWidth(),switchKey.getHeight());
       if(switchKey!=root)((ViewGroup)root).offsetDescendantRectToMyCoords(switchKey,bounds);
@@ -55,6 +55,7 @@ public final class NumericMode {
     },attempt==0?80:100);
   }
   private static View findSwitch(View view){
+    if(view.getVisibility()!=View.VISIBLE||!view.isShown())return null;
     if(view instanceof TextView){String text=((TextView)view).getText().toString().trim();
       if(text.equals("?123")||text.equals("123?")){
         View key=view;
