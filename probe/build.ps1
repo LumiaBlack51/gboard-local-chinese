@@ -26,7 +26,7 @@ if ($LASTEXITCODE) { throw 'aapt failed' }
 Push-Location (Join-Path $taskOut 'dex')
 try { & (Join-Path $taskTools 'aapt.exe') add (Join-Path $taskOut 'unsigned.apk') classes.dex; if ($LASTEXITCODE) { throw 'aapt add failed' } }
 finally { Pop-Location }
-& (Join-Path $taskTools 'zipalign.exe') -f -p 4 (Join-Path $taskOut 'unsigned.apk') (Join-Path $taskOut 'aligned.apk')
+& (Join-Path $taskTools 'zipalign.exe') -f 4 (Join-Path $taskOut 'unsigned.apk') (Join-Path $taskOut 'aligned.apk')
 if ($LASTEXITCODE) { throw 'zipalign failed' }
 $taskKey = $env:GBOARD_KEYSTORE
 if (-not $taskKey -or -not $env:GBOARD_KEYSTORE_PASS) { throw 'Set GBOARD_KEYSTORE and GBOARD_KEYSTORE_PASS' }

@@ -9,6 +9,10 @@ final class LocalSettings {
   static boolean continuous(Context c){return prefs(c).getBoolean("handwriting_continuous",false);}
   static void continuous(Context c,boolean enabled){prefs(c).edit().putBoolean("handwriting_continuous",enabled).apply();KeyboardGestures.reset();}
   static boolean ticks(Context c){return prefs(c).getBoolean("caret_ticks",true);}
+  static boolean toolbarHide(Context c){return prefs(c).getBoolean("toolbar_hide",true);}
+  static void toolbarHide(Context c,boolean enabled){prefs(c).edit().putBoolean("toolbar_hide",enabled).apply();ToolbarHide.refresh();}
+  static int toolbarHidePosition(Context c){return Math.max(0,Math.min(12,prefs(c).getInt("toolbar_hide_position",6)));}
+  static void toolbarHidePosition(Context c,int position){prefs(c).edit().putInt("toolbar_hide_position",Math.max(0,Math.min(12,position))).apply();ToolbarHide.refresh();}
   static final int CANDIDATE_REPLACE=0,CANDIDATE_BOTH=1,CANDIDATE_EXPAND=2;
   static int candidateControls(Context c){return Math.max(0,Math.min(2,prefs(c).getInt("candidate_controls",CANDIDATE_REPLACE)));}
   static void candidateControls(Context c,int mode){prefs(c).edit().putInt("candidate_controls",mode).apply();EnhancedHook.refreshCandidateBars();}

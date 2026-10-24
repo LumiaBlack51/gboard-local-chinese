@@ -87,6 +87,8 @@ public final class MainActivity extends Activity {
         input = new EditText(this);
         input.setHint("仅输入测试句子");
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        if ("number".equals(getIntent().getStringExtra("input_type")))
+            input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         input.setMinLines(2);
         input.setMaxLines(4);
         input.setSaveEnabled(false);

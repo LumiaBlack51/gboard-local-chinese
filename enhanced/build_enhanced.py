@@ -148,9 +148,9 @@ for method in ['onFinishInput()V','onWindowHidden()V']:
   start=source.index('.method public final '+method);body_start=source.index('\n',source.index('.locals',start))+1
   source=source[:body_start]+'    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/VoiceHook;->hidden(Ljava/lang/Object;)V\n'+source[body_start:]
 start=source.index('.method public final onStartInputView(Landroid/view/inputmethod/EditorInfo;Z)V');body_start=source.index('\n',source.index('.locals',start))+1
-source=source[:body_start]+'    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/Diagnostics;->install(Ljava/lang/Object;)V\n    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/VoiceHook;->shown(Ljava/lang/Object;)V\n'+source[body_start:]
+source=source[:body_start]+'    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/Diagnostics;->install(Ljava/lang/Object;)V\n    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/VoiceHook;->shown(Ljava/lang/Object;)V\n    invoke-static/range {p0 .. p0}, Llocal/gboard/enhanced/ToolbarHide;->shown(Ljava/lang/Object;)V\n'+source[body_start:]
 start=source.index('.method public final onStartInput(Landroid/view/inputmethod/EditorInfo;Z)V');body_start=source.index('\n',source.index('.locals',start))+1
-source=source[:body_start]+'    invoke-static/range {p0 .. p2}, Llocal/gboard/enhanced/VoiceHook;->inputStarted(Ljava/lang/Object;Landroid/view/inputmethod/EditorInfo;Z)V\n'+source[body_start:]
+source=source[:body_start]+'    invoke-static/range {p1 .. p1}, Llocal/gboard/enhanced/NumericMode;->inputStarted(Landroid/view/inputmethod/EditorInfo;)V\n    invoke-static {}, Llocal/gboard/enhanced/CapsMode;->reset()V\n    invoke-static/range {p0 .. p2}, Llocal/gboard/enhanced/VoiceHook;->inputStarted(Ljava/lang/Object;Landroid/view/inputmethod/EditorInfo;Z)V\n'+source[body_start:]
 (patches/'pbb.smali').write_text(source,encoding='utf8')
 run(JAVA/'javac.exe','-cp',APKTOOL,ROOT/'tools'/'Assemble.java')
 run(JAVA/'java.exe','-cp',str(APKTOOL)+';'+str(ROOT/'tools'),'Assemble',patches,work/'patched.dex')
@@ -181,6 +181,7 @@ with zipfile.ZipFile(base) as z,zipfile.ZipFile(unsigned,'w') as out:
         content=add_activity(content,'local.gboard.enhanced.AdapterCheckActivity',True)
         content=add_activity(content,'local.gboard.enhanced.GestureCheckActivity',True)
         content=add_activity(content,'local.gboard.enhanced.FontSizeCheckActivity',True)
+        content=add_activity(content,'local.gboard.enhanced.KeyboardModesCheckActivity',True)
     out.writestr(info,content)
   out.write(dex/'classes.dex','classes5.dex',compress_type=zipfile.ZIP_DEFLATED)
   for name in ['libgboard_local_rime.so','librime.so','libFcitx5Core.so','libFcitx5Config.so','libFcitx5Utils.so','libc++_shared.so','libgboard_local_handwriting.so']:

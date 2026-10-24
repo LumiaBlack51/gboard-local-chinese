@@ -47,6 +47,10 @@ python enhanced/release_metadata.py
 
 ## 独立验证
 
+普通数字输入框现在由输入法内部按普通文本键盘初始化，并自动点进可切换的 `?123` 数字符号页；数字密码输入框保持原样，原应用的输入连接仍决定是否接受 `+` 等字符。Shift 单击会触发原生双击大写锁定，再点一次 Shift 退出。管理页可加入或移除顶部「收起」按钮，并调整它在语音、设置等按钮所在一行的位置；长按该按钮也可左右移动或移除。
+
+调试包包含 `KeyboardModesCheckActivity`，在 AVD 中用合成键盘验证数字页可输入 `+`、可切回字母、连续大写及退出，并核对工具栏识别和设置持久化。启动后从应用私有文件 `files/keyboard-modes-report.json` 读取结果。完整 Gboard 18.4.1 的 ARM 原生库在现有 x86 AVD 的 ARM 翻译环境会崩溃，因此这些检查不能代替 ARM64 真机上的键盘界面验收。
+
 测试源码位于 `enhanced/testsrc`、`enhanced/enginecheck`、`enhanced/voicecheck` 与 `probe`。`python enhanced/build_enhanced.py --test` 添加 AdapterCheckActivity、GestureCheckActivity 与 FontSizeCheckActivity，再运行 `python enhanced/make_debug.py` 输出同版本号、debuggable 的四个 AVD APK 到 `enhanced/build/test-apks`。正式版必须重新运行不带 `--test` 的构建命令，避免保留测试 Activity。其他构建入口为相应 `build_*.py` 或 `probe/build.ps1`。
 
 1.1.1 的语音交互测试使用 `build_voicecheck.py` 生成的独立测试 APK；它将当前源码的 VoiceHook 放进 `HookCheckService` 测试输入法，在 `HookCheckActivity` 的合成编辑框中运行。仅在 AVD 选中测试输入法、启动此 Activity；它触发一次模拟麦克风命令，不再点击开始或确认，随后检查文字直接填入及面板关闭。结束后恢复原输入法，运行 `tests/run_avd_regression.py --serial emulator-XXXX` 汇总候选、语音、自动结束和录音生命周期回归。不得在个人手机或聊天应用运行这个测试输入法。

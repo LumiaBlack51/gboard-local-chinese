@@ -44,12 +44,14 @@ public final class KeyboardGestures {
     if(v instanceof ViewGroup){ViewGroup group=(ViewGroup)v;for(int i=0;i<group.getChildCount();i++)keys(group.getChildAt(i),root,found);}
   }
   private static List<Key> keys(View root,State s){List<Key> keys=new ArrayList<>();keys(root,root,keys);s.letters.setEmpty();s.deletion.setEmpty();int letters=0;for(Key k:keys){if(k.code==67)s.deletion.union(k.bounds);if(k.text.length()==1&&Character.isLetter(k.text.charAt(0))){s.letters.union(k.bounds);letters++;}}if(letters<20)s.letters.setEmpty();return keys;}
-  public static void attach(View root){if(roots.containsKey(root))return;State state=new State(root);roots.put(root,state);root.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->render(v,state));root.post(()->render(root,state));}
+  public static void attach(View root){if(roots.containsKey(root))return;State state=new State(root);roots.put(root,state);NumericMode.attach(root);root.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->render(v,state));root.post(()->render(root,state));}
   private static void render(View root,State state){if(root==null)return;if(!EnhancedHook.chineseActive()){state.board=false;if(root.getForeground()==state.drawing){root.setForeground(state.original);root.invalidate();}return;}keys(root,state);state.board=LocalSettings.handwriting(root.getContext())&&LocalSettings.board(root.getContext());
     state.board=state.board&&EnhancedHook.handwritingReady();root.setForeground((state.board||!state.strokes.isEmpty()||!state.ghosts.isEmpty())&&!state.letters.isEmpty()?state.drawing:state.original);root.invalidate();}
   public static void refresh(){if(Looper.myLooper()!=Looper.getMainLooper()){new Handler(Looper.getMainLooper()).post(KeyboardGestures::refresh);return;}for(Map.Entry<View,State> entry:roots.entrySet())render(entry.getKey(),entry.getValue());}
   public static void reset(){if(Looper.myLooper()!=Looper.getMainLooper()){new Handler(Looper.getMainLooper()).post(KeyboardGestures::reset);return;}for(Map.Entry<View,State> entry:roots.entrySet()){State s=entry.getValue();clear(s);stopHold(s);recycleDown(s);s.captured=s.space=s.letter=s.ink=s.blocked=s.routed=false;render(entry.getKey(),s);}ComposingLens.hide();}
-  public static void detached(View root){State s=roots.remove(root);if(s!=null){clear(s);stopHold(s);recycleDown(s);root.setForeground(s.original);}}
+  public static void detached(View root){State s=roots.remove(root);NumericMode.detached(root);CapsMode.detached(root);if(s!=null){clear(s);stopHold(s);recycleDown(s);root.setForeground(s.original);}}
+  private static boolean nativeDispatch;
+  static void nativeTouch(View root,MotionEvent event){State state=roots.get(root);if(state!=null)state.bypass=true;nativeDispatch=true;try{root.dispatchTouchEvent(event);}finally{nativeDispatch=false;if(state!=null)state.bypass=false;}}
   private static void recycleDown(State s){if(s.down!=null){s.down.recycle();s.down=null;}}
   private static void stopHold(State s){View root=s.root.get();if(root!=null&&s.hold!=null)root.removeCallbacks(s.hold);if(s.space&&s.key!=null)s.key.view.setPressed(false);s.hold=null;}
   private static void cancelNative(View root,State s,MotionEvent event){MotionEvent cancel=MotionEvent.obtain(event);cancel.setAction(MotionEvent.ACTION_CANCEL);s.bypass=true;try{root.dispatchTouchEvent(cancel);}finally{s.bypass=false;cancel.recycle();}}
@@ -65,7 +67,7 @@ public final class KeyboardGestures {
     return null;
   }
   public static boolean touch(View root,MotionEvent event){
-    try{State s=roots.get(root);if(s!=null&&s.bypass)return false;if(s==null&&!EnhancedHook.chineseActive())return false;if(s==null){attach(root);s=roots.get(root);}final State state=s;int action=event.getActionMasked();
+    try{State s=roots.get(root);if(nativeDispatch||s!=null&&s.bypass)return false;CapsMode.touch(root,event);if(s==null&&!EnhancedHook.chineseActive())return false;if(s==null){attach(root);s=roots.get(root);}final State state=s;int action=event.getActionMasked();
       if(!s.routing){
         if(action==MotionEvent.ACTION_DOWN){s.routed=false;if(EnhancedHook.chineseActive()){Key target=lowerLetter(root,s,event.getX(),event.getY());if(target!=null){s.routed=true;s.routeX=target.bounds.exactCenterX()-event.getX();s.routeY=target.bounds.exactCenterY()-event.getY();}}}
         if(s.routed){MotionEvent routed=MotionEvent.obtain(event);routed.offsetLocation(s.routeX,s.routeY);s.routing=true;
