@@ -23,7 +23,7 @@ for component in manifest['components']+manifest.get('optionalComponents',[]):
    assert not any(n.startswith('assets/speech-') for n in z.namelist())
    if not path.name.startswith('split_'):
     xml=run(BT/'aapt.exe','dump','xmltree',path,'AndroidManifest.xml')
-    assert all(name not in xml for name in ['AdapterCheckActivity','GestureCheckActivity','FontSizeCheckActivity'])
+    assert all(name not in xml for name in ['AdapterCheckActivity','GestureCheckActivity','FontSizeCheckActivity','KeyboardModesCheckActivity'])
     assert re.search(r'android:debuggable[^\n]*0x0',xml)
     assert re.search(r'android:allowBackup[^\n]*0x0',xml)
     internet="name='android.permission.INTERNET'" in badging
@@ -31,7 +31,7 @@ for component in manifest['components']+manifest.get('optionalComponents',[]):
     if component['package']=='local.gboard.updater':
      assert 'android.permission.RECORD_AUDIO' not in badging and 'android.view.InputMethod' not in xml
     for n in z.namelist():
-     if n.endswith('.dex'):assert all(name not in z.read(n) for name in [b'AdapterCheckActivity',b'GestureCheckActivity',b'FontSizeCheckActivity'])
+     if n.endswith('.dex'):assert all(name not in z.read(n) for name in [b'AdapterCheckActivity',b'GestureCheckActivity',b'FontSizeCheckActivity',b'KeyboardModesCheckActivity'])
    if path.name=='base.apk':
     with zipfile.ZipFile(ROOT/'gboard-18.4.1/base.apk') as original:
      name='lib/arm64-v8a/libintegrated_shared_object.so'

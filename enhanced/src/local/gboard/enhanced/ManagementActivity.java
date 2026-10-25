@@ -5,6 +5,11 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.*;
 public final class ManagementActivity extends Activity {
+  private DictionaryImport dictionaryImport;
+  @Override protected void onActivityResult(int request,int result,Intent data){
+    super.onActivityResult(request,result,data);
+    if(request==DictionaryImport.REQUEST&&dictionaryImport!=null)dictionaryImport.result(result,data);
+  }
   private void fontControls(LinearLayout layout,String label,boolean candidates){
     TextView heading=new TextView(this);heading.setText(label);heading.setTextSize(18);layout.addView(heading);
     LinearLayout row=new LinearLayout(this);row.setGravity(android.view.Gravity.CENTER_VERTICAL);layout.addView(row);
@@ -45,6 +50,7 @@ public final class ManagementActivity extends Activity {
     });
     Button settings=new Button(this);settings.setText("键盘设置");layout.addView(settings);settings.setOnClickListener(v->startActivity(new Intent().setClassName(getPackageName(),"com.google.android.apps.inputmethod.latin.preference.SettingsActivity")));
     Button update=new Button(this);update.setText("检查更新");layout.addView(update);update.setOnClickListener(v->{if(getPackageManager().checkSignatures(getPackageName(),"local.gboard.updater")!=PackageManager.SIGNATURE_MATCH){Toast.makeText(this,"请先安装此版本配套的 updater.apk",Toast.LENGTH_LONG).show();return;}startActivity(new Intent().setClassName("local.gboard.updater","local.gboard.updater.UpdateActivity"));});
+    dictionaryImport=new DictionaryImport(this,layout);
     ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.addView(layout);setContentView(scroll);
   }
 }

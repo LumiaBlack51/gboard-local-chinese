@@ -1,0 +1,7 @@
+{
+  "version": "1.3.2",
+  "java_parser_checks_passed": 23,
+  "python_converter_tests_passed": 3,
+  "fixtures": "Public synthetic words; no real iFlytek export supplied",
+  "passed": true
+}

@@ -20,7 +20,7 @@ for package,version,paths in groups:
   items.append({'name':path.name,'sha256':sha,'size':size})
   assets.append({'file':path.relative_to(ROOT).as_posix(),'bytes':size,'sha256':sha,'name':path.name})
  components.append({'package':package,'versionCode':version,'assets':items})
-save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'语音新增离线中英标点模型，自动补逗号、顿号、问号和句号，保留原有文字、大小写及编号。不依赖可选校对组件；语音安装包增大约72 MiB。保留中英校对、手写连写和候选按钮设置。','components':components[:3],'optionalComponents':components[3:]})
+save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'新增本地词库文本／Gboard ZIP 导入、合并去重和单独清除；讯飞明文词表可先转换后导入，不连接讯飞云词库。包含持续大写、普通数字符号页和可配置顶部收起按钮。保留离线语音标点、中英校对和手写。','components':components[:3],'optionalComponents':components[3:]})
 save('release-manifest.json',{'tag':'v'+VERSION,'assets':assets})
 (ROOT/'SHA256SUMS.txt').write_text(''.join(a['sha256']+'  '+a['name']+'\n' for a in assets),encoding='ascii')
 source={}

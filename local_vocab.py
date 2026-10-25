@@ -30,11 +30,13 @@ def normalize_pinyin(value: str) -> str:
     return re.sub(r"[\s'’]", "", value)
 
 
-def convert(source: Path, destination: Path, kind: str, max_chars: int) -> dict:
+def convert(source: Path, destination: Path, kind: str, max_chars: int, encoding: str = "utf-8-sig") -> dict:
+    if source.stat().st_size > 2 * 1024 * 1024:
+        raise ValueError("Input exceeds 2 MiB; split and review the word list first.")
     records = []
     skipped = []
     seen = set()
-    for number, raw in enumerate(source.read_text(encoding="utf-8-sig").splitlines(), 1):
+    for number, raw in enumerate(source.read_text(encoding=encoding).splitlines(), 1):
         if not raw.strip() or raw.lstrip().startswith("#"):
             continue
         fields = raw.strip().split("\t")
@@ -45,7 +47,8 @@ def convert(source: Path, destination: Path, kind: str, max_chars: int) -> dict:
             word, spelling = (field.strip() for field in fields)
             generated = False
         else:
-            # The documented iFlytek text format has a word and optional type.
+            # Plain word-list exports only: word plus optional metadata. Not a
+            # decoder for version-dependent iFlytek binary/encrypted backups.
             word = raw.strip().split(maxsplit=1)[0]
             spelling = None
             generated = True
@@ -79,7 +82,8 @@ def convert(source: Path, destination: Path, kind: str, max_chars: int) -> dict:
               "skipped": skipped,
               "limits": ["Only explicit word shortcuts; prediction model and frequencies are not transferred.",
                          "Generated pronunciation needs review, especially names and polyphonic characters.",
-                         "Native ZIP import has not been tested on this phone; system dictionary insertion was tested."]}
+                         "Use the enhanced keyboard's local dictionary import and confirm the entry count.",
+                         "Binary/encrypted iFlytek backups and cloud prediction models are not supported."]}
     destination.with_suffix(".review.json").write_text(
         json.dumps(review, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
@@ -93,11 +97,13 @@ def main() -> None:
     parser.add_argument("output", type=Path, help="Gboard dictionary ZIP path")
     parser.add_argument("--format", choices=("tsv", "ifly-text"), default="tsv")
     parser.add_argument("--max-chars", type=int, default=12)
+    parser.add_argument("--encoding", choices=("utf-8-sig", "utf-16", "gb18030"), default="utf-8-sig",
+                        help="Explicit text encoding; use utf-16 only for a BOM-marked text export")
     args = parser.parse_args()
     if not 2 <= args.max_chars <= 32:
         parser.error("--max-chars must be between 2 and 32")
     try:
-        result = convert(args.source, args.output, args.format, args.max_chars)
+        result = convert(args.source, args.output, args.format, args.max_chars, args.encoding)
     except (OSError, ValueError, ImportError) as failure:
         parser.exit(1, f"Conversion failed: {failure}\n")
     print(json.dumps(result, ensure_ascii=False))

@@ -1,5 +1,9 @@
 # 构建说明
 
+1.3.2 复用 1.3.1 的语音、校对与更新器正式 APK，只重新构建主键盘。运行 `enhanced/build_enhanced.py`（不带 `--test`）、`enhanced/make_release.py`、`enhanced/release_metadata.py` 和 `tests/verify_release.py`。`release_version.py` 中未变化组件的 versionCode 保持原值，清单继续核验全部七个安装文件。
+
+词库解析测试：JDK 17 编译 `enhanced/src/local/gboard/enhanced/DictionaryFile.java` 与 `tests/DictionaryFileTest.java` 到临时目录，再运行 `local.gboard.enhanced.DictionaryFileTest`。安装 requirements 后运行 `python tests/test_local_vocab.py` 验证显式拼音、UTF-16 明文词表转换与错误二进制输入。只使用合成词条，不发布个人导出文件。
+
 宿主脚本针对 Windows、Python 3.11+、JDK 17、Android SDK platform 36 / Build Tools 36.1.0、NDK 28.2.13676358。SDK、Java、apktool 路径由 `build_config.py` 的环境变量读取，不含原工作站路径。主键盘适配只支持这里的 Gboard 18.4.1；升级底包不能直接套用反射或 smali 锚点。
 
 ## 外部输入

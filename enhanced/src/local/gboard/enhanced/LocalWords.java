@@ -8,6 +8,7 @@ import java.util.*;
 public final class LocalWords {
   private static volatile List<WordIndex.Entry> words=Collections.emptyList();
   public static void load(Context app){
+    try{DictionaryStore.load(app);}catch(java.io.IOException error){android.util.Log.w("LocalChinese","Imported dictionary unavailable");}
     refresh(app);
     try{app.getContentResolver().registerContentObserver(UserDictionary.Words.CONTENT_URI,true,new ContentObserver(new Handler(Looper.getMainLooper())){public void onChange(boolean self){new Thread(()->refresh(app),"LocalDictionary-Read").start();}});}catch(Exception ignored){}
   }
@@ -23,5 +24,5 @@ public final class LocalWords {
       words=Collections.unmodifiableList(result);
     }catch(Exception error){android.util.Log.w("LocalChinese","System dictionary unavailable");}
   }
-  public static List<WordIndex.Entry> match(String input){String code=input.replace("'","");ArrayList<WordIndex.Entry> result=new ArrayList<>();for(WordIndex.Entry entry:words)if(entry.code.equals(code))result.add(entry);return result;}
+  public static List<WordIndex.Entry> match(String input){String code=DictionaryFile.normalize(input);ArrayList<WordIndex.Entry> result=new ArrayList<>(DictionaryStore.match(code));for(WordIndex.Entry entry:words)if(entry.code.equals(code))result.add(entry);return result;}
 }
