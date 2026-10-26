@@ -1,0 +1,79 @@
+{
+  "version": "1.3.4",
+  "keyboard_version_code": 176027093,
+  "device_model": "PLQ110",
+  "formal_keyboard": true,
+  "baseline_phone_dedicated_layout_reproduced": true,
+  "checks": {
+    "phone": {
+      "opens_switchable_symbols": true,
+      "editor_type": 524289,
+      "actual_digit_committed": true,
+      "returns_to_qwerty": true,
+      "restart_keeps_letters": true,
+      "repeated_switching": true
+    },
+    "number": {
+      "opens_switchable_symbols": true,
+      "editor_type": 524289,
+      "actual_digit_committed": true,
+      "returns_to_qwerty": true,
+      "restart_keeps_letters": true,
+      "repeated_switching": true
+    },
+    "signed_decimal": {
+      "opens_switchable_symbols": true,
+      "editor_type": 524289,
+      "actual_digit_committed": true,
+      "returns_to_qwerty": true,
+      "restart_keeps_letters": true,
+      "repeated_switching": true
+    },
+    "pin": {
+      "opens_switchable_symbols": true,
+      "editor_type": 524417,
+      "password_privacy_preserved": true,
+      "actual_digit_committed": true,
+      "returns_to_qwerty": true,
+      "restart_keeps_letters": true,
+      "repeated_switching": true
+    },
+    "date": {
+      "opens_switchable_symbols": true,
+      "editor_type": 524289,
+      "actual_digit_committed": true,
+      "returns_to_qwerty": true,
+      "restart_keeps_letters": true,
+      "repeated_switching": true
+    },
+    "time": {
+      "opens_switchable_symbols": true,
+      "editor_type": 524289,
+      "actual_digit_committed": true,
+      "returns_to_qwerty": true,
+      "restart_keeps_letters": true,
+      "repeated_switching": true
+    },
+    "datetime": {
+      "opens_switchable_symbols": true,
+      "editor_type": 524289,
+      "actual_digit_committed": true,
+      "returns_to_qwerty": true,
+      "restart_keeps_letters": true,
+      "repeated_switching": true
+    },
+    "ordinary_chinese_input": true
+  },
+  "settings_and_imported_dictionary_preserved": true,
+  "seven_installed_apk_hashes_and_versions_verified": true,
+  "first_install_time_and_default_ime_preserved": true,
+  "test_scope": "Production IME in independent, private synthetic probe editors; no test input in personal apps.",
+  "sources": {
+    "enhanced/src/local/gboard/enhanced/NumericMode.java": "71444c1a3eb5ebc11b93c668196d422d6f71c95a18e3cd5b6fe93feccf8645b6",
+    "enhanced/build_enhanced.py": "080886339df028ff922f151a517f48b25c0936e6a68768f543cc543967ba9944",
+    "probe/src/local/gboard/probe/MainActivity.java": "0e5e343f0bd1de1a7a645f6956fa9af93d7d0864f94303a7789120ac4a31efb0",
+    "tests/android/KeyboardModesInstrumentation.java": "97405dd0d379977f5a29d839d61a78cf5f847941d85805f911bce6d4ed55e36d",
+    "tests/build_keyboard_modes_check.py": "bbc422ec1cbdc2f4fe2736208fbe2c75a96a7405a5502223f4fd57b03151aec2"
+  },
+  "passed": true
+}

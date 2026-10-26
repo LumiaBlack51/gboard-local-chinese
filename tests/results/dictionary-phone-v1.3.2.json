@@ -1,0 +1,13 @@
+{
+  "version": "1.3.2",
+  "device_model": "PLQ110",
+  "formal_keyboard": true,
+  "preview_cancel_does_not_write": true,
+  "synthetic_import_and_clear_passed": true,
+  "large_import_count_verified": true,
+  "imported_dictionary_persisted_after_process_restart": true,
+  "new_entry_absent_from_active_base_dictionary_typed_and_committed": true,
+  "temporary_private_probe_editor_only": true,
+  "personal_word_values_and_hashes_excluded": true,
+  "passed": true
+}

@@ -20,7 +20,7 @@ for package,version,paths in groups:
   items.append({'name':path.name,'sha256':sha,'size':size})
   assets.append({'file':path.relative_to(ROOT).as_posix(),'bytes':size,'sha256':sha,'name':path.name})
  components.append({'package':package,'versionCode':version,'assets':items})
-save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'语音新增离线中英标点模型，自动补逗号、顿号、问号和句号，保留原有文字、大小写及编号。不依赖可选校对组件；语音安装包增大约72 MiB。保留中英校对、手写连写和候选按钮设置。','components':components[:3],'optionalComponents':components[3:]})
+save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'电话号码、数字、日期时间及数字密码输入统一使用可切换的数字符号页，点击 返回／ABC 随时返回普通输入；同一输入框刷新连接后不强制切回数字。数字密码保留密码模式、禁止学习和麦克风。保留右侧收起、本地词库、离线拼音纠错及持续大写。','components':components[:3],'optionalComponents':components[3:]})
 save('release-manifest.json',{'tag':'v'+VERSION,'assets':assets})
 (ROOT/'SHA256SUMS.txt').write_text(''.join(a['sha256']+'  '+a['name']+'\n' for a in assets),encoding='ascii')
 source={}

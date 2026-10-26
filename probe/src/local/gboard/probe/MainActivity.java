@@ -87,6 +87,14 @@ public final class MainActivity extends Activity {
         input = new EditText(this);
         input.setHint("仅输入测试句子");
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        String type = getIntent().getStringExtra("input_type");
+        if ("number".equals(type)) input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        else if ("signed_decimal".equals(type)) input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        else if ("phone".equals(type)) input.setInputType(InputType.TYPE_CLASS_PHONE);
+        else if ("pin".equals(type)) input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+        else if ("date".equals(type)) input.setInputType(InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_DATE);
+        else if ("time".equals(type)) input.setInputType(InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_TIME);
+        else if ("datetime".equals(type)) input.setInputType(InputType.TYPE_CLASS_DATETIME);
         input.setMinLines(2);
         input.setMaxLines(4);
         input.setSaveEnabled(false);

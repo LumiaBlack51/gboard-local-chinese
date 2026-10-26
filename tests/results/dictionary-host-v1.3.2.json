@@ -1,0 +1,11 @@
+{
+  "version": "1.3.2",
+  "java_parser_checks_passed": 23,
+  "python_converter_tests_passed": 6,
+  "fixtures": "Public synthetic words only; personal export is excluded",
+  "passed": true,
+  "capacity_words": 50000,
+  "max_bytes": 16777216,
+  "offline_reading_resolution_tests_passed": 3,
+  "active_base_dictionary_checked_before_new_word_resolution": true
+}
