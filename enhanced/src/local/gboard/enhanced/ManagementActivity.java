@@ -39,15 +39,9 @@ public final class ManagementActivity extends Activity {
     CheckBox proofread=new CheckBox(this);proofread.setText("语音结束后自动校对中文和英文");proofread.setChecked(LocalSettings.proofread(this));layout.addView(proofread);proofread.setOnCheckedChangeListener((b,on)->LocalSettings.prefs(this).edit().putBoolean("voice_proofread",on).apply());
     TextView proofNote=new TextView(this);boolean installed=getPackageManager().checkSignatures(getPackageName(),ProofreadClient.PACKAGE)==PackageManager.SIGNATURE_MATCH;proofNote.setText((installed?"本地校对组件已安装。":"需安装配套 proofread.apk；未安装仍可离线识别、自动补标点和整理英文大小写。")+"校对仅处理本次语音文字，不联网。中文偏向修正高置信度同音错字；英文检查常见语法和拼写。疑似数字、否定或大幅改写会保留原文，不能保证纠正所有语义错误。可跳过校对，修改后可点「恢复识别原文」。");layout.addView(proofNote);
     CheckBox ticks=new CheckBox(this);ticks.setText("拼音光标逐字震动（遵循系统触感设置）");ticks.setChecked(LocalSettings.ticks(this));layout.addView(ticks);ticks.setOnCheckedChangeListener((b,on)->LocalSettings.prefs(this).edit().putBoolean("caret_ticks",on).apply());
-    CheckBox hide=new CheckBox(this);hide.setText("顶部工具栏加入「收起」");hide.setChecked(LocalSettings.toolbarHide(this));layout.addView(hide);
+    CheckBox hide=new CheckBox(this);hide.setText("顶部工具栏最右侧显示「收起」");hide.setChecked(LocalSettings.toolbarHide(this));layout.addView(hide);
     hide.setOnCheckedChangeListener((b,on)->LocalSettings.toolbarHide(this,on));
-    TextView hidePosition=new TextView(this);layout.addView(hidePosition);
-    SeekBar hideOrder=new SeekBar(this);hideOrder.setMax(12);hideOrder.setProgress(LocalSettings.toolbarHidePosition(this));layout.addView(hideOrder);
-    hidePosition.setText("收起位置：从左第 "+(hideOrder.getProgress()+1)+" 位（超出时放在最右）");
-    hideOrder.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
-      public void onProgressChanged(SeekBar bar,int value,boolean fromUser){hidePosition.setText("收起位置：从左第 "+(value+1)+" 位（超出时放在最右）");if(fromUser)LocalSettings.toolbarHidePosition(ManagementActivity.this,value);}
-      public void onStartTrackingTouch(SeekBar bar){}public void onStopTrackingTouch(SeekBar bar){}
-    });
+    TextView hideNote=new TextView(this);hideNote.setText("收起固定在语音按钮右侧的最右端；设置放入功能菜单，单手模式保留。长按收起可移除。");layout.addView(hideNote);
     Button settings=new Button(this);settings.setText("键盘设置");layout.addView(settings);settings.setOnClickListener(v->startActivity(new Intent().setClassName(getPackageName(),"com.google.android.apps.inputmethod.latin.preference.SettingsActivity")));
     Button update=new Button(this);update.setText("检查更新");layout.addView(update);update.setOnClickListener(v->{if(getPackageManager().checkSignatures(getPackageName(),"local.gboard.updater")!=PackageManager.SIGNATURE_MATCH){Toast.makeText(this,"请先安装此版本配套的 updater.apk",Toast.LENGTH_LONG).show();return;}startActivity(new Intent().setClassName("local.gboard.updater","local.gboard.updater.UpdateActivity"));});
     dictionaryImport=new DictionaryImport(this,layout);

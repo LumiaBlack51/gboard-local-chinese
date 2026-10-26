@@ -61,6 +61,8 @@ public final class EnhancedHook {
         Object candidate=get(event,"j");if(candidate==null)return false;
         Object data=get(candidate,"m");if(!(data instanceof Candidate))return false;
         Candidate chosen=(Candidate)data;if(chosen.session!=s)return true;
+        boolean current=false;for(Object item:s.candidates)if(get(item,"m")==chosen){current=true;break;}
+        if(!current)return true;
         if(type==22){if(!s.privateMode&&chosen.index>=0){RimeBridge.forget(s.id,chosen.index);update(s);}return true;}
         if((Boolean)get(event,"k")){
           choose(s,chosen);
@@ -84,14 +86,35 @@ public final class EnhancedHook {
   }
   private static void choose(Session s,Candidate chosen)throws Exception {
     if(chosen.index==-3){s.handwriting=false;KeyboardGestures.clearInk();commit(s,chosen.text);s.dismissed=false;update(s);return;}
-    if(chosen.index>=0){RimeBridge.select(s.id,chosen.index);update(s);}
+    if(chosen.index==-4){RimeBridge.clear(s.id);commit(s,chosen.text);update(s);return;}
+    if(chosen.index>=0){select(s,chosen.index,chosen.text);}
     else if(chosen.index==-1){
             RimeBridge.clear(s.id);for(char ch:chosen.code.toCharArray())RimeBridge.key(s.id,ch);
             String[] state=RimeBridge.state(s.id);int found=-1;
             for(int i=4;i<state.length;i++)if(state[i].equals(chosen.text)){found=i-4;break;}
-            if(found>=0){RimeBridge.select(s.id,found);update(s);}
+            if(found>=0){select(s,found,chosen.text);}
             else{RimeBridge.clear(s.id);commit(s,chosen.text);update(s);}
     }else{commit(s,chosen.text);update(s);}
+  }
+  private static void select(Session s,int index,String text)throws Exception {
+    if(!RimeBridge.select(s.id,index))return;
+    String[] state=RimeBridge.state(s.id);
+    // Rime keeps a selected prefix inside its composition until every segment
+    // is converted. Commit that prefix now, retaining the exact unconverted
+    // input. Derive the boundary from Rime's preedit, never from word length or
+    // a guessed pronunciation. This also handles an invalid trailing syllable.
+    if(state[2].isEmpty()&&state[3].startsWith(text)){
+      String tail=state[3].substring(text.length()).replace(" ","");
+      if(!tail.isEmpty()&&tail.matches("[a-z']+")&&state[0].endsWith(tail)&&tail.length()<state[0].length()){
+        int consumed=state[0].length()-tail.length();
+        int caret=Math.max(0,Integer.parseInt(state[1])-consumed);
+        RimeBridge.clear(s.id);commit(s,text);
+        for(char ch:tail.toCharArray())RimeBridge.key(s.id,ch);
+        RimeBridge.caret(s.id,Math.min(caret,tail.length()));
+        state=RimeBridge.state(s.id);
+      }
+    }
+    update(s,state);
   }
   private static boolean key(Session s,Object event)throws Exception {
     s.openingCandidates=isExpansionEvent(event);if(s.openingCandidates)return false;
@@ -142,7 +165,10 @@ public final class EnhancedHook {
     catch(Throwable error){Log.e("LocalChinese","Literal Enter failed",error);return false;}
   }
   private static void update(Session s)throws Exception {
-    String[] result=RimeBridge.state(s.id);s.raw=result[0];s.caret=Integer.parseInt(result[1]);
+    update(s,RimeBridge.state(s.id));
+  }
+  private static void update(Session s,String[] result)throws Exception {
+    s.raw=result[0];s.caret=Integer.parseInt(result[1]);
     if(!result[2].isEmpty())commit(s,result[2]);
     s.composing=!s.raw.isEmpty();
     String display=s.raw.substring(0,Math.min(s.caret,s.raw.length()))+"│"+s.raw.substring(Math.min(s.caret,s.raw.length()));
@@ -152,10 +178,15 @@ public final class EnhancedHook {
     for(int i=4;i<Math.min(result.length,6);i++)if(seen.add(result[i]))list.add(candidate(new Candidate(s,i-4,result[i]),list.size()));
     if(s.composing)for(WordIndex.Entry e:WordIndex.complete(s.raw))if(seen.add(e.word))list.add(candidate(new Candidate(s,-1,e.word,e.code),list.size()));
     for(int i=6;i<result.length;i++)if(seen.add(result[i]))list.add(candidate(new Candidate(s,i-4,result[i]),list.size()));
+    // Keep an unrecognized remainder visible without leaving the previous
+    // segment's candidate objects on screen. Selecting it commits it literally.
+    if(s.composing&&list.isEmpty())list.add(candidate(new Candidate(s,-4,s.raw),0));
     if(!s.composing&&!s.dismissed)for(WordIndex.Entry e:WordIndex.following(s.context))if(seen.add(e.word))list.add(candidate(new Candidate(s,-2,e.word),list.size()));
     s.suggesting=!s.composing&&!list.isEmpty();
     s.candidates=list;s.page=0;
-    call(s.processor,"aJ",!list.isEmpty());
+    // An unrecognized spelling must remain visible and editable even when
+    // the engine cannot offer a word for its current segment.
+    call(s.processor,"aJ",s.composing||!list.isEmpty());
     refreshCandidateBars();
     ComposingLens.refresh();
     // Normal candidate requests flow through dispatch(type=8).

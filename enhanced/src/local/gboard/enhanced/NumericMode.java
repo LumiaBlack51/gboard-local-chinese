@@ -9,24 +9,46 @@ import android.widget.TextView;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-/** Open number fields on the ordinary, switchable ?123 layout. */
+/** Keep every numeric editor on the ordinary, switchable ?123/ABC layouts. */
 public final class NumericMode {
   private static final Map<View,Boolean> keyboards=new WeakHashMap<>();
   private static boolean pending;
   private static int generation;
+  private static String packageName;
+  private static int fieldId;
+  private static int originalType,normalizedType;
+  private static boolean numericEditor;
   private NumericMode(){}
 
   public static void inputStarted(EditorInfo info){
+    inputStarted(info,false);
+  }
+  public static void inputStarted(EditorInfo info,boolean restarting){
     generation++;
+    boolean wasPending=pending;
     pending=false;
+    boolean sameEditor=info!=null&&numericEditor&&restarting&&java.util.Objects.equals(packageName,info.packageName)&&fieldId==info.fieldId&&(info.inputType==originalType||info.inputType==normalizedType);
+    numericEditor=false;
     if(info==null)return;
     int kind=info.inputType&InputType.TYPE_MASK_CLASS;
-    if(kind!=InputType.TYPE_CLASS_NUMBER)return;
-    if((info.inputType&InputType.TYPE_MASK_VARIATION)==InputType.TYPE_NUMBER_VARIATION_PASSWORD)return;
+    if(sameEditor&&kind==InputType.TYPE_CLASS_TEXT){numericEditor=true;pending=wasPending;refresh();return;}
+    if(kind!=InputType.TYPE_CLASS_NUMBER&&kind!=InputType.TYPE_CLASS_PHONE&&kind!=InputType.TYPE_CLASS_DATETIME)return;
+    boolean password=kind==InputType.TYPE_CLASS_NUMBER&&(info.inputType&InputType.TYPE_MASK_VARIATION)==InputType.TYPE_NUMBER_VARIATION_PASSWORD;
+    originalType=info.inputType;
     // Only the IME's copy of EditorInfo changes. The application's InputConnection
     // still enforces its own field rules, including any signed/decimal restrictions.
     info.inputType=InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
-    pending=true;
+    if(password){
+      // A switchable keyboard must retain native password behavior, disable local
+      // learning and keep the microphone unavailable after changing the class.
+      info.inputType|=InputType.TYPE_TEXT_VARIATION_PASSWORD;
+      info.imeOptions|=EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING;
+    }
+    numericEditor=true;packageName=info.packageName;fieldId=info.fieldId;
+    normalizedType=info.inputType;
+    // Applications often restart this connection while editing. Do not undo
+    // the user's ABC choice by tapping ?123 again on the same field.
+    pending=!sameEditor||wasPending;
     refresh();
   }
   public static void attach(View root){
@@ -41,7 +63,10 @@ public final class NumericMode {
     if(!pending||root==null||attempt>8)return;
     root.postDelayed(()->{
       if(!pending||token!=generation||!root.isAttachedToWindow())return;
-      View switchKey=findSwitch(root);
+      // An existing symbol/number page already has an exit. Finish initialization
+      // now so returning to letters cannot trigger a delayed automatic switch.
+      if(findSwitch(root,true)!=null){pending=false;return;}
+      View switchKey=findSwitch(root,false);
       if(switchKey==null||switchKey.getWidth()==0||switchKey.getHeight()==0){schedule(root,token,attempt+1);return;}
       pending=false;
       android.graphics.Rect bounds=new android.graphics.Rect(0,0,switchKey.getWidth(),switchKey.getHeight());
@@ -54,10 +79,10 @@ public final class NumericMode {
       finally{down.recycle();up.recycle();}
     },attempt==0?80:100);
   }
-  private static View findSwitch(View view){
+  private static View findSwitch(View view,boolean returning){
     if(view.getVisibility()!=View.VISIBLE||!view.isShown())return null;
     if(view instanceof TextView){String text=((TextView)view).getText().toString().trim();
-      if(text.equals("?123")||text.equals("123?")){
+      if(returning?(text.equals("ABC")||text.equals("返回")):(text.equals("?123")||text.equals("123?"))){
         View key=view;
         while(key.getParent() instanceof View&&key.getParent()!=view.getRootView()){
           View parent=(View)key.getParent();
@@ -69,7 +94,7 @@ public final class NumericMode {
       }
     }
     if(view instanceof ViewGroup){ViewGroup group=(ViewGroup)view;
-      for(int i=0;i<group.getChildCount();i++){View found=findSwitch(group.getChildAt(i));if(found!=null)return found;}}
+      for(int i=0;i<group.getChildCount();i++){View found=findSwitch(group.getChildAt(i),returning);if(found!=null)return found;}}
     return null;
   }
 }

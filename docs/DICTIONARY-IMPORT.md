@@ -1,8 +1,28 @@
 # 本地词库导入与讯飞接入评估
 
-2026-10-25 核查了[讯飞输入法官网](https://srf.xunfei.cn/)及[讯飞开放平台](https://www.xfyun.cn/site/)。未找到向第三方输入法公开提供完整拼音词库或个人学习词库实时查询的、可验证的 API 文档。官网提供定制方案，这不等于可直接接入的免费词库 API。未来如果取得正式 SDK、接口文档和相应使用许可，需另行评估其候选格式、性能和联网行为。
+1.3.2 支持通过讯飞自带的导出入口迁移本地用户词。已验证的讯飞版本为 15.0.9；不需要云端接口或账号同步。Android 会隔离应用私有目录，因此采用用户明确导出的文件，不直接读取讯飞的私有学习数据库。
 
-1.3.2 实现的是**显式词表的本地迁移**。没有读取讯飞私有数据库、反向提取其安装包词库、请求讯飞服务或修改其网络策略。没有迁移讯飞模型、学习频率、云联想或账号同步。本次没有取得真实讯飞导出文件，因此不宣称已迁移用户的讯飞词库。
+1.3.2 实现的是**显式词表的本地迁移**。没有读取讯飞私有数据库、反向提取其安装包词库、请求讯飞服务或修改其网络策略。没有迁移讯飞模型、学习频率、云联想或账号同步。个人词库只在机主本地迁移，原始内容不随源码或 Release 分发。
+
+已在讯飞 15.0.9 的「设置 → 词库设置 → 用户词 → 导出」验证了离线导出流程，可同时得到 `user_dict.txt`、`user_dict_bin.dic` 和 `userAss.bin`。明文为 UTF-8，正文格式是「词条 类型」；类型 1 表示联系人，0 表示其他，**不是词频**。明文不含原始拼音。二进制学习备份与联想数据目前不能直接由 Rime 读取。
+
+转换时可加 `--word-index enhanced/rime-data/word-index-v3.bin`，优先从随包公开词典匹配整个词的读音，选最高词频的读音；匹配不到才用 pypinyin。它们都不是从讯飞恢复出的原始读音，多音字仍可能有差异。review 中 `generated: false` 表示明确输入／本地词典读音，`generated: true` 表示自动生成。可按此字段筛选后再导入。英文、符号和无法得到拼音的词保留在原备份中，中文转换不会迁移原生英文学习模型。
+
+个人导出、二进制备份、转换词库及 review 必须保存在仓库忽略的 `private/` 或其他私人目录，不能上传 GitHub。公开仓库只包含转换器、导入功能及合成测试。
+
+## 排除重复，再查询整词和词组读音
+
+匹配已有词典的词，本身不会增加词汇覆盖；导入后仅作为个人词优先显示。`word-index-v3.bin` 是补全索引，不等于完整基础词库，缺少索引记录也不能直接认定为新增词。
+
+`tools/resolve_vocab.py` 会读取 `rime_ice.dict.yaml` 实际启用的词表，排除已存在的整词，再查询离线词语拼音数据；整词未命中时，用较长的已收录词组和单字读音组合。只有得到唯一的默认全拼时才输出，存在多个全拼的词留在报告中，不自动选第一个。结果来自词典，不宣称恢复了讯飞的原始输入编码；人名和特殊语境仍应结合实际使用核对。
+
+本轮词典来源为 [phrase-pinyin-data](https://github.com/mozillazg/phrase-pinyin-data/tree/005814e5c481a5cc648db963db668db8f7c32199) 的 `large_pinyin.txt`，包含其说明列出的汉典、CC-CEDICT 等词语数据，MIT 许可证。整份词典下载到本机后查询，不把个人词条发给在线查询服务，也不把该数据加入手机 APK。
+
+```powershell
+python tools/resolve_vocab.py --review private/words.review.json --rime-data enhanced/rime-data --phrase-data C:\LocalDictionaries\large_pinyin.txt --output private/new-words.zip --report private/reading-review.json
+```
+
+报告区分基础词库已有词、可补充的新词和读音冲突词；输出 ZIP 只包含可补充的新词。测试使用公开合成词，个人词表和逐词核对结果不进入测试仓库。
 
 ## 手机上使用
 
@@ -21,7 +41,7 @@
 lixianciku	离线词库	zh-CN
 ```
 
-文本和 ZIP 容器最多 2 MiB，ZIP 解压后的文本也最多 2 MiB。合并后的独立词库最多 5000 条。不支持其他语言、任意 ZIP 附件、二进制词库或加密备份。文件有坏行时整体拒绝并显示行号，不导入其中的部分内容。
+文本和 ZIP 容器最多 16 MiB，ZIP 解压后的文本也最多 16 MiB。合并后的独立词库最多 50000 条。不支持其他语言、任意 ZIP 附件、二进制词库或加密备份。文件有坏行时整体拒绝并显示行号，不导入其中的部分内容。
 
 ## 讯飞明文词表先转换
 
@@ -29,7 +49,7 @@ lixianciku	离线词库	zh-CN
 
 ```powershell
 python -m pip install -r requirements.txt
-python local_vocab.py "C:\Private\words.txt" "C:\Private\words.zip" --format ifly-text
+python local_vocab.py "C:\Private\words.txt" "C:\Private\words.zip" --format ifly-text --word-index enhanced/rime-data/word-index-v3.bin
 # 若确认原文件是带 BOM 的 UTF-16 明文，再添加 --encoding utf-16；GB18030 使用 --encoding gb18030。
 ```
 
@@ -41,4 +61,4 @@ python local_vocab.py "C:\Private\words.txt" "C:\Private\words.zip" --format ifl
 
 「清除导入的词库」需确认，只清除新增入口的词条，不影响 Rime 学习数据、系统词典或字号等设置。同签名覆盖升级保留词库；卸载或清除应用数据会删除它。
 
-主机测试：用 JDK 17 编译 `DictionaryFile.java` 和 `tests/DictionaryFileTest.java`，运行 `local.gboard.enhanced.DictionaryFileTest`。覆盖 TSV、ZIP、去重、读音规范化、编码错误、坏行、路径与解压边界、5000 条上限、合并溢出和清除后空标记。
+主机测试：用 JDK 17 编译 `DictionaryFile.java` 和 `tests/DictionaryFileTest.java`，运行 `local.gboard.enhanced.DictionaryFileTest`。覆盖 TSV、ZIP、去重、读音规范化、编码错误、坏行、路径与解压边界、50000 条上限、合并溢出和清除后空标记。

@@ -33,8 +33,8 @@ public final class DictionaryFileTest {
     rejects(zip("../dictionary.txt",gboard.getBytes(StandardCharsets.UTF_8)));
     rejects(zip("dictionary.txt",new byte[DictionaryFile.MAX_BYTES+1]));rejects(new byte[DictionaryFile.MAX_BYTES+1]);
     ArrayList<DictionaryFile.Entry> many=new ArrayList<>();
-    for(int i=0;i<5000;i++){int n=i;StringBuilder code=new StringBuilder("a");do{code.append((char)('a'+n%26));n/=26;}while(n>0);many.add(new DictionaryFile.Entry("合成测试",code.toString(),100));}
-    check(DictionaryFile.read(new ByteArrayInputStream(DictionaryFile.encode(many))).size()==5000);
+    for(int i=0;i<50000;i++){int n=i;StringBuilder code=new StringBuilder("a");do{code.append((char)('a'+n%26));n/=26;}while(n>0);many.add(new DictionaryFile.Entry("合成测试",code.toString(),100));}
+    check(DictionaryFile.read(new ByteArrayInputStream(DictionaryFile.encode(many))).size()==50000);
     List<DictionaryFile.Entry> added=read("离线词库\tlixianciku\t500\n");
     check(DictionaryFile.merge(words,added).size()==2);check(DictionaryFile.merge(words,added).get(0).weight==500);
     try{DictionaryFile.merge(many,added);throw new AssertionError("Accepted merge overflow");}catch(IOException expected){checks++;}

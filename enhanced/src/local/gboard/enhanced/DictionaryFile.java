@@ -8,7 +8,7 @@ import java.util.zip.*;
 
 /** Bounded, all-or-nothing reader for explicit local word lists. No Android dependencies. */
 public final class DictionaryFile {
-  public static final int MAX_WORDS=5000, MAX_BYTES=2*1024*1024;
+  public static final int MAX_WORDS=50000, MAX_BYTES=16*1024*1024;
   public static final class Entry {
     public final String word,code;
     public final int weight;
@@ -16,7 +16,7 @@ public final class DictionaryFile {
   }
   private static byte[] bounded(InputStream in,int limit)throws IOException {
     ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buffer=new byte[8192];int n;
-    while((n=in.read(buffer))!=-1){if(out.size()+n>limit)throw new IOException("词库文件过大（文本最多 2 MiB）");out.write(buffer,0,n);}
+    while((n=in.read(buffer))!=-1){if(out.size()+n>limit)throw new IOException("词库文件过大（文本最多 16 MiB）");out.write(buffer,0,n);}
     return out.toByteArray();
   }
   public static List<Entry> read(InputStream in)throws IOException {
@@ -65,7 +65,7 @@ public final class DictionaryFile {
       if(!word.matches("[\\p{IsHan}]{1,32}")||!code.matches("[a-z]{1,128}")||weight<1||weight>1000000)throw invalid(number);
       String key=code+"\t"+word;Entry previous=entries.get(key);
       entries.put(key,new Entry(word,code,previous==null?weight:Math.max(previous.weight,weight)));
-      if(entries.size()>MAX_WORDS)throw new IOException("最多导入 5000 条词条，请拆分并核对词库");
+      if(entries.size()>MAX_WORDS)throw new IOException("最多导入 50000 条词条，请拆分并核对词库");
     }
     if(entries.isEmpty())throw new IOException("文件没有有效词条；需要「词语<Tab>无声调拼音」或 Gboard 词库 ZIP");
     return Collections.unmodifiableList(new ArrayList<>(entries.values()));
@@ -78,7 +78,7 @@ public final class DictionaryFile {
       String key=entry.code+"\t"+entry.word;Entry previous=result.get(key);
       result.put(key,previous==null||entry.weight>previous.weight?entry:previous);
     }
-    if(result.size()>MAX_WORDS)throw new IOException("合并后超过 5000 条，原词库保持不变");
+    if(result.size()>MAX_WORDS)throw new IOException("合并后超过 50000 条，原词库保持不变");
     return Collections.unmodifiableList(new ArrayList<>(result.values()));
   }
   public static byte[] encode(List<Entry> entries){

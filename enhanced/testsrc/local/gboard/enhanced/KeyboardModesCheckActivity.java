@@ -83,7 +83,7 @@ public final class KeyboardModesCheckActivity extends Activity {
         EditorInfo ordinary=new EditorInfo();ordinary.inputType=InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE;
         NumericMode.inputStarted(ordinary);check("ordinary_editor_keeps_its_input_type",ordinary.inputType==(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE));
         EditorInfo pin=new EditorInfo();pin.inputType=InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_VARIATION_PASSWORD;
-        NumericMode.inputStarted(pin);check("password_number_editor_stays_secure",pin.inputType==(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_VARIATION_PASSWORD));
+        NumericMode.inputStarted(pin);check("password_number_editor_stays_secure",pin.inputType==(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS)&&(pin.imeOptions&EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING)!=0);
         save(null);
       }catch(Exception error){save(error);}},180);
     }catch(Exception error){save(error);}},500);

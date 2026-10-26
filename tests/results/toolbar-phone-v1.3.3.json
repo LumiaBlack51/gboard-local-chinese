@@ -1,0 +1,55 @@
+{
+  "version": "1.3.3",
+  "device_model": "PLQ110",
+  "formal_keyboard": true,
+  "checks": {
+    "native_custom_toolbar_recognized": true,
+    "settings_toolbar_slot_replaced": true,
+    "one_handed_action_visible": true,
+    "toolbar_touch_areas_do_not_overlap": true,
+    "actual_touch_hides_keyboard": true,
+    "button_returns_after_reopening": true,
+    "settings_present_in_native_feature_menu": true,
+    "actual_menu_settings_opens_native_settings_activity": true,
+    "composition_candidates_not_obstructed": true,
+    "button_returns_after_clearing_composition": true,
+    "actual_one_handed_layout_opens_with_hide_button_visible": true,
+    "full_width_layout_restored": true,
+    "local_settings_and_imported_dictionary_preserved": true,
+    "seven_installed_apk_hashes_versions_verified": true,
+    "first_install_time_and_default_ime_preserved": true,
+    "hide_is_to_right_of_native_voice": true,
+    "hide_is_rightmost_toolbar_action": true,
+    "hide_and_voice_vertical_centers_match": true,
+    "native_voice_hit_target_follows_visual_position": true,
+    "one_handed_layout_keeps_hide_rightmost_and_centered": true
+  },
+  "test_scope": "Formal keyboard with temporary synthetic private probe editor only.",
+  "sources": {
+    "enhanced/src/local/gboard/enhanced/ToolbarHide.java": "9a2dd730fb9deaa1945ea9de715d5effb0eabbcefc1652b35e687f23696a9eb5",
+    "enhanced/src/local/gboard/enhanced/KeyboardGestures.java": "7aaff93efcf0b338a42f031e0c31076198bc259445120b8e340405dd682f014f",
+    "tests/android/ToolbarInstrumentation.java": "7ca586f0124a91db4f94c0c3a4ffc88b2ea7cbee712018fc619d3128bae6427e"
+  },
+  "passed": true,
+  "keyboard_version_code": 176027092,
+  "geometry_in_ime_window": {
+    "voice": [
+      932,
+      1454,
+      1079,
+      1608
+    ],
+    "hide": [
+      1118,
+      1454,
+      1265,
+      1608
+    ],
+    "header": [
+      0,
+      1454,
+      1272,
+      1608
+    ]
+  }
+}

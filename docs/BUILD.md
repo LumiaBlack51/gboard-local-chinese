@@ -1,6 +1,6 @@
 # 构建说明
 
-1.3.2 复用 1.3.1 的语音、校对与更新器正式 APK，只重新构建主键盘。运行 `enhanced/build_enhanced.py`（不带 `--test`）、`enhanced/make_release.py`、`enhanced/release_metadata.py` 和 `tests/verify_release.py`。`release_version.py` 中未变化组件的 versionCode 保持原值，清单继续核验全部七个安装文件。
+1.3.4 复用 1.3.1 的语音、校对与更新器正式 APK，只重新构建主键盘。运行 `enhanced/build_enhanced.py`（不带 `--test`）、`enhanced/make_release.py`、`enhanced/release_metadata.py` 和 `tests/verify_release.py`。`release_version.py` 中未变化组件的 versionCode 保持原值，清单继续核验全部七个安装文件。
 
 词库解析测试：JDK 17 编译 `enhanced/src/local/gboard/enhanced/DictionaryFile.java` 与 `tests/DictionaryFileTest.java` 到临时目录，再运行 `local.gboard.enhanced.DictionaryFileTest`。安装 requirements 后运行 `python tests/test_local_vocab.py` 验证显式拼音、UTF-16 明文词表转换与错误二进制输入。只使用合成词条，不发布个人导出文件。
 
@@ -51,7 +51,11 @@ python enhanced/release_metadata.py
 
 ## 独立验证
 
-普通数字输入框现在由输入法内部按普通文本键盘初始化，并自动点进可切换的 `?123` 数字符号页；数字密码输入框保持原样，原应用的输入连接仍决定是否接受 `+` 等字符。Shift 单击会触发原生双击大写锁定，再点一次 Shift 退出。管理页可加入或移除顶部「收起」按钮，并调整它在语音、设置等按钮所在一行的位置；长按该按钮也可左右移动或移除。
+数字、电话及日期时间输入框由输入法内部按普通文本键盘初始化，并自动点进可切换的 `?123` 数字符号页；点击 `返回`／`ABC` 返回字母。同一编辑框 `restartInput` 不重复强制点进数字页。数字密码转换为文本密码模式并设置禁止个性化学习，继续禁用麦克风；原应用的密码遮挡和字符过滤仍生效。Shift 单击会触发原生双击大写锁定，再点一次 Shift 退出。管理页可加入或移除顶部「收起」按钮，长按也可移除。1.3.3 识别原生 `AccessPointsBar`，将原生语音按钮移至设置位置，收起固定在语音右侧的最右端；被替换的原生操作加入功能菜单。箭头直接按控件中心绘制。按钮放在外层 FrameLayout，保持原生子控件类型及测量，并在原生触摸分发之前转发完整手势。原生语音保留其原有事件，命中测试按变换矩阵跟随新位置。
+
+`tests/build_keyboard_modes_check.py` 构建临时同签名 instrumentation，在已选设备的独立 probe 隐私编辑框中验证正式键盘。覆盖电话、普通数字、带符号小数、数字密码、日期、时间及日期时间的数字上屏、ABC 返回、反复切换及连接重启；另检查数字密码模式和禁止学习标志、普通中文输入。测试包不进入发行 APK，测试完成后移除。
+
+`tests/build_toolbar_check.py` 构建临时同签名 instrumentation，不进入发行 APK。仅在明确选择的设备、自建 probe 隐私编辑框中运行 `local.gboard.toolbarcheck/.ToolbarInstrumentation`：`-e mode snapshot` 在设备私有目录保存设置和导入词库指纹，覆盖安装后 `-e mode retention` 比较并删除；`-e mode verify` 检查原生工具栏、收起在语音右侧的最右端及垂直中心、原生语音命中位置、设置位置、单手入口、触摸区域、实际收起、重新打开、功能菜单设置入口和拼音候选切换。指纹及私人词条不输出。测试完成卸载检查包；不在个人聊天应用输入测试文字。
 
 调试包包含 `KeyboardModesCheckActivity`，在 AVD 中用合成键盘验证数字页可输入 `+`、可切回字母、连续大写及退出，并核对工具栏识别和设置持久化。启动后从应用私有文件 `files/keyboard-modes-report.json` 读取结果。完整 Gboard 18.4.1 的 ARM 原生库在现有 x86 AVD 的 ARM 翻译环境会崩溃，因此这些检查不能代替 ARM64 真机上的键盘界面验收。
 

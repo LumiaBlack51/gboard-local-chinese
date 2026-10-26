@@ -36,7 +36,24 @@ public final class AdapterCheckActivity extends Activity {
     setContentView(layout);processor=new FakeHmmPinyinQwertyDecodeProcessor();RimeBridge.prepare(this);waitReady(SystemClock.elapsedRealtime()+600000);
   }
   private void waitReady(long deadline){if(RimeBridge.ready){ui.postDelayed(this::test,300);return;}if(SystemClock.elapsedRealtime()>deadline){save(new Exception("Rime timeout"));return;}ui.postDelayed(()->waitReady(deadline),300);}
+  private void selectionProbe()throws Exception{
+    report.put("probe_id",getIntent().getStringExtra("selection_probe_id"));
+    String raw=getIntent().getStringExtra("selection_probe_raw");begin();type(raw);publish(100);
+    report.put("probe_raw_before",EnhancedHook.raw());report.put("probe_candidate_count",gate.last.size());
+    JSONArray before=new JSONArray();for(Object c:gate.last)before.put(String.valueOf(get(c,"a")));report.put("probe_candidates_before",before);
+    if(!gate.last.isEmpty()){
+      Object first=gate.last.get(0);String expected=getIntent().getStringExtra("selection_probe_text");if(expected!=null){first=null;for(Object c:gate.last)if(expected.equals(String.valueOf(get(c,"a")))){first=c;break;}if(first==null)throw new Exception("Requested candidate unavailable");}
+      report.put("probe_first",String.valueOf(get(first,"a")));
+      if(getIntent().getBooleanExtra("selection_probe_space",false))key(62," ");else{Object choice=event(10);put(choice,"j",first);put(choice,"k",true);EnhancedHook.dispatch(processor,choice);}
+      report.put("probe_raw_after",EnhancedHook.raw());report.put("probe_editor_after",editor.getText().toString());report.put("probe_composing_after",EnhancedHook.composing());
+      publish(4);report.put("probe_candidates_after",gate.last.size());
+      JSONArray after=new JSONArray();for(Object c:gate.last)after.put(String.valueOf(get(c,"a")));report.put("probe_words_after",after);
+    }
+    save(null);
+  }
   private void test(){try{
+    if(getIntent().hasExtra("selection_probe_raw")){selectionProbe();return;}
+    testTypoSelections();
     begin();type("nihao");check("enter_consumed",key(66,"\n"));check("enter_commits_literal",editor.getText().toString().equals("nihao"));check("next_enter_falls_through",!key(66,"\n"));
     begin();type("hello");Object enter=call(Class.forName("oas"),"e",66,"\n");check("front_enter_consumed",EnhancedHook.handleEnter(enter));check("front_enter_commits_literal",editor.getText().toString().equals("nihaohello"));check("front_next_enter_falls_through",!EnhancedHook.handleEnter(enter));
     begin();type("shi");publish(3);check("first_batch_selected",gate.selected!=null);Set<Object> first=new HashSet<>(gate.last);publish(6);check("additional_batch_does_not_select",gate.selected==null);check("additional_batch_no_duplicates",Collections.disjoint(first,gate.last));publish(Integer.MAX_VALUE);check("large_request_no_overflow",!gate.more);
@@ -48,6 +65,27 @@ public final class AdapterCheckActivity extends Activity {
     else check("original_candidate_view_loaded",false);
     testFrame();
   }catch(Throwable e){save(e);}}
+  private void testTypoSelections()throws Exception{
+    for(boolean space:new boolean[]{false,true}){
+      begin();editor.setText("");type("ranhiuwohui");publish(100);
+      check("typo_corrected_candidate_"+space,!gate.last.isEmpty()&&"然后我会".equals(String.valueOf(get(gate.last.get(0),"a"))));
+      if(space)key(62," ");else{Object e=event(10);put(e,"j",gate.last.get(0));put(e,"k",true);EnhancedHook.dispatch(processor,e);}
+      check("typo_choice_committed_"+space,"然后我会".equals(editor.getText().toString()));
+      publish(3);check("typo_choice_keeps_predictions_"+space,!gate.last.isEmpty());
+      Object next=gate.last.get(0);String predicted=String.valueOf(get(next,"a"));Object e=event(10);put(e,"j",next);put(e,"k",true);EnhancedHook.dispatch(processor,e);
+      check("following_choice_committed_"+space,("然后我会"+predicted).equals(editor.getText().toString()));
+    }
+    begin();editor.setText("");type("nihaoma");publish(100);Object prefix=null;for(Object c:gate.last)if("你好".equals(String.valueOf(get(c,"a")))){prefix=c;break;}
+    check("partial_candidate_available",prefix!=null);Object e=event(10);put(e,"j",prefix);put(e,"k",true);EnhancedHook.dispatch(processor,e);
+    check("partial_candidate_committed","你好".equals(editor.getText().toString()));check("partial_input_retained","ma".equals(EnhancedHook.raw()));publish(3);check("partial_candidates_retained",!gate.last.isEmpty());
+    key(67,"");check("partial_input_editable","m".equals(EnhancedHook.raw()));
+    begin();editor.setText("");type("nihaovvvvvv");publish(100);Object old=gate.last.get(0);e=event(10);put(e,"j",old);put(e,"k",true);EnhancedHook.dispatch(processor,e);
+    check("invalid_tail_prefix_committed","你好".equals(editor.getText().toString()));check("invalid_tail_retained","vvvvvv".equals(EnhancedHook.raw()));publish(3);
+    check("invalid_tail_replaces_previous_candidates",gate.last.size()==1&&"vvvvvv".equals(String.valueOf(get(gate.last.get(0),"a"))));
+    Object literal=gate.last.get(0);e=event(10);put(e,"j",old);put(e,"k",true);EnhancedHook.dispatch(processor,e);check("stale_candidate_ignored","你好".equals(editor.getText().toString())&&"vvvvvv".equals(EnhancedHook.raw()));
+    e=event(10);put(e,"j",literal);put(e,"k",true);EnhancedHook.dispatch(processor,e);check("invalid_tail_literal_committed","你好vvvvvv".equals(editor.getText().toString())&&!EnhancedHook.composing());
+    begin();editor.setText("");
+  }
   private void testFrame()throws Exception{
     LocalSettings.prefs(this).edit().remove("candidate_controls").commit();check("default_control_replaces_expand",LocalSettings.candidateControls(this)==LocalSettings.CANDIDATE_REPLACE);LocalSettings.candidateControls(this,LocalSettings.CANDIDATE_BOTH);
     ViewGroup old=(ViewGroup)candidateBar.getParent();old.removeView(candidateBar);FrameLayout frame=new FrameLayout(this);frame.addView(candidateBar,new FrameLayout.LayoutParams(-1,-1));((LinearLayout)editor.getParent()).addView(frame,new LinearLayout.LayoutParams(-1,144));
