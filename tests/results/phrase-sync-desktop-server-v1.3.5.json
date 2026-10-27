@@ -1,0 +1,23 @@
+{
+  "release": "v1.3.5",
+  "active_endpoint_host": "45.76.170.31",
+  "first_endpoint_unavailable": "64.56.71.36",
+  "desktop_real_exchange_verified": true,
+  "natural_hourly_timer_run": "2026-10-27T20:00:13+08:00",
+  "natural_run_finished": "2026-10-27T20:00:19+08:00",
+  "desktop_service_inactive_after_run": true,
+  "server_socket_activation_verified": true,
+  "server_process_inactive_between_requests": true,
+  "per_device_credentials": true,
+  "consistent_migration_backup_created": true,
+  "automated_sync_tests": 8,
+  "sources": {
+    "sync/common.py": "7851aa47ef7652767d7fde70fb9e727b356553110687e7d64ac1fd9cafa5de18",
+    "sync/server.py": "3031dc2f462880732d3458d5484aa6b153eb49d05c546f7d65a573dd46f92ccb",
+    "sync/desktop.py": "c6b6290591da11bec2922b0b26bf86f6b2917e80dd81ed0693104ddc37e4fb5f",
+    "sync/backup.py": "f527416c822ae32240965ef48911148de34222a252e800937ac61077c284eb2c",
+    "sync/gboard-phrase-sync.timer": "96249b799986f9c44f0a81f7e2e33e50203b30f06774909470ec6dcccac34b1e",
+    "sync/gboard-phrase-sync.service": "299a8365c4f36a159bd49a90bf8dc7bd334d5b251f53a3c5baf65f34960e8940"
+  },
+  "passed": true
+}

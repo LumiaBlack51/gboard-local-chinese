@@ -1,0 +1,23 @@
+{
+  "release": "v1.3.5",
+  "environment": "Independent headless Android 37.1 emulator, final signed release APK; no personal phone input events",
+  "adapter_cases": 68,
+  "initials_checked": 26,
+  "modes": [
+    "normal",
+    "private"
+  ],
+  "native_learning_ids_preserved": true,
+  "known_shared_words_do_not_mask_native_rank": true,
+  "native_relative_order_preserved": true,
+  "duplicate_candidates": false,
+  "single_initial_first_page_is_native": true,
+  "private_mode_excludes_personal_words": true,
+  "method": "Invoke the shipped EnhancedHook adapter with synthetic native candidate snapshots and an in-memory synthetic imported dictionary; restore the dictionary after checking. This checks adapter behavior rather than full-screen input or overall model accuracy.",
+  "sources": {
+    "enhanced/src/local/gboard/enhanced/EnhancedHook.java": "fbd587494b64bd057ca8d4f1d3aba928cdb57f90471fb7a8d6a12e6b4d9b6d6f",
+    "tests/android/PhoneCandidateInstrumentation.java": "239f8a17da98248ae29c0c1d3f1ded94c5a9564c79ffdd9613e72bdd5b2fd133"
+  },
+  "apk_sha256": "9051960e4aa16bebc2bd33901cf93c26c17b30eaf4bb0dda51022d335202e14d",
+  "passed": true
+}

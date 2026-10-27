@@ -12,7 +12,7 @@ import java.security.*;
 import java.util.*;
 import org.json.*;
 
-/** User initiated GitHub updates in a separate UID with no keyboard or microphone access. */
+/** GitHub updates and opt-in scheduled phrase exchange, without microphone or input connections. */
 public final class UpdateActivity extends Activity {
   static final String REPO="LumiaBlack51/gboard-local-chinese",KEYBOARD="com.localx.android.inputmethod.latin",VOICE="local.gboard.voice",SELF="local.gboard.updater";
   static final String PROOF="local.gboard.proofread";
@@ -26,9 +26,10 @@ public final class UpdateActivity extends Activity {
     LinearLayout layout=new LinearLayout(this);layout.setOrientation(1);int pad=(int)(20*getResources().getDisplayMetrics().density);layout.setPadding(pad,pad,pad,pad);
     TextView title=new TextView(this);title.setText("Gboard 中文增强更新");title.setTextSize(24);layout.addView(title);
     current=new TextView(this);current.setTextSize(16);current.setText(InstalledRelease.versions(this));layout.addView(current);
-    status=new TextView(this);status.setTextSize(17);status.setText("点击检查更新后连接 GitHub。键盘和离线语音保持无联网权限；输入内容不会传给此应用。");layout.addView(status);
+    status=new TextView(this);status.setTextSize(17);status.setText("点击检查更新后连接 GitHub。键盘和离线语音保持无联网权限；启用词库共享后，此应用仅在插电同步时读取中文词条。");layout.addView(status);
     check=new Button(this);check.setText("检查更新");layout.addView(check);check.setOnClickListener(v->check());
     install=new Button(this);install.setText("下载并安装更新");install.setEnabled(false);layout.addView(install);install.setOnClickListener(v->beginInstall());
+    Button sync=new Button(this);sync.setText("词库共享设置");layout.addView(sync);sync.setOnClickListener(v->startActivity(new Intent(this,PhraseSyncSettings.class)));
     setContentView(layout);
     updates=getSharedPreferences("updates",0);
   }

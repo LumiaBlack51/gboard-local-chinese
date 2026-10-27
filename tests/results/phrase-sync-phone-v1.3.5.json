@@ -1,0 +1,16 @@
+{
+  "release": "v1.3.5",
+  "device_model": "PLQ110",
+  "endpoint_host": "45.76.170.31",
+  "hourly_job_configuration_verified": true,
+  "default_requires_charging": false,
+  "signature_provider_boundary_verified": true,
+  "coloros_auto_start_enabled_by_user": true,
+  "actual_scheduled_https_exchange_success": true,
+  "cloud_phrase_merge_verified": true,
+  "sync_process_exited_before_verification": true,
+  "no_test_input_events_sent": true,
+  "passed": true,
+  "phone_origin_entries_uploaded": 9545,
+  "merged_cloud_entries": 25710
+}

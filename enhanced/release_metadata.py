@@ -20,7 +20,7 @@ for package,version,paths in groups:
   items.append({'name':path.name,'sha256':sha,'size':size})
   assets.append({'file':path.relative_to(ROOT).as_posix(),'bytes':size,'sha256':sha,'name':path.name})
  components.append({'package':package,'versionCode':version,'assets':items})
-save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'电话号码、数字、日期时间及数字密码输入统一使用可切换的数字符号页，点击 返回／ABC 随时返回普通输入；同一输入框刷新连接后不强制切回数字。数字密码保留密码模式、禁止学习和麦克风。保留右侧收起、本地词库、离线拼音纠错及持续大写。','components':components[:3],'optionalComponents':components[3:]})
+save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'修复候选栏类型转换崩溃及同步词覆盖原生候选学习的问题；新增多设备词库共享。手机默认插电、离电均每小时由系统安排同步，电脑仅插电；同步时启动、结束即退出，无常驻同步服务。共享中文词语、拼音和词频，不上传原始输入、语音和模型；本版合并词条，不传播删除。','components':components[:3],'optionalComponents':components[3:]})
 save('release-manifest.json',{'tag':'v'+VERSION,'assets':assets})
 (ROOT/'SHA256SUMS.txt').write_text(''.join(a['sha256']+'  '+a['name']+'\n' for a in assets),encoding='ascii')
 source={}

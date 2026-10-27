@@ -1,0 +1,19 @@
+[Unit]
+Description=On-demand encrypted phrase exchange
+Requires=phrase-sync.socket
+After=phrase-sync.socket
+[Service]
+Type=simple
+User=phrase-sync
+Group=phrase-sync
+WorkingDirectory=/opt/phrase-sync
+ExecStart=/usr/bin/python3 /opt/phrase-sync/server.py --database /var/lib/phrase-sync/words.sqlite3 --cert /var/lib/phrase-sync/server.crt --key /var/lib/phrase-sync/server.key
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/phrase-sync
+MemoryMax=256M
+CPUQuota=20%
+TimeoutStopSec=5

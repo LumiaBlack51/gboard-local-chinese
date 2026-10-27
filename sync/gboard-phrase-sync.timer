@@ -1,0 +1,8 @@
+[Unit]
+Description=Hourly plugged-in phrase sync; no resident sync process
+[Timer]
+OnCalendar=hourly
+AccuracySec=1min
+Persistent=false
+[Install]
+WantedBy=timers.target

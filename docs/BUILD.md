@@ -1,3 +1,7 @@
+1.3.5 桌面消费者回归使用系统 librime 的隔离会话，运行 `python3 tests/verify_desktop_candidates.py` 和 `python3 tests/verify_desktop_cloud_rime.py`。前者覆盖单字母、简拼、全拼、多音字、ü、大小写、数字标点，并实际选词验证学习；后者验证已同步文件及同一会话热更新。隔离目录不打开正在使用的个人学习数据库，也不向前台发送按键。详见对应测试脚本的参数说明。
+
+1.3.5 重新构建键盘及更新器，语音与校对复用已有正式 APK。先执行 `python tests/test_phrase_sync.py`，再构建主键盘、make_release、build_updater、release_metadata 和 verify_release。`tests/build_sync_checks.py` 生成临时同签名检查包：候选栏回归和 PhoneCandidateInstrumentation 候选排序/原生编号检查只在独立模拟器运行；手机检查仅针对更新器，无 Activity 或输入事件，不启动手机键盘 instrumentation。
+
 # 构建说明
 
 1.3.4 复用 1.3.1 的语音、校对与更新器正式 APK，只重新构建主键盘。运行 `enhanced/build_enhanced.py`（不带 `--test`）、`enhanced/make_release.py`、`enhanced/release_metadata.py` 和 `tests/verify_release.py`。`release_version.py` 中未变化组件的 versionCode 保持原值，清单继续核验全部七个安装文件。

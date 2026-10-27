@@ -20,6 +20,7 @@ public final class DictionaryStore {
       try(InputStream in=source.openRead()){publish(DictionaryFile.readStored(in));}
     loaded=true;
   }
+  public static synchronized List<DictionaryFile.Entry> snapshot(Context context)throws IOException {load(context);return new ArrayList<>(entries);}
   private static void publish(List<DictionaryFile.Entry> words){
     HashMap<String,List<WordIndex.Entry>> next=new HashMap<>();
     for(DictionaryFile.Entry e:words){List<WordIndex.Entry> group=next.get(e.code);

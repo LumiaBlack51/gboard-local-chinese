@@ -67,7 +67,7 @@ public final class KeyboardGestures {
     return null;
   }
   public static boolean touch(View root,MotionEvent event){
-    try{State s=roots.get(root);if(nativeDispatch||s!=null&&s.bypass)return false;if(ToolbarHide.touch(root,event))return true;CapsMode.touch(root,event);if(s==null&&!EnhancedHook.chineseActive())return false;if(s==null){attach(root);s=roots.get(root);}final State state=s;int action=event.getActionMasked();
+    try{State s=roots.get(root);if(nativeDispatch||s!=null&&s.bypass)return false;if(EnhancedHook.candidateTouch(root,event)||ToolbarHide.touch(root,event))return true;CapsMode.touch(root,event);if(s==null&&!EnhancedHook.chineseActive())return false;if(s==null){attach(root);s=roots.get(root);}final State state=s;int action=event.getActionMasked();
       if(!s.routing){
         if(action==MotionEvent.ACTION_DOWN){s.routed=false;if(EnhancedHook.chineseActive()){Key target=lowerLetter(root,s,event.getX(),event.getY());if(target!=null){s.routed=true;s.routeX=target.bounds.exactCenterX()-event.getX();s.routeY=target.bounds.exactCenterY()-event.getY();}}}
         if(s.routed){MotionEvent routed=MotionEvent.obtain(event);routed.offsetLocation(s.routeX,s.routeY);s.routing=true;

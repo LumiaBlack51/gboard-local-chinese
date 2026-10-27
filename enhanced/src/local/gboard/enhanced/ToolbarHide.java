@@ -35,6 +35,7 @@ public final class ToolbarHide {
     }
   }
   private ToolbarHide(){}
+  static boolean inputVisible(){InputMethodService ime=current.get();return ime!=null&&ime.isInputViewShown();}
   public static void shown(Object service){
     if(!(service instanceof InputMethodService))return;
     InputMethodService ime=(InputMethodService)service;current=new WeakReference<>(ime);
@@ -46,6 +47,7 @@ public final class ToolbarHide {
     for(int delay:new int[]{0,120,400,1000})decor.postDelayed(ToolbarHide::refresh,delay);
   }
   static void refresh(){
+    EnhancedHook.refreshCandidateBars();
     InputMethodService ime=current.get();if(ime==null||ime.getWindow()==null)return;
     TextView control=button.get();
     if(!LocalSettings.toolbarHide(ime)){

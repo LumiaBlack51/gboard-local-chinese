@@ -1,0 +1,10 @@
+[Unit]
+Description=Hourly phrase sync while plugged in
+ConditionACPower=true
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/.local/lib/gboard-phrase-sync/desktop.py
+TimeoutStartSec=60
+Nice=15
+IOSchedulingClass=idle
+UMask=0077

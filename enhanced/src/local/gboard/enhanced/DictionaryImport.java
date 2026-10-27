@@ -18,7 +18,7 @@ final class DictionaryImport {
     activity=owner;
     TextView title=new TextView(owner);title.setText("本地词库");title.setTextSize(18);layout.addView(title);
     status=new TextView(owner);layout.addView(status);
-    TextView note=new TextView(owner);note.setText("导入词条可按完整拼音选用。支持带拼音的 UTF-8 文本和 Gboard 词库 ZIP，最多 50000 条；导入会合并并去重。词库仅保存在本机。讯飞用户词需先导出并转换，不能直接连接其云词库或导入加密备份。");layout.addView(note);
+    TextView note=new TextView(owner);note.setText("导入词条可按完整拼音选用。支持带拼音的 UTF-8 文本和 Gboard 词库 ZIP，最多 50000 条；导入会合并并去重。默认仅保存在本机；可在「检查更新 → 词库共享设置」启用每小时词库共享。讯飞用户词需先导出并转换，不能直接连接其云词库或导入加密备份。");layout.addView(note);
     choose=new Button(owner);choose.setText("导入本地词库");layout.addView(choose);
     choose.setOnClickListener(v->{
       Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*");

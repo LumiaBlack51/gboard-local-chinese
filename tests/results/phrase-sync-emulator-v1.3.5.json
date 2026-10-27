@@ -1,0 +1,20 @@
+{
+  "release": "v1.3.5",
+  "environment": "Independent headless Android 37.1 emulator; no personal app input",
+  "candidate_transitions": 9,
+  "dismiss_outside_native_children": true,
+  "hourly_system_job": true,
+  "default_requires_charging": false,
+  "signature_provider_boundary_verified": true,
+  "synthetic_https_exchange_and_merge": true,
+  "sync_process_absent_after_completion": true,
+  "sources": {
+    "enhanced/src/local/gboard/enhanced/EnhancedHook.java": "fbd587494b64bd057ca8d4f1d3aba928cdb57f90471fb7a8d6a12e6b4d9b6d6f",
+    "enhanced/src/local/gboard/enhanced/KeyboardGestures.java": "faf1ee9c86c6a06489e853cbe5d7b847451369244d08948a39708903ed18ca93",
+    "add_activity.py": "c1091375154b9dab81e260126a7a97331e1af2282c6c9bd9c04834e0bbda13d9"
+  },
+  "passed": true,
+  "battery_powered_exchange_verified": true,
+  "candidate_sources_reverified_after_final_visibility_fix": true,
+  "candidate_sources_reverified_after_final_ranking_fix": true
+}

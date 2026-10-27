@@ -1,0 +1,18 @@
+{
+  "actual_synced_file_candidate_verified": true,
+  "new_word_hot_reload_verified": true,
+  "phone_origin_candidate_verified": true,
+  "native_identity_preserved_for_shared_known_word": false,
+  "front_input_events_sent": false,
+  "personal_words_printed": false,
+  "passed": true,
+  "release": "v1.3.5",
+  "phone_origin_entries_added": 9545,
+  "merged_cloud_entries_at_verification": 25710,
+  "sources": {
+    "sync/cloud_phrase.lua": "4b07d5681bd334e0cf6eb4fbaa5b62b5400259dea4efcb602e64641c39c97776",
+    "sync/cloud_native_filter.lua": "f79f317f5db84ca0411d64a576db6dd432443ca6e9530134061fc428af6395fe",
+    "tests/rime_host.py": "a7b1fe15221536b5ed4f6964333ccd0778e3d0cfa75be1714232c1a90cfbea6f",
+    "tests/verify_desktop_cloud_rime.py": "b9d1c5f6c1b9a8dcc616b4943f9b6cc6d15b206853fd99c4a457c764ecb4b43d"
+  }
+}

@@ -1,6 +1,6 @@
 """Verify the signed outputs and metadata before publishing."""
 from pathlib import Path
-import hashlib,json,re,subprocess,sys,zipfile
+import hashlib,json,re,subprocess,sys,zipfile,struct
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
 from build_config import ROOT,BT
 def run(*args):return subprocess.check_output([str(x) for x in args],encoding='utf8',errors='replace')
@@ -33,6 +33,22 @@ for component in manifest['components']+manifest.get('optionalComponents',[]):
     for n in z.namelist():
      if n.endswith('.dex'):assert all(name not in z.read(n) for name in [b'AdapterCheckActivity',b'GestureCheckActivity',b'FontSizeCheckActivity',b'KeyboardModesCheckActivity'])
    if path.name=='base.apk':
+    # Android TypedArray requires resource-ID-sorted attributes in binary XML.
+    from clone_apk import decode_pool,U32
+    raw=z.read('AndroidManifest.xml');chunks=[];offset=8
+    while offset<len(raw):
+     size=U32(raw,offset+4);chunks.append(raw[offset:offset+size]);offset+=size
+    strings,_=decode_pool(next(c for c in chunks if struct.unpack_from('<H',c)[0]==1))
+    resource=next(c for c in chunks if struct.unpack_from('<H',c)[0]==0x180)
+    ids=[U32(resource,j) for j in range(8,len(resource),4)]
+    checked_provider=False
+    for c in chunks:
+     if struct.unpack_from('<H',c)[0]!=0x102 or strings[U32(c,20)]!='provider':continue
+     start,width,count=struct.unpack_from('<HHH',c,24);attrs=[16+start+i*width for i in range(count)]
+     if not any(c[p+15]==3 and strings[U32(c,p+16)]=='local.gboard.enhanced.DictionarySyncProvider' for p in attrs):continue
+     ordered=[ids[U32(c,p+4)] for p in attrs];assert ordered==sorted(ordered)
+     checked_provider=True
+    assert checked_provider
     with zipfile.ZipFile(ROOT/'gboard-18.4.1/base.apk') as original:
      name='lib/arm64-v8a/libintegrated_shared_object.so'
      assert sha(z.read(name))==sha(original.read(name))

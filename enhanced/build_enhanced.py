@@ -175,8 +175,8 @@ with zipfile.ZipFile(base) as z,zipfile.ZipFile(unsigned,'w') as out:
     if info.filename.startswith('META-INF/'):continue
     content=(fixed/info.filename).read_bytes() if info.filename in ['classes.dex','classes2.dex','classes3.dex'] else z.read(info)
     if info.filename=='AndroidManifest.xml':
-      sys.path.insert(0,str(ROOT));from add_activity import add_activity,add_voice_access,management_launcher
-      content=management_launcher(add_voice_access(add_activity(content,'local.gboard.enhanced.VoicePermissionActivity')))
+      sys.path.insert(0,str(ROOT));from add_activity import add_activity,add_voice_access,management_launcher,add_dictionary_sync
+      content=add_dictionary_sync(management_launcher(add_voice_access(add_activity(content,'local.gboard.enhanced.VoicePermissionActivity'))))
       if '--test' in sys.argv:
         content=add_activity(content,'local.gboard.enhanced.AdapterCheckActivity',True)
         content=add_activity(content,'local.gboard.enhanced.GestureCheckActivity',True)

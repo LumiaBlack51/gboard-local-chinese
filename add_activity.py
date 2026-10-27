@@ -67,3 +67,41 @@ def set_version(raw,code,name):
       if key=='versionCode':struct.pack_into('<I',c,p+16,code)
       if key=='versionName':c[p+15]=3;struct.pack_into('<I',c,p+8,strings.index(name));struct.pack_into('<I',c,p+16,strings.index(name))
   chunks[pi]=encode_pool(strings,flags);body=b''.join(chunks);return struct.pack('<HHI',3,8,len(body)+8)+body
+
+def add_dictionary_sync(raw):
+  """Signature-protected streamed phrases; keeps the keyboard without INTERNET."""
+  chunks=[];offset=8
+  while offset<len(raw):
+    size=U32(raw,offset+4);chunks.append(raw[offset:offset+size]);offset+=size
+  pi=next(i for i,c in enumerate(chunks) if struct.unpack_from('<H',c)[0]==1)
+  strings,flags=decode_pool(chunks[pi])
+  def string(value):
+    if value not in strings:strings.append(value)
+    return strings.index(value)
+  ns=string('http://schemas.android.com/apk/res/android')
+  mi=next(i for i,c in enumerate(chunks) if struct.unpack_from('<H',c)[0]==0x180)
+  ids=[U32(chunks[mi],j) for j in range(8,len(chunks[mi]),4)]
+  resources={'name':0x01010003,'permission':0x01010006,'protectionLevel':0x01010009,'exported':0x01010010,'authorities':0x01010018}
+  def node(tag,attrs):
+    values=[]
+    # Android styled-attribute lookup requires resource-ID ordering.
+    for key,value in sorted(attrs.items(),key=lambda item:resources[item[0]]):
+      index=string(key)
+      while len(ids)<=index:ids.append(0)
+      ids[index]=resources[key]
+      kind=0x12 if isinstance(value,bool) else 0x10 if isinstance(value,int) else 3
+      typed=(0xffffffff if value else 0) if kind==0x12 else value if kind==0x10 else string(value)
+      values.append(struct.pack('<IIIHBBI',ns,index,typed if kind==3 else 0xffffffff,8,0,kind,typed))
+    tagid=string(tag)
+    start=struct.pack('<HHIII',0x102,16,36+20*len(values),0,0xffffffff)+struct.pack('<IIHHHHHH',0xffffffff,tagid,20,20,len(values),0,0,0)+b''.join(values)
+    end=struct.pack('<HHIIIII',0x103,16,24,0,0xffffffff,0xffffffff,tagid)
+    return [start,end]
+  permission=node('permission',{'name':'local.gboard.DICTIONARY_SYNC','protectionLevel':2})
+  provider=node('provider',{'name':'local.gboard.enhanced.DictionarySyncProvider','authorities':'com.localx.android.inputmethod.latin.dictionary_sync','exported':True,'permission':'local.gboard.DICTIONARY_SYNC'})
+  ci=next(i for i,c in enumerate(chunks) if struct.unpack_from('<H',c)[0]==0x103 and strings[U32(c,20)]=='application')
+  chunks[ci:ci]=provider
+  ci=next(i for i,c in enumerate(chunks) if struct.unpack_from('<H',c)[0]==0x102 and strings[U32(c,20)]=='application')
+  chunks[ci:ci]=permission
+  chunks[mi]=struct.pack('<HHI',0x180,8,8+len(ids)*4)+b''.join(struct.pack('<I',n) for n in ids)
+  chunks[pi]=encode_pool(strings,flags);body=b''.join(chunks)
+  return struct.pack('<HHI',3,8,len(body)+8)+body

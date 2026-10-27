@@ -22,7 +22,7 @@ public final class DictionaryFile {
   public static List<Entry> read(InputStream in)throws IOException {
     return read(in,false);
   }
-  static List<Entry> readStored(InputStream in)throws IOException {return read(in,true);}
+  public static List<Entry> readStored(InputStream in)throws IOException {return read(in,true);}
   private static List<Entry> read(InputStream in,boolean stored)throws IOException {
     byte[] raw=bounded(in,MAX_BYTES);
     if(raw.length>=2&&raw[0]=='P'&&raw[1]=='K'){
@@ -67,6 +67,7 @@ public final class DictionaryFile {
       entries.put(key,new Entry(word,code,previous==null?weight:Math.max(previous.weight,weight)));
       if(entries.size()>MAX_WORDS)throw new IOException("最多导入 50000 条词条，请拆分并核对词库");
     }
+    if(entries.isEmpty()&&stored)return Collections.emptyList();
     if(entries.isEmpty())throw new IOException("文件没有有效词条；需要「词语<Tab>无声调拼音」或 Gboard 词库 ZIP");
     return Collections.unmodifiableList(new ArrayList<>(entries.values()));
   }

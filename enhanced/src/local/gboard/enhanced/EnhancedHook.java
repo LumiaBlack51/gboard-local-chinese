@@ -174,10 +174,16 @@ public final class EnhancedHook {
     String display=s.raw.substring(0,Math.min(s.caret,s.raw.length()))+"│"+s.raw.substring(Math.min(s.caret,s.raw.length()));
     call(s.processor,"au",s.composing?display:"");
     ArrayList<Object> list=new ArrayList<>();HashSet<String> seen=new HashSet<>();
-    if(s.composing)for(WordIndex.Entry e:LocalWords.match(s.raw))if(seen.add(e.word))list.add(candidate(new Candidate(s,-1,e.word,e.code),list.size()));
-    for(int i=4;i<Math.min(result.length,6);i++)if(seen.add(result[i]))list.add(candidate(new Candidate(s,i-4,result[i]),list.size()));
-    if(s.composing)for(WordIndex.Entry e:WordIndex.complete(s.raw))if(seen.add(e.word))list.add(candidate(new Candidate(s,-1,e.word,e.code),list.size()));
-    for(int i=6;i<result.length;i++)if(seen.add(result[i]))list.add(candidate(new Candidate(s,i-4,result[i]),list.size()));
+    HashSet<String> nativeWords=new HashSet<>();for(int i=4;i<result.length;i++)nativeWords.add(result[i]);
+    boolean initial=s.composing&&DictionaryFile.normalize(s.raw).length()==1;
+    int nativeLead=initial?5:2;
+    // Keep genuine Rime candidate IDs and ordering for shared known words.
+    // They carry selection learning; a static imported row must not mask them.
+    if(initial)for(int i=4;i<Math.min(result.length,4+nativeLead);i++)if(seen.add(result[i]))list.add(candidate(new Candidate(s,i-4,result[i]),list.size()));
+    if(s.composing&&!s.privateMode)for(WordIndex.Entry e:LocalWords.match(s.raw))if(!nativeWords.contains(e.word)&&seen.add(e.word))list.add(candidate(new Candidate(s,-1,e.word,e.code),list.size()));
+    if(!initial)for(int i=4;i<Math.min(result.length,4+nativeLead);i++)if(seen.add(result[i]))list.add(candidate(new Candidate(s,i-4,result[i]),list.size()));
+    if(s.composing)for(WordIndex.Entry e:WordIndex.complete(s.raw))if(!nativeWords.contains(e.word)&&seen.add(e.word))list.add(candidate(new Candidate(s,-1,e.word,e.code),list.size()));
+    for(int i=4+nativeLead;i<result.length;i++)if(seen.add(result[i]))list.add(candidate(new Candidate(s,i-4,result[i]),list.size()));
     // Keep an unrecognized remainder visible without leaving the previous
     // segment's candidate objects on screen. Selecting it commits it literally.
     if(s.composing&&list.isEmpty())list.add(candidate(new Candidate(s,-4,s.raw),0));
@@ -234,7 +240,7 @@ public final class EnhancedHook {
     if(!(bar instanceof android.view.ViewGroup))return;
     BarControl previous=bars.get(bar);
     if(previous!=null){android.widget.TextView button=previous.button.get();
-      if(button!=null&&button.getParent()==bar){android.view.ViewGroup group=(android.view.ViewGroup)bar;if(group.getChildAt(group.getChildCount()-1)!=button)group.bringChildToFront(button);refreshCandidateBars();return;}
+      if(button!=null&&button.getParent()!=null){placeDismiss(bar,button,previous.size);refreshCandidateBars();return;}
       if(button!=null&&button.getParent() instanceof android.view.ViewGroup)((android.view.ViewGroup)button.getParent()).removeView(button);
       bars.remove(bar);
     }
@@ -245,7 +251,9 @@ public final class EnhancedHook {
     int size=(int)(48*bar.getResources().getDisplayMetrics().density+0.5f);
     android.util.TypedValue color=new android.util.TypedValue();bar.getContext().getTheme().resolveAttribute(android.R.attr.textColorPrimary,color,true);
     if(color.resourceId!=0)close.setTextColor(bar.getContext().getColor(color.resourceId));
-    ((android.view.ViewGroup)bar).addView(close,new android.widget.LinearLayout.LayoutParams(size,android.view.ViewGroup.LayoutParams.MATCH_PARENT));
+    // Native candidate holders cast every child to SoftKeyView. Our control must
+    // live outside that typed child list, including while the list shrinks.
+    if(!placeDismiss(bar,close,size))return;
     bars.put(bar,new BarControl(close,size));
     close.setOnClickListener(v->{synchronized(EnhancedHook.class){try{if(active!=null)dismiss(active);}catch(Throwable error){Log.e("LocalChinese","Dismiss failed",error);}}});
     refreshCandidateBars();
@@ -268,7 +276,39 @@ public final class EnhancedHook {
     int expansion=0;
     try{View more=(View)get(bar,"a");if(more!=null&&more.getVisibility()==View.VISIBLE)expansion=more.getWidth()>0?more.getWidth():more.getMeasuredWidth();}catch(Exception ignored){}
     int right=Math.max(0,bar.getWidth()-expansion),left=Math.max(0,right-control.size);
-    close.layout(left,0,right,bar.getHeight());
+    placeDismiss(bar,close,control.size);
+  }
+  private static boolean placeDismiss(View bar,TextView close,int size){
+    android.view.ViewParent ancestor=bar.getParent();
+    while(ancestor instanceof View&&!(ancestor instanceof android.widget.FrameLayout))ancestor=ancestor.getParent();
+    if(!(ancestor instanceof android.widget.FrameLayout))return false;
+    android.widget.FrameLayout host=(android.widget.FrameLayout)ancestor;
+    android.graphics.Rect bounds=new android.graphics.Rect(0,0,bar.getWidth(),bar.getHeight());
+    host.offsetDescendantRectToMyCoords(bar,bounds);
+    int expansion=0;try{View more=(View)get(bar,"a");if(more!=null&&more.getVisibility()==View.VISIBLE)expansion=more.getWidth();}catch(Exception ignored){}
+    if(close.getParent()!=host){if(close.getParent() instanceof android.view.ViewGroup)((android.view.ViewGroup)close.getParent()).removeView(close);host.addView(close,new android.widget.FrameLayout.LayoutParams(size,Math.max(0,bounds.height())));}
+    android.widget.FrameLayout.LayoutParams params=(android.widget.FrameLayout.LayoutParams)close.getLayoutParams();
+    int left=Math.max(bounds.left,bounds.right-expansion-size);
+    if(params.width!=size||params.height!=bounds.height()||params.leftMargin!=left||params.topMargin!=bounds.top){params.width=size;params.height=Math.max(0,bounds.height());params.leftMargin=left;params.topMargin=bounds.top;params.gravity=android.view.Gravity.TOP|android.view.Gravity.LEFT;close.setLayoutParams(params);}
+    close.layout(left,bounds.top,left+size,bounds.bottom);return true;
+  }
+  private static java.lang.ref.WeakReference<TextView> dismissTouch=new java.lang.ref.WeakReference<>(null);
+  static synchronized boolean candidateTouch(View root,android.view.MotionEvent event){
+    if(!(root instanceof android.view.ViewGroup))return false;
+    TextView target=dismissTouch.get();
+    if(event.getActionMasked()==android.view.MotionEvent.ACTION_DOWN){target=null;
+      for(BarControl control:bars.values()){TextView view=control.button.get();if(view==null||!view.isShown())continue;
+        android.graphics.Rect r=new android.graphics.Rect(0,0,view.getWidth(),view.getHeight());
+        try{((android.view.ViewGroup)root).offsetDescendantRectToMyCoords(view,r);}catch(IllegalArgumentException outside){continue;}
+        if(r.contains((int)event.getX(),(int)event.getY())){target=view;break;}}
+      dismissTouch=new java.lang.ref.WeakReference<>(target);
+    }
+    if(target==null)return false;
+    android.graphics.Rect r=new android.graphics.Rect(0,0,target.getWidth(),target.getHeight());
+    try{((android.view.ViewGroup)root).offsetDescendantRectToMyCoords(target,r);}catch(IllegalArgumentException outside){dismissTouch.clear();return false;}
+    android.view.MotionEvent local=android.view.MotionEvent.obtain(event);local.offsetLocation(-r.left,-r.top);
+    try{target.dispatchTouchEvent(local);}finally{local.recycle();}
+    if(event.getActionMasked()==android.view.MotionEvent.ACTION_UP||event.getActionMasked()==android.view.MotionEvent.ACTION_CANCEL)dismissTouch.clear();return true;
   }
   private static boolean refreshingBars;
   private static TextView candidateLabel(View root,View except){if(root==except)return null;if(root instanceof TextView&&((TextView)root).length()>0)return (TextView)root;if(root instanceof android.view.ViewGroup){android.view.ViewGroup group=(android.view.ViewGroup)root;for(int i=0;i<group.getChildCount();i++){TextView label=candidateLabel(group.getChildAt(i),except);if(label!=null)return label;}}return null;}
@@ -283,7 +323,7 @@ public final class EnhancedHook {
       TextView label=candidateLabel(entry.getKey(),close);if(label!=null)close.setTextColor(label.getCurrentTextColor());
       boolean nativeSuggestions=false,nativeComposing=false;
       try{nativeSuggestions=(Integer)get(entry.getKey(),fixedChineseBar(entry.getKey())?"e":"f")>0;if(active!=null)nativeComposing=(Boolean)get(active.processor,"n");}catch(Exception ignored){}
-      boolean predictions=active!=null&&!active.dismissed&&!active.composing&&!active.handwriting&&(active.suggesting||!nativeComposing&&nativeSuggestions)&&entry.getKey().getVisibility()==View.VISIBLE;
+      boolean predictions=active!=null&&!active.dismissed&&!active.composing&&!active.handwriting&&(active.suggesting||!nativeComposing&&nativeSuggestions)&&entry.getKey().isShown();
       int mode=LocalSettings.candidateControls(entry.getKey().getContext());
       boolean visible=predictions&&mode!=LocalSettings.CANDIDATE_EXPAND;
       BarControl control=entry.getValue();View replaced=control.replaced.get();
