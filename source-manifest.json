@@ -6,7 +6,7 @@
   "enhanced/src/local/gboard/enhanced/DictionaryImport.java": "2d2df4f8e532538d3b0c62cf54d4d39487a1d05648a6b16f753ee9582f711ecb",
   "enhanced/src/local/gboard/enhanced/DictionaryStore.java": "9d49492bf8dfa3a90f4814afed6d8d0f9d31eca16c4e841e079b3bce1c5c2228",
   "enhanced/src/local/gboard/enhanced/DictionarySyncProvider.java": "f21613f2f1856ede4cac6254b6ba5c3b51170d09d0acc9c17c30e16d855042d9",
-  "enhanced/src/local/gboard/enhanced/EnhancedHook.java": "fbd587494b64bd057ca8d4f1d3aba928cdb57f90471fb7a8d6a12e6b4d9b6d6f",
+  "enhanced/src/local/gboard/enhanced/EnhancedHook.java": "e4fa1845c72d7405d6f579d014e3df4d89783e0160caa17ad884d600de942b93",
   "enhanced/src/local/gboard/enhanced/FontSizes.java": "7b657da1197164604a86ff178774991373962fd750e78bebbccca79865f61f15",
   "enhanced/src/local/gboard/enhanced/HandwritingBridge.java": "9c8de6359159e0f6f4cf26b069b41d4887b54f6e15cfe38f2007b4c48b421017",
   "enhanced/src/local/gboard/enhanced/KeyboardGestures.java": "faf1ee9c86c6a06489e853cbe5d7b847451369244d08948a39708903ed18ca93",
@@ -75,5 +75,6 @@
   "enhanced/proofread/EnglishTokenizer.java": "5e280b45ca71ee672d28822c0601c794557e9ab2ffad2d8f0bbf44f2c97c9d34",
   "enhanced/proofread/ProofEngine.java": "6e7f5ada6e0a4f3b770e3e5dfe9998ac1d268513ed72054c56ea0583924eb092",
   "enhanced/proofread/ProofreadingService.java": "ac4ad4eeb53621b89429e4d39bc8e360bdd6df709d0051f7791fe26df0dbe30d",
-  "enhanced/proofread/SetupActivity.java": "18fb6b7b2e89123af8aab6b032a105125d3cfdc5051f20b73d99e47e7e2c6db8"
+  "enhanced/proofread/SetupActivity.java": "18fb6b7b2e89123af8aab6b032a105125d3cfdc5051f20b73d99e47e7e2c6db8",
+  "enhanced/src/local/gboard/enhanced/SelectionLearning.java": "a043e00151fecc443494b0fc56adb52fa2153ed5885787a1cb69e9fc5b7981fa"
 }

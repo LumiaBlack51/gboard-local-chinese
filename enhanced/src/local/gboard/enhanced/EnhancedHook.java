@@ -85,6 +85,7 @@ public final class EnhancedHook {
     }catch(Throwable error){Log.e("LocalChinese","Adapter failure",error);return false;}
   }
   private static void choose(Session s,Candidate chosen)throws Exception {
+    String learningCode=s.composing&&!s.privateMode?s.raw:"";
     if(chosen.index==-3){s.handwriting=false;KeyboardGestures.clearInk();commit(s,chosen.text);s.dismissed=false;update(s);return;}
     if(chosen.index==-4){RimeBridge.clear(s.id);commit(s,chosen.text);update(s);return;}
     if(chosen.index>=0){select(s,chosen.index,chosen.text);}
@@ -95,6 +96,7 @@ public final class EnhancedHook {
             if(found>=0){select(s,found,chosen.text);}
             else{RimeBridge.clear(s.id);commit(s,chosen.text);update(s);}
     }else{commit(s,chosen.text);update(s);}
+    if(!learningCode.isEmpty())SelectionLearning.record((Context)get(s.processor,"u"),learningCode,chosen.text);
   }
   private static void select(Session s,int index,String text)throws Exception {
     if(!RimeBridge.select(s.id,index))return;
@@ -175,13 +177,13 @@ public final class EnhancedHook {
     call(s.processor,"au",s.composing?display:"");
     ArrayList<Object> list=new ArrayList<>();HashSet<String> seen=new HashSet<>();
     HashSet<String> nativeWords=new HashSet<>();for(int i=4;i<result.length;i++)nativeWords.add(result[i]);
-    boolean initial=s.composing&&DictionaryFile.normalize(s.raw).length()==1;
-    int nativeLead=initial?5:2;
+    int nativeLead=5;
     // Keep genuine Rime candidate IDs and ordering for shared known words.
     // They carry selection learning; a static imported row must not mask them.
-    if(initial)for(int i=4;i<Math.min(result.length,4+nativeLead);i++)if(seen.add(result[i]))list.add(candidate(new Candidate(s,i-4,result[i]),list.size()));
+    String preferred=s.privateMode?"":SelectionLearning.preferred((Context)get(s.processor,"u"),s.raw);
+    if(s.composing&&!s.privateMode&&!nativeWords.contains(preferred))for(WordIndex.Entry e:LocalWords.match(s.raw))if(e.word.equals(preferred)&&seen.add(e.word))list.add(candidate(new Candidate(s,-1,e.word,e.code),list.size()));
+    for(int i=4;i<Math.min(result.length,4+nativeLead);i++)if(seen.add(result[i]))list.add(candidate(new Candidate(s,i-4,result[i]),list.size()));
     if(s.composing&&!s.privateMode)for(WordIndex.Entry e:LocalWords.match(s.raw))if(!nativeWords.contains(e.word)&&seen.add(e.word))list.add(candidate(new Candidate(s,-1,e.word,e.code),list.size()));
-    if(!initial)for(int i=4;i<Math.min(result.length,4+nativeLead);i++)if(seen.add(result[i]))list.add(candidate(new Candidate(s,i-4,result[i]),list.size()));
     if(s.composing)for(WordIndex.Entry e:WordIndex.complete(s.raw))if(!nativeWords.contains(e.word)&&seen.add(e.word))list.add(candidate(new Candidate(s,-1,e.word,e.code),list.size()));
     for(int i=4+nativeLead;i<result.length;i++)if(seen.add(result[i]))list.add(candidate(new Candidate(s,i-4,result[i]),list.size()));
     // Keep an unrecognized remainder visible without leaving the previous

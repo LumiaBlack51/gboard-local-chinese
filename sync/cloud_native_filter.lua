@@ -30,24 +30,29 @@ function M.func(input,env)
       table.insert(cloud(candidate) and extra or native,candidate)
     end
   end
+  for _,candidate in ipairs(extra) do candidate.quality=candidate.quality-10 end
   table.sort(extra,function(a,b) if outranks(a,b) then return true end;if outranks(b,a) then return false end;return a.text<b.text end)
-  -- A one-letter input is normally an abbreviation. Imported shortcuts or
-  -- syllabic-consonant examples must not freeze its first page above Rime's
-  -- own, learnable candidates. Apply this to every letter, not just m.
-  local raw=env.engine.context.input
-  if raw:match('^[a-z]$') then
-    local page=math.max(1,math.min(10,env.engine.schema.config:get_int('menu/page_size') or 5))
-    for i=1,math.min(page,#native) do yield(native[i]) end
-    for _,candidate in ipairs(extra) do yield(candidate) end
-    for i=page+1,#native do yield(native[i]) end
-  else
+  -- Unselected imports must not displace the native first page, for complete
+  -- syllables as well as initials. Selected imports become native user_phrase
+  -- candidates and participate in native learning/ranking instead.
+  local page=math.max(1,math.min(10,env.engine.schema.config:get_int('menu/page_size') or 5))
+  local lead=0
+  for i=1,math.min(page,#native) do
+    -- A full shared phrase still precedes native partial conversions.
+    if #extra>0 and native[i]._end<extra[1]._end then break end
+    yield(native[i]);lead=i
+  end
   local position=1
-  for _,candidate in ipairs(native) do
+  for i=lead+1,#native do
+    local candidate=native[i]
+    -- Keep new shared entries reachable immediately after the native page.
+    if i==lead+1 then
+      while position<=#extra and extra[position]._end>=candidate._end do yield(extra[position]);position=position+1 end
+    end
     while position<=#extra and outranks(extra[position],candidate) do yield(extra[position]);position=position+1 end
     yield(candidate)
   end
   while position<=#extra do yield(extra[position]);position=position+1 end
-  end
   while true do
     local candidate=iterator();if not candidate then break end
     if not seen[candidate.text] then seen[candidate.text]=true;yield(candidate) end

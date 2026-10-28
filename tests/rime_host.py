@@ -66,6 +66,13 @@ class RimeHost:
         if self.r.RimeGetCommit(self.session,C.byref(result)):
             text=(result.text or b'').decode();self.r.RimeFreeCommit(C.byref(result));return text
         return ''
+    def restart(self):
+        """Reopen this isolated database, exercising actual persisted learning."""
+        self.r.RimeDestroySession(self.session);self.r.RimeFinalize()
+        self.r.RimeInitialize(C.byref(self.traits))
+        self.session=self.r.RimeCreateSession();assert self.session
+        assert self.r.RimeSelectSchema(self.session,b'rime_ice')
+        self.r.RimeSetOption(self.session,b'ascii_mode',0)
     def close(self):
         self.r.RimeDestroySession(self.session);self.r.RimeFinalize();self.temp.cleanup()
     def __enter__(self):return self

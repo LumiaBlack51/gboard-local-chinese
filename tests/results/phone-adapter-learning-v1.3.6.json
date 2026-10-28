@@ -1,0 +1,22 @@
+{
+  "version": "1.3.6",
+  "device_model": "PLQ110",
+  "adapter_cases": 72,
+  "foreground_probe_verified": true,
+  "no_personal_app_input": true,
+  "test_type": "Shipped adapter dex with synthetic native/imported candidates; saved words and preferences restored in finally.",
+  "native_first_pages_preserved": true,
+  "native_candidate_ids_preserved": true,
+  "novel_shared_word_learning": true,
+  "later_native_selection_clears_shared_boost": true,
+  "private_mode_isolated": true,
+  "passed": true,
+  "actual_formal_keyboard_zhi_rare_first_reproduced_before_fix": true,
+  "actual_formal_keyboard_zhi_native_first_after_fix": true,
+  "actual_native_learning_preserved_after_process_restart": true,
+  "test_text_entered_only_in_probe": true,
+  "actual_native_selection_once_promoted_to_first": true,
+  "actual_native_learning_preserved_after_sync": true,
+  "code": "zhi",
+  "selected_test_word": "只"
+}

@@ -6,7 +6,7 @@ p=argparse.ArgumentParser();p.add_argument('--expected-entry');args=p.parse_args
 live=Path.home()/'.local/share/fcitx5/rime';root=Path(__file__).resolve().parents[1]
 for name in ['cloud_phrase.lua','cloud_native_filter.lua']:
     assert (live/'lua'/name).read_bytes()==(root/'sync'/name).read_bytes(),'Installed component differs from source'
-with RimeHost() as engine:
+with RimeHost(learning=True) as engine:
     original=(live/'cloud-phrases.tsv').read_bytes()
     phone_origin=False;native_identity_preserved=False
     if args.expected_entry:

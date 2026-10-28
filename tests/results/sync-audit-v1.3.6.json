@@ -1,0 +1,12 @@
+{
+  "verified_at": "2026-10-28T17:38:48.141426+08:00",
+  "desktop_last_success": "2026-10-28T17:24:50.272714+08:00",
+  "desktop_merged_words": 26607,
+  "phone_successful_system_job_at": "2026-10-28 17:37:50",
+  "phone_last_result_success_checked_by_signed_instrumentation": true,
+  "phone_merged_words_at_least": 26607,
+  "phone_hourly_job_registered": true,
+  "phone_runs_on_battery": true,
+  "passed": true,
+  "phone_sync_success_after_keyboard_upgrade": true
+}

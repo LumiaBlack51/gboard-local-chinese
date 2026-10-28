@@ -1,28 +1,28 @@
 {
-  "tag": "v1.3.5",
+  "tag": "v1.3.6",
   "assets": [
     {
       "file": "enhanced/final/base.apk",
       "bytes": 548943486,
-      "sha256": "9051960e4aa16bebc2bd33901cf93c26c17b30eaf4bb0dda51022d335202e14d",
+      "sha256": "0c84cc1c377004011a7c392ce9060e352907ded7224ed3157da19826aa42a81e",
       "name": "base.apk"
     },
     {
       "file": "enhanced/final/split_brella_feature_split.apk",
       "bytes": 35656040,
-      "sha256": "45b7f78b6e6e26acb9ede6e974b90be234db04483fa909db6d1aa1505651b349",
+      "sha256": "5ee297d8bb407ec72758699f0814480369f2eba7db6d692c8f7cdc580501f2b6",
       "name": "split_brella_feature_split.apk"
     },
     {
       "file": "enhanced/final/split_config.xxxhdpi.apk",
       "bytes": 129884,
-      "sha256": "25f36283822630f8ee27a5b14e47edeba3f78b9aca7abbc0a5caf7f7e6dada42",
+      "sha256": "1047ccef1306e8eed3aaf85f1adff3a076e06b92b01bb2fbc8a82de4cf73a91b",
       "name": "split_config.xxxhdpi.apk"
     },
     {
       "file": "enhanced/final/split_tenoranimation_feature_split.apk",
       "bytes": 11321708,
-      "sha256": "5c6f4ed499c2ec8f5f683840e9f6b401b7594d0b1dc30111902932125c4ab34e",
+      "sha256": "0ad2f8cf25f3db6cbef57bfbda72557634e7ec3c52597d6505b0acdf341624a0",
       "name": "split_tenoranimation_feature_split.apk"
     },
     {

@@ -20,7 +20,7 @@ for package,version,paths in groups:
   items.append({'name':path.name,'sha256':sha,'size':size})
   assets.append({'file':path.relative_to(ROOT).as_posix(),'bytes':size,'sha256':sha,'name':path.name})
  components.append({'package':package,'versionCode':version,'assets':items})
-save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'修复候选栏类型转换崩溃及同步词覆盖原生候选学习的问题；新增多设备词库共享。手机默认插电、离电均每小时由系统安排同步，电脑仅插电；同步时启动、结束即退出，无常驻同步服务。共享中文词语、拼音和词频，不上传原始输入、语音和模型；本版合并词条，不传播删除。','components':components[:3],'optionalComponents':components[3:]})
+save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'修复完整拼音同步生僻字固定插队，保留原生首屏和选词编号；手机新增共享词本地选择偏好，后续同步不覆盖本地选择。词库、设置与现有定时同步配置保留。','components':components[:3],'optionalComponents':components[3:]})
 save('release-manifest.json',{'tag':'v'+VERSION,'assets':assets})
 (ROOT/'SHA256SUMS.txt').write_text(''.join(a['sha256']+'  '+a['name']+'\n' for a in assets),encoding='ascii')
 source={}

@@ -1,4 +1,4 @@
-"""Build temporary headless checkers. Candidate checker is emulator-only."""
+"""Build temporary headless checkers; candidate checks require an isolated editor/device."""
 from pathlib import Path
 import subprocess,sys,zipfile
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))

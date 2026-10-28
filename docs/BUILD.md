@@ -1,4 +1,8 @@
-1.3.5 桌面消费者回归使用系统 librime 的隔离会话，运行 `python3 tests/verify_desktop_candidates.py` 和 `python3 tests/verify_desktop_cloud_rime.py`。前者覆盖单字母、简拼、全拼、多音字、ü、大小写、数字标点，并实际选词验证学习；后者验证已同步文件及同一会话热更新。隔离目录不打开正在使用的个人学习数据库，也不向前台发送按键。详见对应测试脚本的参数说明。
+1.3.6 新增 `python3 tests/verify_cloud_learning.py`：在隔离的真实 Rime 引擎注入最大词频的 `凪/zhi`、`徳/de`，检查全部共享单字编码与字母、原生选词学习、新共享词转为原生用户词，以及后续选择、同步文件刷新和引擎重启后排序保持。手机新增 SelectionLearning，普通选择写本地偏好，隐私模式禁用；PhoneCandidateInstrumentation 检查所有编码的原生首屏、共享词学习及再次选择原生词后取消共享词前移。
+
+1.3.6 的候选合成检查可在独立测试 AVD 运行，或在已明确选择、仅有本项目 probe 编辑框处于前台的手机运行。手机须先清空未提交拼音、隐藏键盘，并确认词库同步任务未在执行。检查只向适配器传入合成候选，不向输入连接发送文字；临时替换的内存词表和本地偏好在 finally 中恢复，随后重新打开正式键盘。不得在个人应用编辑框活跃时运行。
+
+桌面消费者回归还运行 `python3 tests/verify_desktop_candidates.py` 和 `python3 tests/verify_desktop_cloud_rime.py`。前者覆盖单字母、简拼、全拼、多音字、ü、大小写、数字标点，并实际选词验证学习；后者验证已同步文件及同一会话热更新。隔离目录不打开正在使用的个人学习数据库，也不向前台发送按键。详见对应测试脚本的参数说明。
 
 1.3.5 重新构建键盘及更新器，语音与校对复用已有正式 APK。先执行 `python tests/test_phrase_sync.py`，再构建主键盘、make_release、build_updater、release_metadata 和 verify_release。`tests/build_sync_checks.py` 生成临时同签名检查包：候选栏回归和 PhoneCandidateInstrumentation 候选排序/原生编号检查只在独立模拟器运行；手机检查仅针对更新器，无 Activity 或输入事件，不启动手机键盘 instrumentation。
 

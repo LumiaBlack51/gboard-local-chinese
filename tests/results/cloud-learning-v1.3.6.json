@@ -1,0 +1,28 @@
+{
+  "inputs_checked": 333,
+  "rare_imports_do_not_pin_first_page": true,
+  "zhi": {
+    "before_rank": 9,
+    "after_rank": 1
+  },
+  "de": {
+    "before_rank": 3,
+    "after_rank": 1
+  },
+  "m": {
+    "before_rank": 28,
+    "after_rank": 1
+  },
+  "new_shared_words_use_native_learning": true,
+  "later_native_choice_replaces_cloud_choice": true,
+  "learning_survives_sync_and_engine_restart": true,
+  "private_mode_excludes_cloud": true,
+  "shared_word_available_without_native_candidates": true,
+  "passed": true,
+  "live_user_database_opened": false,
+  "elapsed_seconds": 26.87,
+  "sources": {
+    "sync/cloud_phrase.lua": "6d356326cb35af87d5cd42d080bee4a6fd95925d7955155b89d578e34b722fe5",
+    "sync/cloud_native_filter.lua": "b6c1ee0b80203bee27bf89fa91e4f00e096f4b68f7771d1ddaf8c96c5f7184e3"
+  }
+}
