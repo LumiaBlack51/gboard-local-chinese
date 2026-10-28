@@ -1,0 +1,43 @@
+{
+  "version": "1.3.7",
+  "android_device": "emulator-5564",
+  "isolated_test_uid": true,
+  "personal_database_opened": false,
+  "android_to_native_rime": {
+    "before_rank": 9,
+    "remote_rank": 1,
+    "native_identity_preserved": true,
+    "local_choice_persisted": true,
+    "native_history_continued": true,
+    "passed": true
+  },
+  "native_rime_to_android": {
+    "native_word_promoted": "知",
+    "native_id_preserved": true,
+    "survives_reload": true
+  },
+  "actual_android_atomic_file_checks": {
+    "import_weights_excluded": "true",
+    "native_history_continued": "true",
+    "new_local_choice_wins": "true",
+    "new_remote_learning_can_update_preference": "true",
+    "passed": "true",
+    "remote_frequency_changes_native_rank": "true",
+    "retries_do_not_inflate_counts": "true"
+  },
+  "repeated_bidirectional_exchange_without_feedback": true,
+  "passed": true,
+  "sources": {
+    "sync/common.py": "e93b2a791b2942e5b042b2d42ef33c61a6897352c32319660b95dece3edc51d3",
+    "sync/server.py": "fedb1023c3418847bf7074f3659f93305ace63e5accdc51dd521c34257c9b314",
+    "sync/desktop.py": "064a9a0e6deeb88fb83372ae143e6d16afd256ca837a4745fe9fe489da3ebd84",
+    "sync/cloud_phrase.lua": "cc6fb561309456bb7cb92ea6aa12be88163413ac5dd71320b944160d92b2cebf",
+    "sync/cloud_native_filter.lua": "221406960c08663a370ba3fb65a6ed572a58744dde92b77b5df8c6e589bd079d",
+    "sync/selection_learning.lua": "b08f0e6b40aeffb3fe3f9a757dea06b1389fa8fa4c40da5b22ba6760560197d2",
+    "enhanced/src/local/gboard/enhanced/DictionaryFile.java": "0a55a10f10ecf43915a519f42764d0e5e9210f6985e2dd736ad89a30fc8ad04a",
+    "enhanced/src/local/gboard/enhanced/LearningFile.java": "ccf3b094a3f1df70dc13749fb849ed89c4ea792589b6d1fe47d07cd4f8f9703c",
+    "enhanced/src/local/gboard/enhanced/LearningStore.java": "53c2ac8057f35145c7f49caf28d098029f83b9e333c6e84f3afc5d396eca26fd",
+    "enhanced/src/local/gboard/enhanced/SelectionLearning.java": "fb6e51cf95cb7c921087548ea1db972c281a296b493cbb7bc5ade7fb9936b1b3",
+    "enhanced/src/local/gboard/enhanced/SharedRanking.java": "0df12d4dd9a3ba601cb7465c51b4b63c70d71e288e1d4a4632449708606fb0a9"
+  }
+}

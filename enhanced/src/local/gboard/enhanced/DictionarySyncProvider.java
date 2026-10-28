@@ -26,6 +26,9 @@ public final class DictionarySyncProvider extends ContentProvider {
       if("merge".equals(method)){
         byte[] raw=extras==null?null:extras.getByteArray("words");if(raw==null||raw.length>512*1024)throw new IOException("invalid batch");
         List<DictionaryFile.Entry> words=DictionaryFile.readStored(new ByteArrayInputStream(raw));allowed(allowBattery);DictionaryStore.merge(getContext(),words);
+      }else if("merge_learning".equals(method)){
+        byte[] raw=extras==null?null:extras.getByteArray("learning");if(raw==null||raw.length>512*1024)throw new IOException("invalid learning batch");
+        List<LearningFile.Entry> rows=LearningFile.read(new ByteArrayInputStream(raw),false);allowed(allowBattery);LearningStore.mergeShared(getContext(),rows);
       }else if(!"status".equals(method))throw new IOException("unsupported method");
       result.putBoolean("ok",true);result.putInt("count",DictionaryStore.count(getContext()));
     }catch(IOException error){result.putBoolean("ok",false);result.putString("error",error.getMessage());}
@@ -41,6 +44,7 @@ public final class DictionarySyncProvider extends ContentProvider {
         if(RimeBridge.ready&&!ToolbarHide.inputVisible()&&!EnhancedHook.composing()){RimeBridge.sync();allowed(allowBattery);}
         File sync=new File(getContext().getNoBackupFilesDir(),"local-rime/user/sync");
         words=readSnapshots(sync,words,0,allowBattery);allowed(allowBattery);out.write(DictionaryFile.encode(words));
+        out.write(LearningFile.encode(LearningStore.snapshotOwn(getContext()),true));
       }catch(Throwable error){try{pipe[1].closeWithError("phrase export deferred");}catch(IOException ignored){}}},"PhraseExport").start();return pipe[0];
     }catch(IOException error){throw new FileNotFoundException(error.getMessage());}
   }

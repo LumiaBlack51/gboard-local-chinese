@@ -20,7 +20,7 @@ for package,version,paths in groups:
   items.append({'name':path.name,'sha256':sha,'size':size})
   assets.append({'file':path.relative_to(ROOT).as_posix(),'bytes':size,'sha256':sha,'name':path.name})
  components.append({'package':package,'versionCode':version,'assets':items})
-save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'修复完整拼音同步生僻字固定插队，保留原生首屏和选词编号；手机新增共享词本地选择偏好，后续同步不覆盖本地选择。词库、设置与现有定时同步配置保留。','components':components[:3],'optionalComponents':components[3:]})
+save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'双向共享真实选词次数，并用于手机和桌面的原生候选排序；新近本地选词即时生效，重复同步不累加计数。导入权重继续用于补充词条，不固定覆盖原生首屏。保留词库、设置和定时同步配置。','components':components[:3],'optionalComponents':components[3:]})
 save('release-manifest.json',{'tag':'v'+VERSION,'assets':assets})
 (ROOT/'SHA256SUMS.txt').write_text(''.join(a['sha256']+'  '+a['name']+'\n' for a in assets),encoding='ascii')
 source={}

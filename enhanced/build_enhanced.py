@@ -168,6 +168,7 @@ fixed=work/'fixed-dex';fixed.mkdir(exist_ok=True)
 base=ROOT/'enhanced'/'baseline'/'base.apk'
 with zipfile.ZipFile(base) as z:
   for name in ['classes.dex','classes2.dex','classes3.dex']:(raw/name).write_bytes(z.read(name))
+run(JAVA/'javac.exe','-cp',CP,ROOT/'tools'/'DexTool.java')
 run(JAVA/'java.exe','-Xmx2G','-cp',CP,'DexTool',raw,fixed,work/'patched.dex')
 unsigned=work/'enhanced.apk'
 with zipfile.ZipFile(base) as z,zipfile.ZipFile(unsigned,'w') as out:

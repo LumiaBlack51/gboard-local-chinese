@@ -2,6 +2,7 @@
 -- candidate. Deduplicate display text and prefer the candidate consuming more
 -- input. Bound lookahead so a long native candidate stream stays lazy.
 local M = {}
+local learning = require('selection_learning')
 local function cloud(c) return c:get_genuine().type == 'cloud_phrase' end
 local function preferred(a,b)
   if a._end~=b._end then return a._end>b._end end
@@ -32,6 +33,32 @@ function M.func(input,env)
   end
   for _,candidate in ipairs(extra) do candidate.quality=candidate.quality-10 end
   table.sort(extra,function(a,b) if outranks(a,b) then return true end;if outranks(b,a) then return false end;return a.text<b.text end)
+  local stats,preferred={},nil
+  if not env.engine.context:get_option('incognito') then stats,preferred=learning.ranking(env.engine.context.input) end
+  if next(stats) then
+    local pool,static={},{}
+    for i,candidate in ipairs(native) do
+      local row=stats[candidate.text] or {count=0,last=0}
+      pool[#pool+1]={candidate=candidate,rank=i,count=row.count,last=row.last}
+    end
+    for i,candidate in ipairs(extra) do
+      local row=stats[candidate.text]
+      if row and row.count>0 then
+        pool[#pool+1]={candidate=candidate,rank=5+i,count=row.count,last=row.last}
+      else static[#static+1]=candidate end
+    end
+    table.sort(pool,function(a,b)
+      if a.candidate._end~=b.candidate._end then return a.candidate._end>b.candidate._end end
+      local ap,bp=a.candidate.text==preferred,b.candidate.text==preferred
+      if ap~=bp then return ap end
+      local score_a,score_b=math.log(1+a.count)-0.01*math.min(51,a.rank),math.log(1+b.count)-0.01*math.min(51,b.rank)
+      if score_a~=score_b then return score_a>score_b end
+      if a.last~=b.last then return a.last>b.last end
+      return a.rank<b.rank
+    end)
+    native={};for _,row in ipairs(pool) do native[#native+1]=row.candidate end
+    extra=static
+  end
   -- Unselected imports must not displace the native first page, for complete
   -- syllables as well as initials. Selected imports become native user_phrase
   -- candidates and participate in native learning/ranking instead.

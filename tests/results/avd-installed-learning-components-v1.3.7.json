@@ -1,0 +1,32 @@
+{
+  "version": "1.3.7",
+  "isolated_avd": true,
+  "checks": [
+    {
+      "package": "com.localx.android.inputmethod.latin",
+      "asset": "base.apk",
+      "hash_matches": true
+    },
+    {
+      "package": "com.localx.android.inputmethod.latin",
+      "asset": "split_brella_feature_split.apk",
+      "hash_matches": true
+    },
+    {
+      "package": "com.localx.android.inputmethod.latin",
+      "asset": "split_config.xxxhdpi.apk",
+      "hash_matches": true
+    },
+    {
+      "package": "com.localx.android.inputmethod.latin",
+      "asset": "split_tenoranimation_feature_split.apk",
+      "hash_matches": true
+    },
+    {
+      "package": "local.gboard.updater",
+      "asset": "updater.apk",
+      "hash_matches": true
+    }
+  ],
+  "passed": true
+}

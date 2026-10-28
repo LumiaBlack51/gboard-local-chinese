@@ -1,0 +1,10 @@
+{
+  "version": "1.3.7",
+  "isolated_avd": true,
+  "formal_updater_https_exchange": true,
+  "signature_protected_keyboard_provider_applied_learning": true,
+  "repeat_exchange_without_count_feedback": true,
+  "temporary_local_tls_and_credentials": true,
+  "production_endpoint_used": false,
+  "passed": true
+}

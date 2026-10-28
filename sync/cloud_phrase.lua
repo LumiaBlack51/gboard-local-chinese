@@ -1,5 +1,6 @@
 -- Called only by normal Rime translation. No timer, watcher or network.
 local M = {}
+local learning = require('selection_learning')
 local fingerprint, words = nil, {}
 local function compact(code)
   return (code:gsub("u:","v"):gsub("ü","v"):gsub("[' ]",''))
@@ -8,6 +9,7 @@ function M.init(env)
   local dictionary = env.engine.schema.config:get_string('translator/dictionary')
   if dictionary and dictionary ~= '' then env.reverse = ReverseLookup(dictionary) end
   env.native = {}
+  env.selection_connection = env.engine.context.commit_notifier:connect(learning.committed)
   env.syllables = {}
   -- Use the same dictionary language as script_translator. A selected cloud
   -- Phrase can then become a normal, learnable user_phrase on the next query.
@@ -24,6 +26,7 @@ function M.init(env)
   end)
 end
 function M.fini(env)
+  env.selection_connection:disconnect()
   if env.memory.disconnect then env.memory:disconnect() end
   env.memory = nil
   collectgarbage('collect')
@@ -93,11 +96,25 @@ function M.func(input, seg, env)
   end
   file:close()
   local code = compact(input)
-  local found, emitted = words[code] or {}, 0
+  local stats,preferred = learning.ranking(input)
+  local found,seen,emitted = {},{},0
+  for _,row in ipairs(words[code] or {}) do
+    found[#found+1]=row;seen[row.word]=true
+  end
+  for word in pairs(stats) do
+    if not seen[word] then found[#found+1]={word=word,weight=0} end
+  end
+  table.sort(found,function(a,b)
+    if (a.word==preferred)~=(b.word==preferred) then return a.word==preferred end
+    local ac,bc=(stats[a.word] or {}).count or 0,(stats[b.word] or {}).count or 0
+    if ac~=bc then return ac>bc end
+    if a.weight~=b.weight then return a.weight>b.weight end
+    return a.word<b.word
+  end)
   for _, row in ipairs(found) do
     -- Keep the real native Phrase for known readings: it carries Rime's
     -- dictionary identity and selection learning. Generic Lua candidates do not.
-    if not native_entry(env,row.word,code) then
+    if stats[row.word] or not native_entry(env,row.word,code) then
       local spelled = spelling(env, code, utf8.len(row.word))
       local candidate
       if spelled then

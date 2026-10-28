@@ -30,7 +30,8 @@ def configure(root,dynamic_ranking=False):
             rows=phrases.read_text().splitlines()
             phrases.write_text('\n'.join(row for row in rows if tuple(row.split('\t')[:2]) not in STOCK_SHORTCUTS)+'\n')
     (root/'lua').mkdir(exist_ok=True)
-    for name in ['cloud_phrase.lua','cloud_native_filter.lua']:shutil.copyfile(source/name,root/'lua'/name)
+    (root/'selection-learning').mkdir(exist_ok=True,mode=0o700)
+    for name in ['cloud_phrase.lua','cloud_native_filter.lua','selection_learning.lua']:shutil.copyfile(source/name,root/'lua'/name)
     path.write_text(yaml.safe_dump(settings,allow_unicode=True,sort_keys=False))
 
 if __name__=='__main__':

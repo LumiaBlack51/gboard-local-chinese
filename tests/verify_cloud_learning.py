@@ -15,7 +15,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def configure(user, config):
-    for name in ('cloud_phrase.lua', 'cloud_native_filter.lua'):
+    (user/'selection-learning').mkdir(exist_ok=True)
+    for name in ('cloud_phrase.lua', 'cloud_native_filter.lua', 'selection_learning.lua'):
         shutil.copyfile(ROOT / 'sync' / name, user / 'lua' / name)
 
 
@@ -85,6 +86,9 @@ def main():
         config = yaml.safe_load(schema.read_text())
         config['engine']['translators'] = ['lua_translator@*cloud_phrase']
         schema.write_text(yaml.safe_dump(config, allow_unicode=True))
+        # Exercise static-only fallback independently of earlier real selections.
+        shutil.rmtree(engine.user/'selection-learning')
+        (engine.user/'selection-learning').mkdir()
         engine.restart()
         assert engine.candidates('zhi')[0] == ('凪', 'cloud_phrase'), 'cloud-only fallback lost'
     results['shared_word_available_without_native_candidates'] = True
@@ -92,8 +96,8 @@ def main():
     results.update(passed=True, live_user_database_opened=False,
                    elapsed_seconds=round(time.monotonic()-started, 2),
                    sources={name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-                            for name in ['sync/cloud_phrase.lua', 'sync/cloud_native_filter.lua']})
-    (ROOT / 'tests/results/cloud-learning-v1.3.6.json').write_text(json.dumps(results, indent=2)+'\n')
+                            for name in ['sync/cloud_phrase.lua', 'sync/cloud_native_filter.lua', 'sync/selection_learning.lua']})
+    (ROOT / 'tests/results/cloud-learning-v1.3.7.json').write_text(json.dumps(results, indent=2)+'\n')
     print(json.dumps(results, indent=2))
 
 

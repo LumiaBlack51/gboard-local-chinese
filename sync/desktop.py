@@ -14,7 +14,7 @@ import tempfile
 import threading
 import urllib.request
 import urllib.parse
-from common import parse, encode, valid_word, MAX_BYTES
+from common import parse, encode, parse_learning, encode_learning, packet, valid_word, MAX_BYTES
 
 def powered(root=Path('/sys/class/power_supply')):
     for supply in root.iterdir():
@@ -35,10 +35,14 @@ def atomic(path, data):
     finally:
         if os.path.exists(temporary): os.unlink(temporary)
 
-def local_words(root):
+def rime_learning(root):
     result = {}
     # Preserve the engine's database lock. Read only Rime-created text snapshots.
-    for path in (root/'sync').glob('*/rime_ice.userdb.txt'):
+    installation=root/'installation.yaml'
+    match=re.search(r'''^installation_id:\s*["']?([a-zA-Z0-9][a-zA-Z0-9_.-]{0,127})["']?\s*$''',installation.read_text('utf-8'),re.M) if installation.exists() else None
+    if not match:
+        return result
+    for path in (root/'sync'/match[1]).glob('rime_ice.userdb.txt'):
         if path.stat().st_size > MAX_BYTES:
             raise ValueError('Rime snapshot too large')
         for line in path.read_text('utf-8').splitlines():
@@ -49,7 +53,24 @@ def local_words(root):
             code = re.sub(r"[\s'’]", '', code.lower()).replace('ü', 'v').replace('u:', 'v')
             if count and int(count[1]) > 0 and valid_word(word) and re.fullmatch('[a-z]{1,128}', code):
                 key = (word, code)
-                result[key] = max(result.get(key, 0), min(1000000, 100+int(count[1])))
+                result[key] = (max(result.get(key, (0, 0))[0], min(1000000, int(count[1]))), 0)
+    return result
+
+def local_learning(root, native=None):
+    result = dict(rime_learning(root) if native is None else native)
+    for path in (root/'selection-learning').glob('*.tsv'):
+        if not re.fullmatch('[a-z]{1,128}', path.stem):
+            continue
+        for key, (count, stamp) in parse_learning(path.read_bytes(), comments=False).items():
+            if key[1] != path.stem:
+                raise ValueError('learning input does not match file')
+            previous = result.get(key, (0, 0))
+            result[key] = (max(previous[0], count), max(previous[1], stamp))
+    # A downloaded total is never re-exported as this device's own selections.
+    return result
+
+def local_words(root, native=None):
+    result = {key: min(1000000, 100+value[0]) for key, value in (rime_learning(root) if native is None else native).items()}
     custom = root/'custom_phrase.txt'
     if custom.exists():
         for line in custom.read_text('utf-8-sig').splitlines():
@@ -81,11 +102,14 @@ def main():
         state=subprocess.run(['fcitx5-remote'],capture_output=True,text=True,timeout=3)
         if state.returncode == 0 and state.stdout.strip() in ('0','1') and powered():
             subprocess.run(['busctl','--user','call','org.fcitx.Fcitx5','/controller','org.fcitx.Fcitx.Controller1','Save'],capture_output=True,timeout=5)
-        words=local_words(args.rime)
+        native=rime_learning(args.rime)
+        data=encode_learning(native,comments=False)
+        atomic(args.rime/'local-native-learning.tsv',('# snapshot '+hashlib.sha256(data).hexdigest()+'\n').encode()+data)
+        words=local_words(args.rime,native)
         cloud=args.rime/'cloud-phrases.tsv'
         if cloud.exists():
             for key,n in parse(cloud.read_bytes()).items(): words[key]=max(words.get(key,0),n)
-        raw=encode(words)
+        raw=packet(words,local_learning(args.rime,native))
         if config.get('systemTrust',False):
             tls=ssl.create_default_context()
         else:
@@ -109,13 +133,18 @@ def main():
             opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),urllib.request.HTTPSHandler(context=tls),NoRedirect)
             with opener.open(request,timeout=15) as incoming:
                 body=incoming.read(MAX_BYTES+1)
+                learning_supported=incoming.headers.get('X-Phrase-Learning')=='1'
             merged=parse(body)
+            learned=parse_learning(body)
             if not powered(): return
             data=encode(merged)
             fingerprint=hashlib.sha256(data).hexdigest()
             atomic(cloud,('# snapshot '+fingerprint+'\n').encode()+data)
-            atomic(args.config.parent/'status.json',json.dumps({'success':True,'words':len(merged),'at':__import__('time').time()},indent=2).encode())
-            print('Phrase sync complete:',len(merged),'words')
+            if learning_supported:
+                data=encode_learning(learned,comments=False)
+                atomic(args.rime/'cloud-learning.tsv',('# snapshot '+hashlib.sha256(data).hexdigest()+'\n').encode()+data)
+            atomic(args.config.parent/'status.json',json.dumps({'success':True,'words':len(merged),'learning_supported':learning_supported,'learned_words':len(learned),'at':__import__('time').time()},indent=2).encode())
+            print('Phrase sync complete:',len(merged),'words;',len(learned),'learned entries')
         finally:
             stopped.set();watcher.join(timeout=1)
 

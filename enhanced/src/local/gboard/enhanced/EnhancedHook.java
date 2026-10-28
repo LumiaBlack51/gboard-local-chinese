@@ -88,19 +88,29 @@ public final class EnhancedHook {
     String learningCode=s.composing&&!s.privateMode?s.raw:"";
     if(chosen.index==-3){s.handwriting=false;KeyboardGestures.clearInk();commit(s,chosen.text);s.dismissed=false;update(s);return;}
     if(chosen.index==-4){RimeBridge.clear(s.id);commit(s,chosen.text);update(s);return;}
-    if(chosen.index>=0){select(s,chosen.index,chosen.text);}
+    if(chosen.index>=0){learningCode=select(s,chosen.index,chosen.text);}
     else if(chosen.index==-1){
             RimeBridge.clear(s.id);for(char ch:chosen.code.toCharArray())RimeBridge.key(s.id,ch);
             String[] state=RimeBridge.state(s.id);int found=-1;
             for(int i=4;i<state.length;i++)if(state[i].equals(chosen.text)){found=i-4;break;}
-            if(found>=0){select(s,found,chosen.text);}
+            if(found>=0){learningCode=select(s,found,chosen.text);}
             else{RimeBridge.clear(s.id);commit(s,chosen.text);update(s);}
     }else{commit(s,chosen.text);update(s);}
-    if(!learningCode.isEmpty())SelectionLearning.record((Context)get(s.processor,"u"),learningCode,chosen.text);
+    if(!s.privateMode&&!learningCode.isEmpty())SelectionLearning.record((Context)get(s.processor,"u"),learningCode,chosen.text);
   }
-  private static void select(Session s,int index,String text)throws Exception {
-    if(!RimeBridge.select(s.id,index))return;
+  private static String selectedCode(String raw,String[] state,String text){
+    if(!state[2].isEmpty())return raw;
+    if(state[3].startsWith(text)){
+      String tail=state[3].substring(text.length()).replace(" ","");
+      if(!tail.isEmpty()&&tail.matches("[a-z']+")&&state[0].endsWith(tail)&&tail.length()<state[0].length())return state[0].substring(0,state[0].length()-tail.length());
+    }
+    return "";
+  }
+  private static String select(Session s,int index,String text)throws Exception {
+    String raw=RimeBridge.state(s.id)[0];
+    if(!RimeBridge.select(s.id,index))return "";
     String[] state=RimeBridge.state(s.id);
+    String learned=selectedCode(raw,state,text);
     // Rime keeps a selected prefix inside its composition until every segment
     // is converted. Commit that prefix now, retaining the exact unconverted
     // input. Derive the boundary from Rime's preedit, never from word length or
@@ -117,6 +127,7 @@ public final class EnhancedHook {
       }
     }
     update(s,state);
+    return learned;
   }
   private static boolean key(Session s,Object event)throws Exception {
     s.openingCandidates=isExpansionEvent(event);if(s.openingCandidates)return false;
@@ -175,21 +186,33 @@ public final class EnhancedHook {
     s.composing=!s.raw.isEmpty();
     String display=s.raw.substring(0,Math.min(s.caret,s.raw.length()))+"│"+s.raw.substring(Math.min(s.caret,s.raw.length()));
     call(s.processor,"au",s.composing?display:"");
-    ArrayList<Object> list=new ArrayList<>();HashSet<String> seen=new HashSet<>();
+    ArrayList<Candidate> choices=new ArrayList<>();HashSet<String> seen=new HashSet<>();
     HashSet<String> nativeWords=new HashSet<>();for(int i=4;i<result.length;i++)nativeWords.add(result[i]);
     int nativeLead=5;
     // Keep genuine Rime candidate IDs and ordering for shared known words.
     // They carry selection learning; a static imported row must not mask them.
-    String preferred=s.privateMode?"":SelectionLearning.preferred((Context)get(s.processor,"u"),s.raw);
-    if(s.composing&&!s.privateMode&&!nativeWords.contains(preferred))for(WordIndex.Entry e:LocalWords.match(s.raw))if(e.word.equals(preferred)&&seen.add(e.word))list.add(candidate(new Candidate(s,-1,e.word,e.code),list.size()));
-    for(int i=4;i<Math.min(result.length,4+nativeLead);i++)if(seen.add(result[i]))list.add(candidate(new Candidate(s,i-4,result[i]),list.size()));
-    if(s.composing&&!s.privateMode)for(WordIndex.Entry e:LocalWords.match(s.raw))if(!nativeWords.contains(e.word)&&seen.add(e.word))list.add(candidate(new Candidate(s,-1,e.word,e.code),list.size()));
-    if(s.composing)for(WordIndex.Entry e:WordIndex.complete(s.raw))if(!nativeWords.contains(e.word)&&seen.add(e.word))list.add(candidate(new Candidate(s,-1,e.word,e.code),list.size()));
-    for(int i=4+nativeLead;i<result.length;i++)if(seen.add(result[i]))list.add(candidate(new Candidate(s,i-4,result[i]),list.size()));
+    for(int i=4;i<Math.min(result.length,4+nativeLead);i++)if(seen.add(result[i]))choices.add(new Candidate(s,i-4,result[i]));
+    if(s.composing&&!s.privateMode)for(WordIndex.Entry e:LocalWords.match(s.raw))if(!nativeWords.contains(e.word)&&seen.add(e.word))choices.add(new Candidate(s,-1,e.word,e.code));
+    if(s.composing)for(WordIndex.Entry e:WordIndex.complete(s.raw))if(!nativeWords.contains(e.word)&&seen.add(e.word))choices.add(new Candidate(s,-1,e.word,e.code));
+    for(int i=4+nativeLead;i<result.length;i++)if(seen.add(result[i]))choices.add(new Candidate(s,i-4,result[i]));
+    if(s.composing&&!s.privateMode){
+      Context app=(Context)get(s.processor,"u");String preferred=SelectionLearning.preferred(app,s.raw);
+      List<LearningFile.Entry> learned=SelectionLearning.match(app,s.raw);
+      if(!learned.isEmpty()){
+        int added=0;
+        for(int i=0;i<learned.size();i++){LearningFile.Entry e=learned.get(i);
+          if(!nativeWords.contains(e.word)&&added<20&&seen.add(e.word)){choices.add(new Candidate(s,-1,e.word,e.code));added++;}}
+        String[] texts=new String[choices.size()];int[] ids=new int[choices.size()];
+        for(int i=0;i<choices.size();i++){texts[i]=choices.get(i).text;ids[i]=choices.get(i).index;}
+        int[] order=SharedRanking.order(texts,ids,learned,preferred);ArrayList<Candidate> sorted=new ArrayList<>();
+        for(int i:order)sorted.add(choices.get(i));choices=sorted;
+      }
+    }
     // Keep an unrecognized remainder visible without leaving the previous
     // segment's candidate objects on screen. Selecting it commits it literally.
-    if(s.composing&&list.isEmpty())list.add(candidate(new Candidate(s,-4,s.raw),0));
-    if(!s.composing&&!s.dismissed)for(WordIndex.Entry e:WordIndex.following(s.context))if(seen.add(e.word))list.add(candidate(new Candidate(s,-2,e.word),list.size()));
+    if(s.composing&&choices.isEmpty())choices.add(new Candidate(s,-4,s.raw));
+    if(!s.composing&&!s.dismissed)for(WordIndex.Entry e:WordIndex.following(s.context))if(seen.add(e.word))choices.add(new Candidate(s,-2,e.word));
+    ArrayList<Object> list=new ArrayList<>();for(Candidate c:choices)list.add(candidate(c,list.size()));
     s.suggesting=!s.composing&&!list.isEmpty();
     s.candidates=list;s.page=0;
     // An unrecognized spelling must remain visible and editable even when

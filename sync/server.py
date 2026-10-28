@@ -10,15 +10,16 @@ import socket
 import sqlite3
 import ssl
 import time
-from common import parse, encode, MAX_BYTES, MAX_WORDS
+from common import parse, encode, parse_learning, packet, MAX_BYTES, MAX_WORDS
 
 def database(path):
     db = sqlite3.connect(path, timeout=10)
     db.execute('CREATE TABLE IF NOT EXISTS devices (name TEXT PRIMARY KEY, token_hash TEXT UNIQUE NOT NULL)')
     db.execute('CREATE TABLE IF NOT EXISTS words (word TEXT, code TEXT, weight INTEGER, PRIMARY KEY(word,code))')
+    db.execute('CREATE TABLE IF NOT EXISTS learning (device TEXT, word TEXT, code TEXT, count INTEGER NOT NULL, last INTEGER NOT NULL, PRIMARY KEY(device,word,code))')
     return db
 
-def exchange(db, words):
+def exchange(db, words, learned=None, device=None, now=None):
     # Check the full union before writing; retries cannot inflate weights.
     with db:
         total = dict(((w, c), n) for w, c, n in db.execute('SELECT word,code,weight FROM words'))
@@ -26,8 +27,23 @@ def exchange(db, words):
             total[key] = max(total.get(key, 0), weight)
         if len(total) > MAX_WORDS:
             raise ValueError('union exceeds limit')
+        if learned:
+            if not device:
+                raise ValueError('authenticated device required for learning')
+            keys = set(db.execute('SELECT DISTINCT word,code FROM learning'))
+            if len(keys | learned.keys()) > MAX_WORDS:
+                raise ValueError('learning union exceeds limit')
+            ceiling = int((time.time() if now is None else now) * 1000) + 300000
+            db.executemany('INSERT INTO learning VALUES(?,?,?,?,?) ON CONFLICT(device,word,code) DO UPDATE SET count=max(count,excluded.count),last=max(last,excluded.last)',
+                           [(device, w, c, n, min(stamp, ceiling)) for (w, c), (n, stamp) in learned.items()])
         db.executemany('INSERT INTO words VALUES(?,?,?) ON CONFLICT(word,code) DO UPDATE SET weight=max(weight,excluded.weight)', [(w, c, n) for (w, c), n in words.items()])
-        return encode(total)
+        if learned is None:
+            return encode(total)
+        # Max per authenticated device, sum across devices: retries and stale
+        # snapshots cannot inflate counters or feed the aggregate back as local use.
+        combined = {(w, c): (n, stamp) for w, c, n, stamp in db.execute(
+            'SELECT word,code,min(1000000,sum(count)),max(last) FROM learning GROUP BY word,code')}
+        return packet(total, combined)
 
 class Server(HTTPServer):
     def get_request(self):
@@ -49,6 +65,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('Content-Type', 'text/tab-separated-values; charset=utf-8')
         self.send_header('Content-Length', str(len(data)))
         self.send_header('Cache-Control', 'no-store')
+        self.send_header('X-Phrase-Learning', '1')
         self.end_headers()
         self.wfile.write(data)
     def do_POST(self):
@@ -61,7 +78,8 @@ class Handler(BaseHTTPRequestHandler):
             self.reply(401); return
         with database(self.server.db_path) as db:
             token_hash = hashlib.sha256(auth[7:].encode()).hexdigest()
-            if not db.execute('SELECT 1 FROM devices WHERE token_hash=?', (token_hash,)).fetchone():
+            device = db.execute('SELECT name FROM devices WHERE token_hash=?', (token_hash,)).fetchone()
+            if not device:
                 self.reply(401); return
             try:
                 length = int(self.headers.get('Content-Length', '-1'))
@@ -70,7 +88,7 @@ class Handler(BaseHTTPRequestHandler):
                 raw = self.rfile.read(length)
                 if len(raw) != length:
                     self.reply(400); return
-                body = exchange(db, parse(raw))
+                body = exchange(db, parse(raw), parse_learning(raw), device[0])
             except (ValueError, UnicodeError):
                 self.reply(400); return
         self.reply(200, body)

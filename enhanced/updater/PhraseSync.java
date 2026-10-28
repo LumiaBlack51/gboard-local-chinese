@@ -60,7 +60,11 @@ public final class PhraseSync extends JobService {
     guard();try(OutputStream out=connection.getOutputStream()){for(int pos=0;pos<upload.length;pos+=8192){guard();out.write(upload,pos,Math.min(8192,upload.length-pos));}}
     guard();if(connection.getResponseCode()!=200)throw new IOException("exchange failed");byte[] download;try(InputStream in=connection.getInputStream()){download=read(in);}guard();
     java.util.List<local.gboard.enhanced.DictionaryFile.Entry> words=local.gboard.enhanced.DictionaryFile.readStored(new ByteArrayInputStream(download));
+    boolean learningSupported="1".equals(connection.getHeaderField("X-Phrase-Learning"));
+    java.util.List<local.gboard.enhanced.LearningFile.Entry> learned=local.gboard.enhanced.LearningFile.read(new ByteArrayInputStream(download),true);
     for(int from=0;from<words.size();from+=500){guard();Bundle batch=options();batch.putByteArray("words",local.gboard.enhanced.DictionaryFile.encode(words.subList(from,Math.min(words.size(),from+500))));Bundle result=getContentResolver().call(PROVIDER,"merge",null,batch);if(result==null||!result.getBoolean("ok"))throw new IOException("merge deferred");}
+    if(learningSupported)for(int from=0;from<learned.size();from+=500){guard();Bundle batch=options();batch.putByteArray("learning",local.gboard.enhanced.LearningFile.encode(learned.subList(from,Math.min(learned.size(),from+500)),false));Bundle result=getContentResolver().call(PROVIDER,"merge_learning",null,batch);if(result==null||!result.getBoolean("ok"))throw new IOException("learning merge deferred");}
+    prefs(this).edit().putBoolean("learning_synced",learningSupported).putInt("learned_words",learningSupported?learned.size():0).commit();
   }
   private Bundle options(){Bundle b=new Bundle();b.putBoolean("allow_battery",allowBattery());return b;}
   private byte[] read(InputStream in)throws IOException {if(in==null)throw new IOException("no phrase stream");ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buffer=new byte[8192];int n;while((n=in.read(buffer))!=-1){guard();if(out.size()+n>16*1024*1024)throw new IOException("too large");out.write(buffer,0,n);}return out.toByteArray();}

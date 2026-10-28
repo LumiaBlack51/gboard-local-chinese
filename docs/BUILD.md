@@ -1,3 +1,9 @@
+正式传输链检查：在隔离 AVD 安装正式键盘、更新器及同签名 `tests/build_sync_checks.py` 生成的 synccheck 后，执行 `python3 -B tests/run_installed_learning_checks.py --serial emulator-XXXX`。它使用临时自签名 HTTPS 服务、合成词条与临时配对，验证正式更新器解析学习记录、签名保护 provider 写入成功和重复交换不回传总计数。只接受 AVD；会替换测试更新器的配对，不可用于个人手机。测试后删除测试 AVD 和临时包。
+
+1.3.7 增加真实学习的双向集成检查：`python3 -B tests/run_learning_checks.py --serial emulator-XXXX`。需要本机 Android SDK/JDK 和已启动的隔离 AVD。测试用独立 UID APK 实际写入 Android AtomicFile，通过临时 HTTP 服务与隔离的真实 librime 交换学习记录，验证原生候选重新排序、原生编号保留、历史本机次数接续、重启保存、较新的本地/远端选择，以及往返重试无计数反馈。APK 无网络权限和 Activity，测试完成自动卸载；不会打开个人词库或使用生产令牌。输出 `tests/results/shared-learning-integration-v1.3.7.json` 记录源码哈希与测试范围。
+
+服务端单元检查：`python3 -B -m unittest discover -s tests -p 'test_*learning.py'` 和 `python3 -B -m unittest discover -s tests -p 'test_phrase_sync.py'`。桌面脚本的 1.3.7 报告单独保存，保留历史 1.3.6 真机结果；不要将 AVD 结果标为真机结果。
+
 1.3.6 新增 `python3 tests/verify_cloud_learning.py`：在隔离的真实 Rime 引擎注入最大词频的 `凪/zhi`、`徳/de`，检查全部共享单字编码与字母、原生选词学习、新共享词转为原生用户词，以及后续选择、同步文件刷新和引擎重启后排序保持。手机新增 SelectionLearning，普通选择写本地偏好，隐私模式禁用；PhoneCandidateInstrumentation 检查所有编码的原生首屏、共享词学习及再次选择原生词后取消共享词前移。
 
 1.3.6 的候选合成检查可在独立测试 AVD 运行，或在已明确选择、仅有本项目 probe 编辑框处于前台的手机运行。手机须先清空未提交拼音、隐藏键盘，并确认词库同步任务未在执行。检查只向适配器传入合成候选，不向输入连接发送文字；临时替换的内存词表和本地偏好在 finally 中恢复，随后重新打开正式键盘。不得在个人应用编辑框活跃时运行。

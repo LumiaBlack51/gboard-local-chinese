@@ -56,6 +56,7 @@ class PhraseSyncTest(unittest.TestCase):
     def test_snapshot_excludes_unlearned_deleted_non_chinese(self):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder);snapshot=root/'sync/device/rime_ice.userdb.txt';snapshot.parent.mkdir(parents=True)
+            (root/'installation.yaml').write_text('installation_id: device\n')
             snapshot.write_text('# comment\nce shi \t测试\tc=2 d=1 t=1\nshan chu \t删除\tc=-1 d=1\nwei xue \t未学\tc=0 d=1\nen \tEnglish\tc=2\n')
             self.assertEqual(local_words(root),{('测试','ceshi'):102})
     def test_power_policy(self):
