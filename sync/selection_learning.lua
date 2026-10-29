@@ -1,9 +1,8 @@
 -- Aggregate actual selections only. No per-keystroke history or network work.
 local M = {}
-local compact_tsv = require('compact_tsv')
-local local_codes, cloud_path, fingerprint, cloud = {}, nil, nil, {}
-local history_path,history_fingerprint,history=nil,nil,{}
-local local_count = 0
+local snapshots = require('phrase_lookup')
+local local_codes = {}
+local local_order = {}
 
 function M.compact(code)
   return (code:gsub('u:','v'):gsub('ü','v'):gsub("[' ’]",''))
@@ -37,51 +36,31 @@ local function local_group(code)
   local path=root()..'/selection-learning/'..code..'.tsv'
   if not local_codes[path] then
     local groups={}
-    local file=io.open(path,'r')
+    local file=io.open(path,'r') or io.open(path..'.new','r') or io.open(path..'.old','r')
     if file then read_rows(file,groups);file:close() end
-    if local_count>=128 then local_codes={};local_count=0 end
-    local_codes[path]=groups[code] or {};local_count=local_count+1
+    local_codes[path]=groups[code] or {}
+    local_order[#local_order+1]=path
+    if #local_order>128 then local_codes[table.remove(local_order,1)]=nil end
   end
   return local_codes[path],path
 end
 
-local function read_compact(file)
-  file:seek('set', 0)
-  return compact_tsv.read(file, function(line)
-    local word,code,count,last=line:match('^([^\t]+)\t([a-z]+)\t(%d+)\t(%d+)$')
-    if word and #code<=128 and valid_word(word) and tonumber(count)>0 and tonumber(count)<=1000000 then
-      return code, word..'\t'..count..'\t'..last
+local function group(name,code)
+  local rows=snapshots.iter(name,code)
+  local result={}
+  if not rows then return result end
+  for word,stats in rows do
+    local count,last=stats:match('^(%d+)\t(%d+)$')
+    if count and valid_word(word) then
+      count,last=tonumber(count),tonumber(last)
+      if count>0 and count<=1000000 then result[word]={count=count,last=last} end
     end
-  end)
-end
-local function group(index, code)
-  local rows = {}
-  for line in compact_tsv.rows(index, code) do
-    local word,count,last=line:match('^([^\t]+)\t(%d+)\t(%d+)$')
-    rows[word]={count=tonumber(count),last=tonumber(last)}
   end
-  return rows
+  return result
 end
-local function shared(code)
-  local path=root()..'/cloud-learning.tsv'
-  local file=io.open(path,'r')
-  if not file then return {} end
-  local current=file:read('*l')
-  if path~=cloud_path or current~=fingerprint then
-    cloud=read_compact(file);cloud_path,fingerprint=path,current
-  end
-  file:close()
-  return group(cloud,code)
-end
-local function historical(code)
-  local path=root()..'/local-native-learning.tsv'
-  local file=io.open(path,'r');if not file then return {} end
-  local current=file:read('*l')
-  if path~=history_path or current~=history_fingerprint then
-    history=read_compact(file);history_path,history_fingerprint=path,current
-  end
-  file:close();return group(history,code)
-end
+
+local function shared(code) return group('cloud-learning.tsv',code) end
+local function historical(code) return group('local-native-learning.tsv',code) end
 
 function M.ranking(raw)
   local code=M.compact(raw)
@@ -124,7 +103,19 @@ function M.record(raw,word,native_count)
     file:write(text,'\t',code,'\t',string.format('%.0f',row.count),'\t',string.format('%.0f',row.last),'\n')
   end
   file:close()
-  if not os.rename(path..'.new',path) then os.remove(path..'.new') end
+  if not os.rename(path..'.new',path) then
+    -- Windows CRT rename does not replace an existing destination. Keep a
+    -- recoverable aggregate across both renames; never append selection events.
+    if package.config:sub(1,1)=='\\' then
+      os.remove(path..'.old')
+      local moved=os.rename(path,path..'.old')
+      if os.rename(path..'.new',path) then
+        os.remove(path..'.old')
+      elseif moved then
+        os.rename(path..'.old',path)
+      end
+    else os.remove(path..'.new') end
+  end
 end
 
 function M.committed(ctx)

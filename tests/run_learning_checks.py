@@ -88,7 +88,7 @@ with tempfile.TemporaryDirectory(prefix='shared-learning-check-') as folder:
             received=instrument('receive',learning=base64.b64encode(reply).decode(),expected='知')
             reply=exchange('android',base64.b64decode(received['outgoing_base64']))
             assert parse_learning(reply)==expected,'Retries/aggregate feedback inflated counters'
-        sources=['sync/compact_tsv.lua','sync/common.py','sync/server.py','sync/desktop.py','sync/cloud_phrase.lua','sync/cloud_native_filter.lua','sync/selection_learning.lua']
+        sources=['sync/phrase_lookup.lua','sync/common.py','sync/server.py','sync/desktop.py','sync/cloud_phrase.lua','sync/cloud_native_filter.lua','sync/selection_learning.lua']
         sources += ['enhanced/src/local/gboard/enhanced/'+name+'.java' for name in names]
         report={'version':VERSION,'android_device':a.serial,'isolated_test_uid':True,'personal_database_opened':False,
                 'android_to_native_rime':{k:v for k,v in native.items() if k!='outgoing_base64'},

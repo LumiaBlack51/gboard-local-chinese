@@ -1,6 +1,6 @@
 ## 1.3.8 延迟与 Emoji 回归
 
-`python3 tests/benchmark_rime.py --baseline-ref v1.3.7` 在不同子进程使用同一套部署词典与个人数据副本，按键后枚举前五候选，排除第一轮热身；不向桌面发送按键，不修改活跃数据库。`python3 -m unittest discover -s tests -p 'test_compact_tsv.py'` 直接执行实际 Lua 模块，检查大快照、字母前缀碰撞与未知编码。
+`python3 tests/benchmark_rime.py --baseline-ref v1.3.7` 在不同子进程使用同一套部署词典与个人数据副本，按键后枚举前五候选，排除第一轮热身；不向桌面发送按键，不修改活跃数据库。`python3 -m unittest discover -s tests -p 'test_phrase_lookup.py'` 直接执行实际 Lua 模块，检查大快照、字母前缀碰撞与未知编码。
 
 `python3 tests/run_startup_checks.py --serial emulator-XXXX` 在独立 UID 的临时 APK 中，以 20,001 条合成共享记录与 20,000 条历史记录比较主线程首次查询、后台预载与预载后首次查询，验证重复预载复用快照且不把远端次数回传。只接受隔离 AVD，退出自动卸载，不需要手机。此项不测真实电池能耗。JDK 可单独编译 `EmojiSuggestions.java` 与 `tests/EmojiSuggestionsTest.java`，传入 `enhanced/rime-data/emoji.txt` 检查完整别名表。
 

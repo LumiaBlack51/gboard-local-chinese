@@ -34,12 +34,12 @@ class RimeHost:
         for source in self.live.glob('*.txt'):
             shutil.copyfile(source,self.user/source.name)
         shutil.copyfile(self.live/'cloud-phrases.tsv',self.user/'cloud-phrases.tsv')
-        schema=build/'rime_ice.schema.yaml';config=yaml.safe_load(schema.read_text())
+        schema=build/'rime_ice.schema.yaml';config=yaml.safe_load(schema.read_text(encoding="utf-8"))
         config.setdefault('translator',{})['enable_user_dict']=learning
         if configure:configure(self.user,config)
         if annotate:config['engine']['filters'].append('lua_filter@*verify_candidate_source')
         (self.user/'lua/verify_candidate_source.lua').write_text("return {func=function(t,e) for c in t:iter() do c.comment='VERIFY:'..c.type..'|'..c.start..'|'..c._end..'|'..c.preedit..'|'..c.quality yield(c) end end}\n")
-        schema.write_text(yaml.safe_dump(config,allow_unicode=True))
+        schema.write_text(yaml.safe_dump(config,allow_unicode=True),encoding="utf-8")
         self.r=C.CDLL(ctypes.util.find_library('rime'),mode=C.RTLD_GLOBAL)
         functions=[('Setup',[C.POINTER(Traits)],None),('Initialize',[C.POINTER(Traits)],None),('CreateSession',[],C.c_size_t),('SelectSchema',[C.c_size_t,C.c_char_p],C.c_int),('SetOption',[C.c_size_t,C.c_char_p,C.c_int],None),('ProcessKey',[C.c_size_t,C.c_int,C.c_int],C.c_int),('ClearComposition',[C.c_size_t],None),('CandidateListBegin',[C.c_size_t,C.POINTER(Iterator)],C.c_int),('CandidateListNext',[C.POINTER(Iterator)],C.c_int),('CandidateListEnd',[C.POINTER(Iterator)],None),('SelectCandidate',[C.c_size_t,C.c_size_t],C.c_int),('CommitComposition',[C.c_size_t],C.c_int),('GetCommit',[C.c_size_t,C.POINTER(Commit)],C.c_int),('FreeCommit',[C.POINTER(Commit)],C.c_int),('DestroySession',[C.c_size_t],C.c_int),('Finalize',[],None)]
         for name,args,ret in functions:

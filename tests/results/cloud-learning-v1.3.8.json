@@ -20,11 +20,11 @@
   "shared_word_available_without_native_candidates": true,
   "passed": true,
   "live_user_database_opened": false,
-  "elapsed_seconds": 2.27,
+  "elapsed_seconds": 2.84,
   "sources": {
-    "sync/compact_tsv.lua": "979769a5d17363434046e57b8ebd996d10002cd9b4ab7ca9c6e9bd82a7dc9a98",
-    "sync/cloud_phrase.lua": "0c19b657258d3accee79387a5fcea2b016d70949117344d1c97dca7d12cfa48e",
+    "sync/phrase_lookup.lua": "a53e7c396fbf5a0feaad7d4409b70b12d4be69d0c48512d5f454adcd7e1f9101",
+    "sync/cloud_phrase.lua": "8289328db5e5297777501994dd1ada5d5c9f41adb3b33776c9d29b9aa249fb4a",
     "sync/cloud_native_filter.lua": "221406960c08663a370ba3fb65a6ed572a58744dde92b77b5df8c6e589bd079d",
-    "sync/selection_learning.lua": "c3b1fea18cb929c56304bc8580a0d54ff27e9d0c77551e96179ef0631cb732e2"
+    "sync/selection_learning.lua": "a72a7913c1bc9c3f9a36c6e5b096ac193c45bc5836309fe2e5a9ffdb00fefd3a"
   }
 }

@@ -72,8 +72,8 @@
     "abc123": 0,
     "zhongguorenmingongheguo": 31
   },
-  "input_processing_median_ms": 2.83,
-  "input_processing_max_ms": 37.3,
+  "input_processing_median_ms": 3.56,
+  "input_processing_max_ms": 37.04,
   "duplicate_inputs": [],
   "stock_shortcut_no_longer_overrides_m": true,
   "native_selection_learning": [
@@ -96,12 +96,12 @@
   "live_user_database_opened": false,
   "front_input_events_sent": false,
   "sources": {
-    "sync/compact_tsv.lua": "979769a5d17363434046e57b8ebd996d10002cd9b4ab7ca9c6e9bd82a7dc9a98",
-    "sync/cloud_phrase.lua": "0c19b657258d3accee79387a5fcea2b016d70949117344d1c97dca7d12cfa48e",
+    "sync/phrase_lookup.lua": "a53e7c396fbf5a0feaad7d4409b70b12d4be69d0c48512d5f454adcd7e1f9101",
+    "sync/cloud_phrase.lua": "8289328db5e5297777501994dd1ada5d5c9f41adb3b33776c9d29b9aa249fb4a",
     "sync/cloud_native_filter.lua": "221406960c08663a370ba3fb65a6ed572a58744dde92b77b5df8c6e589bd079d",
-    "sync/selection_learning.lua": "c3b1fea18cb929c56304bc8580a0d54ff27e9d0c77551e96179ef0631cb732e2",
+    "sync/selection_learning.lua": "a72a7913c1bc9c3f9a36c6e5b096ac193c45bc5836309fe2e5a9ffdb00fefd3a",
     "tests/rime_host.py": "b454aeb7ae2aa5e4bc2a6e8fc6fb5f1a7de517aa6c43dfb15bc0f11944310ab4",
-    "tests/verify_desktop_candidates.py": "0e5030e315e142ac8d6840d09590f74cc8dfa36d480869edce37028ce22d9c57"
+    "tests/verify_desktop_candidates.py": "b37484426f0e9de6f7f834710a11c9bbc9ecd689a65a598075b7553394a96f53"
   },
   "passed": true
 }

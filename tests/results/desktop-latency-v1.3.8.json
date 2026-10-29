@@ -2,41 +2,38 @@
   "before": {
     "input": {
       "n": 280,
-      "median_ms": 43.036,
-      "p95_ms": 53.885,
-      "max_ms": 59.903
+      "median_ms": 42.308,
+      "p95_ms": 54.688,
+      "max_ms": 59.336
     },
     "delete": {
       "n": 280,
-      "median_ms": 42.627,
-      "p95_ms": 54.024,
-      "max_ms": 58.224
+      "median_ms": 42.256,
+      "p95_ms": 55.044,
+      "max_ms": 58.925
     }
   },
   "after": {
     "input": {
       "n": 280,
-      "median_ms": 1.698,
-      "p95_ms": 12.111,
-      "max_ms": 15.098
+      "median_ms": 2.729,
+      "p95_ms": 15.545,
+      "max_ms": 19.05
     },
     "delete": {
       "n": 280,
-      "median_ms": 1.64,
-      "p95_ms": 12.055,
-      "max_ms": 15.259
+      "median_ms": 2.703,
+      "p95_ms": 15.414,
+      "max_ms": 19.541
     }
   },
   "baseline_revision": "d467237c6e1b03b0fe8064837f036e281f2e45aa",
   "method": "Isolated copies of deployed schema/database/shared data; normal mode, each key followed by first five candidates; one warm-up pass excluded; no input-window/display timing.",
   "front_input_events_sent": false,
   "sources": {
-    "sync/compact_tsv.lua": "cb9403cca1f925ce71886c302a583e6b493efc58387f44cc11c82d7cda60ccfa",
+    "sync/phrase_lookup.lua": "a53e7c396fbf5a0feaad7d4409b70b12d4be69d0c48512d5f454adcd7e1f9101",
     "sync/cloud_native_filter.lua": "221406960c08663a370ba3fb65a6ed572a58744dde92b77b5df8c6e589bd079d",
-    "sync/cloud_phrase.lua": "0c19b657258d3accee79387a5fcea2b016d70949117344d1c97dca7d12cfa48e",
-    "sync/selection_learning.lua": "c3b1fea18cb929c56304bc8580a0d54ff27e9d0c77551e96179ef0631cb732e2"
-  },
-  "installed_to_local_disk": true,
-  "active_input_method_restarted": false,
-  "activation_note": "New Lua files will load when the input method engine is restarted; no active desktop process or focus was interrupted."
+    "sync/cloud_phrase.lua": "8289328db5e5297777501994dd1ada5d5c9f41adb3b33776c9d29b9aa249fb4a",
+    "sync/selection_learning.lua": "a72a7913c1bc9c3f9a36c6e5b096ac193c45bc5836309fe2e5a9ffdb00fefd3a"
+  }
 }
