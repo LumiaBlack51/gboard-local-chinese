@@ -38,7 +38,7 @@ Windows 小狼毫接入、微软拼音词条迁移及任务计划设置见 [Wind
 python3 sync/configure_rime.py --rime ~/.local/share/fcitx5/rime --dynamic-ranking
 ```
 
-工具安装 `cloud_phrase.lua`、`cloud_native_filter.lua` 和 `selection_learning.lua`，保留已有键位与学习数据；如发现同一补丁位置已有其他组件则停止并要求人工合并。原 YAML 备份为 `.before-cloud-setup`。`--dynamic-ranking` 仅在未设置用户置顶规则时关闭上游默认固定置顶，并从 `custom_phrase.txt` 移除三条上游样例 `呣/m`、`呒/m`、`噷/hm`，原文件备份为 `.before-candidate-repair`；不删除基础词典中的这些字。已有自定义置顶规则保留。随后按本机 Rime 的部署方式重新编译方案，并让 Fcitx 重新加载 Rime 配置；不要在正在组成拼音时强制重启输入法。
+工具安装 `cloud_phrase.lua`、`cloud_native_filter.lua`、`selection_learning.lua` 和 `phrase_lookup.lua`，保留已有键位与学习数据；如发现同一补丁位置已有其他组件则停止并要求人工合并。原 YAML 备份为 `.before-cloud-setup`。`--dynamic-ranking` 仅在未设置用户置顶规则时关闭上游默认固定置顶，并从 `custom_phrase.txt` 移除三条上游样例 `呣/m`、`呒/m`、`噷/hm`，原文件备份为 `.before-candidate-repair`；不删除基础词典中的这些字。已有自定义置顶规则保留。随后按本机 Rime 的部署方式重新编译方案，并让 Fcitx 重新加载 Rime 配置；不要在正在组成拼音时强制重启输入法。
 
 手机的双向学习排序需要主键盘 1.3.7 和更新器 14，保留原生选词编号；隐私模式不加入个人导入/同步词。同步与键盘候选生成分别验证，接口收到词条成功不等于前台候选已消费该词条。
 

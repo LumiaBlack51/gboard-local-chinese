@@ -1,7 +1,7 @@
 -- Called only by normal Rime translation. No timer, watcher or network.
 local M = {}
 local learning = require('selection_learning')
-local fingerprint, words = nil, {}
+local snapshots = require('phrase_lookup')
 local function compact(code)
   return (code:gsub("u:","v"):gsub("ü","v"):gsub("[' ]",''))
 end
@@ -78,28 +78,15 @@ local function native_entry(env, word, code)
 end
 function M.func(input, seg, env)
   if env.engine.context:get_option('incognito') then return end
-  local path = rime_api.get_user_data_dir() .. '/cloud-phrases.tsv'
-  local file = io.open(path, 'r')
-  if not file then return end
-  local current = file:read('*l')
-  if current ~= fingerprint then
-    local next_words = {}
-    for line in file:lines() do
-      local word, code, weight = line:match('^([^\t]+)\t([a-z]+)\t(%d+)$')
-      if word then
-        next_words[code] = next_words[code] or {}
-        table.insert(next_words[code], {word=word, weight=tonumber(weight)})
-      end
-    end
-    for _, group in pairs(next_words) do table.sort(group,function(a,b) return a.weight==b.weight and a.word<b.word or a.weight>b.weight end) end
-    words, fingerprint = next_words, current
-  end
-  file:close()
   local code = compact(input)
+  local rows = snapshots.iter('cloud-phrases.tsv',code)
+  if not rows then return end
   local stats,preferred = learning.ranking(input)
   local found,seen,emitted = {},{},0
-  for _,row in ipairs(words[code] or {}) do
-    found[#found+1]=row;seen[row.word]=true
+  for word,weight in rows do
+    if weight:match('^%d+$') then
+      found[#found+1]={word=word,weight=tonumber(weight)};seen[word]=true
+    end
   end
   for word in pairs(stats) do
     if not seen[word] then found[#found+1]={word=word,weight=0} end

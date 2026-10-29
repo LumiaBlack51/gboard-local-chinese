@@ -1,0 +1,20 @@
+{
+  "synthetic_phrases": 33000,
+  "synthetic_learning_rows": 17000,
+  "scope": "installed librime key processing and first candidate page; excludes UI/IPC and OS repeat delay",
+  "typing": {
+    "keys": 60,
+    "mean_ms": 3.87,
+    "p50_ms": 3.45,
+    "p95_ms": 6.12,
+    "max_ms": 7.66
+  },
+  "backspace": {
+    "keys": 60,
+    "mean_ms": 3.56,
+    "p50_ms": 3.29,
+    "p95_ms": 5.9,
+    "max_ms": 6.06
+  },
+  "success": true
+}

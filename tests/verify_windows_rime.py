@@ -1,5 +1,6 @@
 """Exercise installed Windows librime in a fresh profile; no UI or live DB writes."""
 import ctypes.util
+import argparse
 import json
 import os
 from pathlib import Path
@@ -13,6 +14,9 @@ from rime_data import local_learning, snapshot
 from rime_host import RimeHost
 
 def main():
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--components-from',type=Path)
+    args=parser.parse_args()
     with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,r'SOFTWARE\Rime\Weasel',0,winreg.KEY_READ|winreg.KEY_WOW64_32KEY) as key:
         directory=Path(winreg.QueryValueEx(key,'WeaselRoot')[0])
     dll_directory=os.add_dll_directory(str(directory))
@@ -23,6 +27,9 @@ def main():
     selected=list(key for key in sorted(imported) if 3<=len(key[0])<=5)[:3]
     word,code='同步麒麟','tongbuqilin'
     def setup(user,config):
+        if args.components_from:
+            for name in ['cloud_phrase.lua','cloud_native_filter.lua','selection_learning.lua','phrase_lookup.lua']:
+                shutil.copyfile(args.components_from/name,user/'lua'/name)
         # The running Weasel also searches its shared OpenCC directory.
         link=user/'opencc'
         if link.is_symlink(): link.unlink()
@@ -56,6 +63,13 @@ def main():
         host.select(next(i for i,row in enumerate(rows) if row[0]==word))
         assert local_learning(host.user,{})==own, 'Incognito selection changed local aggregates'
         report['incognito_excludes_cloud']=True
+        host.r.RimeSetOption(host.session,b'incognito',0)
+        updated_word,updated_code='轻快同步','qingkuaitongbu'
+        snapshot(host.user/'cloud-phrases.tsv',encode({(word,code):100,(updated_word,updated_code):100}))
+        snapshot(host.user/'cloud-learning.tsv',encode_learning({(updated_word,updated_code):(1000,2000)},comments=False))
+        assert host.candidates(updated_code,100)[0][0]==updated_word, 'Updated shared snapshot was not consumed'
+        assert local_learning(host.user,{})==own, 'Downloaded counts became local selections'
+        report['shared_snapshot_hot_update']=True
     report['success']=True
     print(json.dumps(report,indent=2))
 

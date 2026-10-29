@@ -28,6 +28,8 @@ python sync\configure_rime.py --rime C:\实际Rime用户目录 --dynamic-ranking
 
 `cloud-phrases.tsv` 和 `cloud-learning.tsv` 用文件头指纹热更新。选择次数只来自本机安装的官方 Rime 文本快照及 `selection-learning` 聚合文件；收到的服务器总数不会作为本机次数回传。小狼毫在普通提交时保存聚合，不记录逐键或逐次历史。Windows 文件替换保留 `.new` / `.old` 聚合用于失败恢复，不需要启动子进程。隐私模式不读取共享候选、共享排序计数或新增本机计数。
 
+共享快照在 Lua 中保留为文本字符串，只解析当前拼音对应的行，本机逐编码缓存最多保留 128 项。这样避免将几万条词和学习记录展开成常驻 Lua 对象，在旧版 librime-lua 的按键间垃圾回收中反复扫描；不改变词库文件、协议、选词次数、排序规则或 Backspace 的逐字删除行为。
+
 ## 私有配置与计划任务
 
 将私有配对 `config.json`、可选的 `server.crt` 及转换得到的 `microsoft-phrases.tsv` 放在 `%USERPROFILE%\.config\gboard-phrase-sync\`。只允许当前用户、SYSTEM 和管理员访问此目录。令牌和个人词条不进入 Git。
@@ -65,3 +67,5 @@ Set-WinDefaultInputMethodOverride -InputTip '0804:{81D4E9C9-1D3B-41BC-9E6C-4B40B
 ## 验证
 
 `tests/test_windows_sync.py` 用合成数据验证格式边界、隐私过滤、供电限制、互斥及学习计数不会回流。`python -X utf8 tests/verify_windows_rime.py` 使用已安装的小狼毫 DLL 和临时用户目录，验证导入词候选、共享排序、重复选词持久化及隐私模式，不向真实用户数据库提交测试词。
+
+`python -B -X utf8 tests/verify_windows_latency.py` 在临时目录生成 33000 条合成词和 17000 条学习记录，测量输入及退格后生成首屏候选的耗时，默认要求预热后的 p95 小于 33 毫秒。结果不包含 Windows 按键重复等待、跨进程通信或界面绘制，因此不是完整前台延迟或微软输入法对比测试。

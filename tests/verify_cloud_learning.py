@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def configure(user, config):
     (user/'selection-learning').mkdir(exist_ok=True)
-    for name in ('cloud_phrase.lua', 'cloud_native_filter.lua', 'selection_learning.lua'):
+    for name in ('cloud_phrase.lua', 'cloud_native_filter.lua', 'selection_learning.lua', 'phrase_lookup.lua'):
         shutil.copyfile(ROOT / 'sync' / name, user / 'lua' / name)
 
 
@@ -96,7 +96,7 @@ def main():
     results.update(passed=True, live_user_database_opened=False,
                    elapsed_seconds=round(time.monotonic()-started, 2),
                    sources={name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-                            for name in ['sync/cloud_phrase.lua', 'sync/cloud_native_filter.lua', 'sync/selection_learning.lua']})
+                            for name in ['sync/cloud_phrase.lua', 'sync/cloud_native_filter.lua', 'sync/selection_learning.lua', 'sync/phrase_lookup.lua']})
     (ROOT / 'tests/results/cloud-learning-v1.3.7.json').write_text(json.dumps(results, indent=2)+'\n')
     print(json.dumps(results, indent=2))
 

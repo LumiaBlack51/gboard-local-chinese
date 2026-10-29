@@ -11,9 +11,9 @@ ROOT=Path(__file__).resolve().parents[1]
 FILES=[
     'sync/common.py','sync/rime_data.py','sync/windows.py','sync/windows_setup.pyw',
     'sync/install_windows.ps1','sync/microsoft_pinyin.py','sync/configure_rime.py',
-    'sync/cloud_phrase.lua','sync/cloud_native_filter.lua','sync/selection_learning.lua',
+    'sync/cloud_phrase.lua','sync/cloud_native_filter.lua','sync/selection_learning.lua','sync/phrase_lookup.lua',
     'sync/desktop.py','docs/DICTIONARY-SYNC-WINDOWS.md','docs/DICTIONARY-SYNC.md',
-    'tests/test_windows_sync.py','tests/verify_windows_rime.py','tests/rime_host.py',
+    'tests/test_windows_sync.py','tests/verify_windows_rime.py','tests/verify_windows_latency.py','tests/rime_host.py',
 ]
 
 def git(*args):
