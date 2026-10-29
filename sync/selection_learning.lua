@@ -35,7 +35,7 @@ local function local_group(code)
   local path=root()..'/selection-learning/'..code..'.tsv'
   if not local_codes[path] then
     local groups={}
-    local file=io.open(path,'r')
+    local file=io.open(path,'r') or io.open(path..'.new','r') or io.open(path..'.old','r')
     if file then read_rows(file,groups);file:close() end
     local_codes[path]=groups[code] or {}
   end
@@ -106,7 +106,19 @@ function M.record(raw,word,native_count)
     file:write(text,'\t',code,'\t',string.format('%.0f',row.count),'\t',string.format('%.0f',row.last),'\n')
   end
   file:close()
-  if not os.rename(path..'.new',path) then os.remove(path..'.new') end
+  if not os.rename(path..'.new',path) then
+    -- Windows CRT rename does not replace an existing destination. Keep a
+    -- recoverable aggregate across both renames; never append selection events.
+    if package.config:sub(1,1)=='\\' then
+      os.remove(path..'.old')
+      local moved=os.rename(path,path..'.old')
+      if os.rename(path..'.new',path) then
+        os.remove(path..'.old')
+      elseif moved then
+        os.rename(path..'.old',path)
+      end
+    else os.remove(path..'.new') end
+  end
 end
 
 function M.committed(ctx)

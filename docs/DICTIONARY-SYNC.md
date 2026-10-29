@@ -1,5 +1,7 @@
 # 手机与电脑词库共享（1.3.7）
 
+Windows 小狼毫接入、微软拼音词条迁移及任务计划设置见 [Windows 同步说明](DICTIONARY-SYNC-WINDOWS.md)。
+
 手机默认插电、离电均由 Android JobScheduler 每小时安排一次联网同步；可在「检查更新 → 词库共享设置」关闭「允许电池供电时同步」，改为仅插电。系统省电、网络不可用时可能延后；键盘使用中仍交换独立词条文件，仅延后刷新 Rime 学习快照，不是精确闹钟。
 
 电脑端由 systemd 用户 timer 每小时触发 oneshot，ConditionACPower=true；离电时不启动 Python，运行中拔电也会结束本次进程。不更改电源管理、输入法切换和前台窗口。
