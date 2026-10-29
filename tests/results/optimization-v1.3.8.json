@@ -1,0 +1,84 @@
+{
+  "version": "1.3.8",
+  "source_commit": "4911636a3f03ffdee95c3bc60544c03a8f699f31",
+  "desktop": {
+    "before": {
+      "input": {
+        "n": 280,
+        "median_ms": 42.308,
+        "p95_ms": 54.688,
+        "max_ms": 59.336
+      },
+      "delete": {
+        "n": 280,
+        "median_ms": 42.256,
+        "p95_ms": 55.044,
+        "max_ms": 58.925
+      }
+    },
+    "after": {
+      "input": {
+        "n": 280,
+        "median_ms": 2.729,
+        "p95_ms": 15.545,
+        "max_ms": 19.05
+      },
+      "delete": {
+        "n": 280,
+        "median_ms": 2.703,
+        "p95_ms": 15.414,
+        "max_ms": 19.541
+      }
+    },
+    "baseline_revision": "d467237c6e1b03b0fe8064837f036e281f2e45aa",
+    "method": "Isolated copies of deployed schema/database/shared data; normal mode, each key followed by first five candidates; one warm-up pass excluded; no input-window/display timing.",
+    "front_input_events_sent": false,
+    "sources": {
+      "sync/phrase_lookup.lua": "a53e7c396fbf5a0feaad7d4409b70b12d4be69d0c48512d5f454adcd7e1f9101",
+      "sync/cloud_native_filter.lua": "221406960c08663a370ba3fb65a6ed572a58744dde92b77b5df8c6e589bd079d",
+      "sync/cloud_phrase.lua": "8289328db5e5297777501994dd1ada5d5c9f41adb3b33776c9d29b9aa249fb4a",
+      "sync/selection_learning.lua": "a72a7913c1bc9c3f9a36c6e5b096ac193c45bc5836309fe2e5a9ffdb00fefd3a"
+    }
+  },
+  "android_preload": {
+    "synthetic_shared_rows": 20001,
+    "synthetic_history_rows": 20000,
+    "cold_query_median_ms": 518.612,
+    "preloaded_query_median_ms": 0.302,
+    "thread_lifecycle": "One existing Chinese-engine initialization worker per process; no additional timer, wake lock, polling or keep-alive.",
+    "real_power_measured": false,
+    "physical_phone_connected": false
+  },
+  "emoji": {
+    "offline_alias_rows": 4836,
+    "host_checks": 10,
+    "installed_production_adapter_cases": 72,
+    "normal_private_native_selection_checks": 2,
+    "native_candidate_view_transitions": 9
+  },
+  "regressions": {
+    "python_tests": 30,
+    "python_skipped_windows_only": 1,
+    "desktop_synthetic_codes": 333,
+    "broad_desktop_inputs": 68,
+    "bidirectional_learning_no_feedback": true
+  },
+  "activation": {
+    "desktop_files_installed": true,
+    "desktop_process_restarted": false,
+    "phone_updated": false
+  },
+  "cleanup": {
+    "temporary_avd_removed": true,
+    "temporary_system_image_removed": true,
+    "remote_owned_build_stage_removed": true,
+    "persistent_regression_sources_retained": true,
+    "original_user_reports_retained": true,
+    "local_build_caches_removed": true
+  },
+  "publication": {
+    "url": "https://github.com/LumiaBlack51/gboard-local-chinese/releases/tag/v1.3.8",
+    "latest": true,
+    "assets_verified": 13
+  }
+}

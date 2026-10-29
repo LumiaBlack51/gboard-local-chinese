@@ -1,0 +1,794 @@
+{
+  "date_local": "2026-10-29",
+  "timezone": "Asia/Shanghai",
+  "task": "Measure candidate latency and deletion behavior on local Linux Rime and connected phone, without modifying production input method code/configuration.",
+  "phone": {
+    "model": "PLQ110",
+    "soc": "SM8750",
+    "android": "16",
+    "version": "18.4.1-local-1.3.7",
+    "installed_keyboard_apks": [
+      {
+        "apk": "base.apk",
+        "hash_matches_release": true
+      },
+      {
+        "apk": "split_brella_feature_split.apk",
+        "hash_matches_release": true
+      },
+      {
+        "apk": "split_config.xxxhdpi.apk",
+        "hash_matches_release": true
+      },
+      {
+        "apk": "split_tenoranimation_feature_split.apk",
+        "hash_matches_release": true
+      }
+    ],
+    "methods": {
+      "kernel": "Same-signature temporary instrumentation in installed production IME. Real RimeBridge.key + state (up to 100 candidates) + installed EnhancedHook.update with mock processor/candidate sink. Separate Rime session, no commits. Normal and private modes; 12 fixed pinyin strings; 5 passes, first pass excluded from warm quantiles.",
+      "ui": "Real production QWERTY touch injection only into local.gboard.probe. OnPreDraw samples require exact current Rime raw input and the first current candidate visible in the keyboard view tree. Three passes of four fixed pinyin strings, 183 input and 183 deletion events. Values are from injection until pre-draw; display scanout and physical touch latency excluded. Down injection waits synchronously and deliberately holds briefly, so use release-to-predraw for tap response.",
+      "cold": "Two fresh production IME process launches, initialized and allowed to idle before first actual touch; no kernel/adapter prewarm. Actual first candidate predraw recorded.",
+      "long_delete": "Three paired runs of a nominal 1.8-second physical delete-key hold on the same 38 ASCII letters, either Rime composition or already committed via InputConnection. Five-millisecond polling of raw composition versus editor text length. Injection acknowledgement and release allow small differences in wall duration. This is a composing-vs-committed deletion control, not an original-Gboard Chinese-engine benchmark."
+    },
+    "warm_kernel": {
+      "False": {
+        "input": {
+          "key_ms": {
+            "n": 560,
+            "median_ms": 0.333,
+            "p95_ms": 12.802,
+            "p99_ms": 16.267,
+            "max_ms": 17.148,
+            "over_16_7_ms": 3,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "state_ms": {
+            "n": 560,
+            "median_ms": 0.361,
+            "p95_ms": 0.928,
+            "p99_ms": 0.986,
+            "max_ms": 1.028,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "adapter_ms": {
+            "n": 560,
+            "median_ms": 0.316,
+            "p95_ms": 0.404,
+            "p99_ms": 0.471,
+            "max_ms": 1.521,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "total_ms": {
+            "n": 560,
+            "median_ms": 1.004,
+            "p95_ms": 13.762,
+            "p99_ms": 17.258,
+            "max_ms": 18.139,
+            "over_16_7_ms": 7,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          }
+        },
+        "delete": {
+          "key_ms": {
+            "n": 560,
+            "median_ms": 0.27,
+            "p95_ms": 13.36,
+            "p99_ms": 16.376,
+            "max_ms": 17.063,
+            "over_16_7_ms": 4,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "state_ms": {
+            "n": 560,
+            "median_ms": 0.361,
+            "p95_ms": 0.905,
+            "p99_ms": 0.969,
+            "max_ms": 0.994,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "adapter_ms": {
+            "n": 560,
+            "median_ms": 0.307,
+            "p95_ms": 0.392,
+            "p99_ms": 0.459,
+            "max_ms": 1.719,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "total_ms": {
+            "n": 560,
+            "median_ms": 0.951,
+            "p95_ms": 14.355,
+            "p99_ms": 17.61,
+            "max_ms": 18.106,
+            "over_16_7_ms": 9,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          }
+        }
+      },
+      "True": {
+        "input": {
+          "key_ms": {
+            "n": 560,
+            "median_ms": 0.183,
+            "p95_ms": 9.231,
+            "p99_ms": 10.833,
+            "max_ms": 11.458,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "state_ms": {
+            "n": 560,
+            "median_ms": 0.343,
+            "p95_ms": 0.891,
+            "p99_ms": 0.938,
+            "max_ms": 0.981,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "adapter_ms": {
+            "n": 560,
+            "median_ms": 0.221,
+            "p95_ms": 0.28,
+            "p99_ms": 0.323,
+            "max_ms": 0.718,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "total_ms": {
+            "n": 560,
+            "median_ms": 0.767,
+            "p95_ms": 10.084,
+            "p99_ms": 11.67,
+            "max_ms": 12.328,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          }
+        },
+        "delete": {
+          "key_ms": {
+            "n": 560,
+            "median_ms": 0.158,
+            "p95_ms": 9.112,
+            "p99_ms": 10.738,
+            "max_ms": 11.34,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "state_ms": {
+            "n": 560,
+            "median_ms": 0.327,
+            "p95_ms": 0.873,
+            "p99_ms": 0.94,
+            "max_ms": 1.509,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "adapter_ms": {
+            "n": 560,
+            "median_ms": 0.218,
+            "p95_ms": 0.276,
+            "p99_ms": 0.299,
+            "max_ms": 0.73,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "total_ms": {
+            "n": 560,
+            "median_ms": 0.733,
+            "p95_ms": 9.949,
+            "p99_ms": 11.586,
+            "max_ms": 12.209,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          }
+        }
+      }
+    },
+    "warm_ui": {
+      "input": {
+        "down_to_candidate_predraw_ms": {
+          "n": 183,
+          "median_ms": 77.285,
+          "p95_ms": 104.652,
+          "p99_ms": 115.478,
+          "max_ms": 118.922,
+          "over_16_7_ms": 183,
+          "over_50_ms": 156,
+          "over_100_ms": 15
+        },
+        "release_to_candidate_predraw_ms": {
+          "n": 183,
+          "median_ms": 34.851,
+          "p95_ms": 59.37,
+          "p99_ms": 68.093,
+          "max_ms": 76.104,
+          "over_16_7_ms": 132,
+          "over_50_ms": 27,
+          "over_100_ms": 0
+        },
+        "by_case": {
+          "nihao": {
+            "n": 15,
+            "median_ms": 78.413,
+            "p95_ms": 92.491,
+            "p99_ms": 92.491,
+            "max_ms": 92.491,
+            "over_16_7_ms": 15,
+            "over_50_ms": 11,
+            "over_100_ms": 0
+          },
+          "zhongwenshurufa": {
+            "n": 45,
+            "median_ms": 73.407,
+            "p95_ms": 91.426,
+            "p99_ms": 94.902,
+            "max_ms": 94.902,
+            "over_16_7_ms": 45,
+            "over_50_ms": 40,
+            "over_100_ms": 0
+          },
+          "wozhengzaiceshizhongwenshurufadeyanchi": {
+            "n": 114,
+            "median_ms": 78.141,
+            "p95_ms": 108.395,
+            "p99_ms": 115.478,
+            "max_ms": 118.922,
+            "over_16_7_ms": 114,
+            "over_50_ms": 97,
+            "over_100_ms": 15
+          },
+          "zhi": {
+            "n": 9,
+            "median_ms": 54.083,
+            "p95_ms": 93.263,
+            "p99_ms": 93.263,
+            "max_ms": 93.263,
+            "over_16_7_ms": 9,
+            "over_50_ms": 8,
+            "over_100_ms": 0
+          }
+        }
+      },
+      "delete": {
+        "down_to_candidate_predraw_ms": {
+          "n": 183,
+          "median_ms": 76.08,
+          "p95_ms": 98.78,
+          "p99_ms": 116.924,
+          "max_ms": 119.974,
+          "over_16_7_ms": 183,
+          "over_50_ms": 161,
+          "over_100_ms": 6
+        },
+        "release_to_candidate_predraw_ms": {
+          "n": 183,
+          "median_ms": 35.873,
+          "p95_ms": 58.677,
+          "p99_ms": 75.329,
+          "max_ms": 77.755,
+          "over_16_7_ms": 148,
+          "over_50_ms": 20,
+          "over_100_ms": 0
+        },
+        "by_case": {
+          "nihao": {
+            "n": 15,
+            "median_ms": 82.625,
+            "p95_ms": 88.771,
+            "p99_ms": 88.771,
+            "max_ms": 88.771,
+            "over_16_7_ms": 15,
+            "over_50_ms": 14,
+            "over_100_ms": 0
+          },
+          "zhongwenshurufa": {
+            "n": 45,
+            "median_ms": 57.247,
+            "p95_ms": 90.336,
+            "p99_ms": 93.666,
+            "max_ms": 93.666,
+            "over_16_7_ms": 45,
+            "over_50_ms": 32,
+            "over_100_ms": 0
+          },
+          "wozhengzaiceshizhongwenshurufadeyanchi": {
+            "n": 114,
+            "median_ms": 77.856,
+            "p95_ms": 101.025,
+            "p99_ms": 116.924,
+            "max_ms": 119.974,
+            "over_16_7_ms": 114,
+            "over_50_ms": 108,
+            "over_100_ms": 6
+          },
+          "zhi": {
+            "n": 9,
+            "median_ms": 53.583,
+            "p95_ms": 86.057,
+            "p99_ms": 86.057,
+            "max_ms": 86.057,
+            "over_16_7_ms": 9,
+            "over_50_ms": 7,
+            "over_100_ms": 0
+          }
+        }
+      }
+    },
+    "cold_first_key": [
+      {
+        "phase": "input",
+        "case": "nihao",
+        "index": 0,
+        "rep": 0,
+        "down_to_candidate_predraw_ms": 428.824844,
+        "release_to_candidate_predraw_ms": 381.246302,
+        "candidate_visible": true
+      },
+      {
+        "phase": "input",
+        "case": "nihao",
+        "index": 0,
+        "rep": 0,
+        "down_to_candidate_predraw_ms": 393.216511,
+        "release_to_candidate_predraw_ms": 356.531354,
+        "candidate_visible": true
+      }
+    ],
+    "first_kernel_adapter_key": {
+      "privacy": false,
+      "rep": 0,
+      "case": "nihao",
+      "phase": "input",
+      "index": 0,
+      "key_ms": 0.308438,
+      "state_ms": 0.54125,
+      "adapter_ms": 380.7075,
+      "total_ms": 381.557188,
+      "candidate_count": 100
+    },
+    "long_delete_comparison": [
+      {
+        "rep": 0,
+        "rime_composing": true,
+        "initial_length": 38,
+        "deleted_in_nominal_1_8_second_hold": 25,
+        "first_delete_observed_ms": 481.291,
+        "steady_interval": {
+          "n": 24,
+          "median_ms": 52.078,
+          "p95_ms": 95.701,
+          "max_ms": 97.766
+        }
+      },
+      {
+        "rep": 0,
+        "rime_composing": false,
+        "initial_length": 38,
+        "deleted_in_nominal_1_8_second_hold": 28,
+        "first_delete_observed_ms": 431.007,
+        "steady_interval": {
+          "n": 27,
+          "median_ms": 54.857,
+          "p95_ms": 59.145,
+          "max_ms": 62.336
+        }
+      },
+      {
+        "rep": 1,
+        "rime_composing": true,
+        "initial_length": 38,
+        "deleted_in_nominal_1_8_second_hold": 26,
+        "first_delete_observed_ms": 482.18,
+        "steady_interval": {
+          "n": 25,
+          "median_ms": 53.374,
+          "p95_ms": 91.714,
+          "max_ms": 95.859
+        }
+      },
+      {
+        "rep": 1,
+        "rime_composing": false,
+        "initial_length": 38,
+        "deleted_in_nominal_1_8_second_hold": 28,
+        "first_delete_observed_ms": 444.812,
+        "steady_interval": {
+          "n": 27,
+          "median_ms": 54.977,
+          "p95_ms": 57.806,
+          "max_ms": 58.492
+        }
+      },
+      {
+        "rep": 2,
+        "rime_composing": true,
+        "initial_length": 38,
+        "deleted_in_nominal_1_8_second_hold": 27,
+        "first_delete_observed_ms": 484.773,
+        "steady_interval": {
+          "n": 26,
+          "median_ms": 52.337,
+          "p95_ms": 93.57,
+          "max_ms": 99.883
+        }
+      },
+      {
+        "rep": 2,
+        "rime_composing": false,
+        "initial_length": 38,
+        "deleted_in_nominal_1_8_second_hold": 28,
+        "first_delete_observed_ms": 440.153,
+        "steady_interval": {
+          "n": 27,
+          "median_ms": 54.603,
+          "p95_ms": 59.901,
+          "max_ms": 63.269
+        }
+      }
+    ],
+    "findings_zh": [
+      "常态引擎加适配器中位数约 1 ms，实际松键到候选绘制前中位数约 35 ms，输入与单次退格接近。",
+      "冷启动首次真实按键出现约 357–381 ms 延迟；单独分段计时主要耗在 Java 候选适配阶段，而非 Rime 按键计算。",
+      "长按连删吞吐接近已上屏同一字母串，但组成拼音时有更明显的间隔抖动；不能据此宣称完全无延迟问题。"
+    ],
+    "cold_cause_inference_zh": "EnhancedHook.update 首次经 SelectionLearning 调用 LearningStore.state，后者同步读共享学习表和历史快照；与首次适配耗时约 381 ms、热身后适配中位约 0.3 ms 一致。尚未单独预载 LearningStore 做干预验证，故将具体函数归因为源码支持的推断。",
+    "limitations": [
+      "No completed same-device original Google Gboard Chinese-engine latency control: bypassing the Rime adapter left the native decoder waiting for its language pack. Native-inspect result excluded from performance conclusions.",
+      "No high-speed-camera end-to-end touch-to-photon measurement.",
+      "Fixed synthetic phrases, normal battery/USB conditions; not a general accuracy or all-app performance assessment."
+    ]
+  },
+  "desktop": {
+    "system": "Linux / Fcitx5 / librime 1.10.0 / rime_ice",
+    "method": "Installed librime and deployed schema/Lua, copied user database/shared dictionaries/learning aggregates into isolated temporary directories; same first-five candidate enumeration after every input/backspace. Four passes of 12 fixed pinyin strings, first excluded. No live desktop keys after background-only request; no installed config modified.",
+    "configurations": {
+      "current": {
+        "input": {
+          "key_ms": {
+            "n": 420,
+            "median_ms": 40.11,
+            "p95_ms": 49.453,
+            "p99_ms": 62.158,
+            "max_ms": 75.369,
+            "over_16_7_ms": 420,
+            "over_50_ms": 17,
+            "over_100_ms": 0
+          },
+          "first5_ms": {
+            "n": 420,
+            "median_ms": 0.042,
+            "p95_ms": 0.151,
+            "p99_ms": 0.175,
+            "max_ms": 0.187,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "total_ms": {
+            "n": 420,
+            "median_ms": 40.162,
+            "p95_ms": 49.502,
+            "p99_ms": 62.204,
+            "max_ms": 75.415,
+            "over_16_7_ms": 420,
+            "over_50_ms": 17,
+            "over_100_ms": 0
+          }
+        },
+        "delete": {
+          "key_ms": {
+            "n": 420,
+            "median_ms": 40.186,
+            "p95_ms": 50.25,
+            "p99_ms": 64.825,
+            "max_ms": 77.734,
+            "over_16_7_ms": 384,
+            "over_50_ms": 21,
+            "over_100_ms": 0
+          },
+          "first5_ms": {
+            "n": 420,
+            "median_ms": 0.042,
+            "p95_ms": 0.148,
+            "p99_ms": 0.172,
+            "max_ms": 0.193,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "total_ms": {
+            "n": 420,
+            "median_ms": 40.235,
+            "p95_ms": 50.296,
+            "p99_ms": 64.873,
+            "max_ms": 77.786,
+            "over_16_7_ms": 384,
+            "over_50_ms": 22,
+            "over_100_ms": 0
+          }
+        }
+      },
+      "without_shared": {
+        "input": {
+          "key_ms": {
+            "n": 420,
+            "median_ms": 0.834,
+            "p95_ms": 8.427,
+            "p99_ms": 9.947,
+            "max_ms": 10.582,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "first5_ms": {
+            "n": 420,
+            "median_ms": 0.024,
+            "p95_ms": 0.192,
+            "p99_ms": 0.273,
+            "max_ms": 0.34,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "total_ms": {
+            "n": 420,
+            "median_ms": 0.856,
+            "p95_ms": 8.456,
+            "p99_ms": 9.975,
+            "max_ms": 10.611,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          }
+        },
+        "delete": {
+          "key_ms": {
+            "n": 420,
+            "median_ms": 0.839,
+            "p95_ms": 8.39,
+            "p99_ms": 9.98,
+            "max_ms": 10.542,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "first5_ms": {
+            "n": 420,
+            "median_ms": 0.024,
+            "p95_ms": 0.189,
+            "p99_ms": 0.284,
+            "max_ms": 0.294,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "total_ms": {
+            "n": 420,
+            "median_ms": 0.86,
+            "p95_ms": 8.42,
+            "p99_ms": 10.008,
+            "max_ms": 10.57,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          }
+        }
+      },
+      "without_filter": {
+        "input": {
+          "key_ms": {
+            "n": 420,
+            "median_ms": 42.676,
+            "p95_ms": 58.797,
+            "p99_ms": 68.674,
+            "max_ms": 76.604,
+            "over_16_7_ms": 420,
+            "over_50_ms": 71,
+            "over_100_ms": 0
+          },
+          "first5_ms": {
+            "n": 420,
+            "median_ms": 0.044,
+            "p95_ms": 0.245,
+            "p99_ms": 0.349,
+            "max_ms": 0.381,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "total_ms": {
+            "n": 420,
+            "median_ms": 42.779,
+            "p95_ms": 58.842,
+            "p99_ms": 68.984,
+            "max_ms": 76.673,
+            "over_16_7_ms": 420,
+            "over_50_ms": 71,
+            "over_100_ms": 0
+          }
+        },
+        "delete": {
+          "key_ms": {
+            "n": 420,
+            "median_ms": 42.963,
+            "p95_ms": 58.165,
+            "p99_ms": 69.677,
+            "max_ms": 95.537,
+            "over_16_7_ms": 384,
+            "over_50_ms": 69,
+            "over_100_ms": 0
+          },
+          "first5_ms": {
+            "n": 420,
+            "median_ms": 0.043,
+            "p95_ms": 0.254,
+            "p99_ms": 0.34,
+            "max_ms": 0.39,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "total_ms": {
+            "n": 420,
+            "median_ms": 43.031,
+            "p95_ms": 58.209,
+            "p99_ms": 69.866,
+            "max_ms": 95.586,
+            "over_16_7_ms": 384,
+            "over_50_ms": 69,
+            "over_100_ms": 0
+          }
+        }
+      },
+      "without_translator": {
+        "input": {
+          "key_ms": {
+            "n": 420,
+            "median_ms": 10.845,
+            "p95_ms": 19.737,
+            "p99_ms": 21.742,
+            "max_ms": 22.35,
+            "over_16_7_ms": 33,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "first5_ms": {
+            "n": 420,
+            "median_ms": 0.042,
+            "p95_ms": 0.142,
+            "p99_ms": 0.174,
+            "max_ms": 0.192,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "total_ms": {
+            "n": 420,
+            "median_ms": 10.889,
+            "p95_ms": 19.78,
+            "p99_ms": 21.785,
+            "max_ms": 22.39,
+            "over_16_7_ms": 34,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          }
+        },
+        "delete": {
+          "key_ms": {
+            "n": 420,
+            "median_ms": 10.8,
+            "p95_ms": 19.311,
+            "p99_ms": 21.325,
+            "max_ms": 22.289,
+            "over_16_7_ms": 36,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "first5_ms": {
+            "n": 420,
+            "median_ms": 0.04,
+            "p95_ms": 0.142,
+            "p99_ms": 0.169,
+            "max_ms": 0.189,
+            "over_16_7_ms": 0,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          },
+          "total_ms": {
+            "n": 420,
+            "median_ms": 10.858,
+            "p95_ms": 19.356,
+            "p99_ms": 21.377,
+            "max_ms": 22.34,
+            "over_16_7_ms": 36,
+            "over_50_ms": 0,
+            "over_100_ms": 0
+          }
+        }
+      }
+    },
+    "findings_zh": [
+      "当前部署配置输入、退格中位数均约 40 ms，说明计算链路本身有稳定额外开销。",
+      "隔离副本同时移除 cloud_phrase 与 cloud_native_filter 后中位数约 0.86 ms、P95 约 8.4 ms；仅移除过滤器仍约 43 ms，仅移除翻译器降至约 10.9 ms。额外开销与共享词库组件有关，尚未逐函数定位。"
+    ],
+    "limitations": [
+      "A live Fcitx D-Bus attempt lost focus to GNOME and failed to capture candidate signals. That run was invalid and is excluded.",
+      "Desktop numbers are engine/first-page computation, not application/display end-to-end latency.",
+      "No Microsoft Pinyin or Windows Weasel comparison performed."
+    ]
+  },
+  "cleanup": {
+    "temporary_instrumentation_uninstalled": true,
+    "preexisting_probe_force_stopped_and_retained": true,
+    "default_ime": "com.localx.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME",
+    "production_keyboard_or_dictionary_replaced": false,
+    "desktop_config_changed": false
+  },
+  "raw_artifacts": {
+    "desktop-native-current.json": {
+      "sha256": "3822289385ce542273a1dd7b0b133f6fc93db4db8054589705961ec4fba67417"
+    },
+    "phone-longpress.json": {
+      "sha256": "e767bf3615c3826c1272640bd23ac855082729ed16c42fa5924b11bd4bd99f5b"
+    },
+    "desktop-native-without_translator.json": {
+      "sha256": "b5b93b95845c9403245eb6c7abf3c621afa3c34fb6ea55a948c503262c7b592e"
+    },
+    "desktop-native-without_filter.json": {
+      "sha256": "cd274d3636b62d523c886b4307d2d69a6f168713ce74b6fcbd307b91dc360135"
+    },
+    "phone-delete-compare.json": {
+      "sha256": "4338974915d183edd23e0832f4b7614c16fcae3e93f75e38c8b737d55f8fbee6"
+    },
+    "phone-cold-ui.json": {
+      "sha256": "760847b7972b30e51779eb581f16b94f12b2ba6b3e1e085c01a0a4baeeef4737"
+    },
+    "desktop-native-without_shared.json": {
+      "sha256": "e3cbf15ca34b40c2511283dfb23b448620556ba70071732044928ed6dd6ae9ed"
+    },
+    "phone-first-attempt.json": {
+      "sha256": "d6ee6d84d359fe8e0b97a51dd7c78d1d97bb0d2ac530a2938ecbdf27c9e58559"
+    },
+    "phone-cold-ui-repeat.json": {
+      "sha256": "80bf5a9a263ff1e102ea7ae95abf78ba05ff83f206a50e2bca2b34208869d9e5"
+    },
+    "phone-native-inspect.json": {
+      "sha256": "e7719855e7f7f5184fc9c93794712eaf30afb4fd86b3c4ff9a47e5892e185e28"
+    },
+    "phone-summary.json": {
+      "sha256": "4ad4d8980f2814b42566efa5bac11ff661dc03410dbcee174672fd031f38e24e"
+    },
+    "phone.json": {
+      "sha256": "e204722956dc2982de22aea90fcef462f12798413bdf2e548f49e96a51318ed4"
+    }
+  },
+  "source_sha256": {
+    "LatencyInstrumentation.java": "969dbbc504eb83ae595c1925262f3ca805949da87837830eaf180ee6f7d02a55",
+    "desktop_native.py": "576c63c5c3bb8cf53b84f9c455a9d00441e8c9bd7ff0d8c14f996d44f9289208",
+    "perf_rime_host.py": "7b992e1afff9799865e78229fcde09c579c7bc76654aa75440b17bf864794f1c",
+    "get_input.c": "04569ae04b3b4f57c87afe6a2521085a0d68ac612b0c715fc77364f26ddad1e8",
+    "build_phone.py": "8df7dcd48056bb121a777a65e155d184f547d94bb18ca6e2744fcd78cab286a1"
+  },
+  "raw_archive": "rime-latency-raw-2026-10-29.json.gz"
+}

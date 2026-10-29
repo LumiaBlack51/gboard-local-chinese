@@ -1,0 +1,22 @@
+{
+  "version": "1.3.8",
+  "published_release": "https://github.com/LumiaBlack51/gboard-local-chinese/releases/tag/v1.3.8",
+  "release_assets_verified": 13,
+  "local_build_and_download_caches_removed": [
+    "artifacts/release-v1.3.8",
+    "artifacts/windows-release",
+    "enhanced/final",
+    "enhanced/voice-helper/final",
+    "enhanced/proofread/final",
+    "enhanced/updater/out/updater.apk",
+    "artifacts/release-v1.3.7"
+  ],
+  "owned_windows_build_stage_removed": true,
+  "temporary_avd_removed": "inputmethod-v138-audit",
+  "temporary_sdk_image_removed": "android-35/google_apis/x86_64",
+  "one_off_latency_code_removed": true,
+  "measurements_archived": "rime-latency-raw-2026-10-29.json.gz",
+  "regression_test_sources_retained": true,
+  "preexisting_audit_reports_retained": true,
+  "personal_dictionary_and_signing_key_retained": true
+}
