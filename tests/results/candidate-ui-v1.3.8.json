@@ -1,0 +1,8 @@
+{
+  "version": "1.3.8",
+  "device": "isolated Android 15 x86_64 AVD",
+  "candidate_transitions": 9,
+  "dismiss_outside_native_children": true,
+  "passed": true,
+  "physical_phone_tested": false
+}

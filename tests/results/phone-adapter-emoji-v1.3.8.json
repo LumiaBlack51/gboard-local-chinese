@@ -1,0 +1,12 @@
+{
+  "version": "1.3.8",
+  "method": "Same-signature headless instrumentation in installed production keyboard on isolated Android 15 x86_64 AVD with ARM64 translation. 72 synthetic adapter/ranking cases and two real-Rime normal/private emoji selection/clear checks. No full keyboard touch/display or physical-phone testing.",
+  "adapter_cases": 72,
+  "emoji_selection_checks": 2,
+  "native_learning_ids_preserved": true,
+  "emoji_selection_clears_native_composition": true,
+  "private_mode_excludes_personal_words": true,
+  "passed": true,
+  "physical_phone_tested": false,
+  "source_sha256": "831c32d734e0fb002b74f64ae0191de7f9f1702298e42894705089eaa9bec818"
+}

@@ -55,6 +55,11 @@ for component in manifest['components']+manifest.get('optionalComponents',[]):
     assert sha(z.read('assets/local-handwriting/handwriting-zh_CN.model'))=='e16153d1ff267cd479aea260d6f71a3edda8b4ba06db2d121513adda65a4449e'
     assert 'lib/arm64-v8a/libgboard_local_handwriting.so' in z.namelist()
     helper=z.read('classes5.dex');assert '结束录音'.encode() in helper and '点击开始后录音'.encode() not in helper
+    assert 'EmojiSuggestions'.encode() in helper and 'preload'.encode() in helper
+    index=z.read('assets/local-rime/word-index-v3.bin');assert index[:4]==b'GBI3' and len(index)>1000000
+    hashes=json.loads((ROOT/'enhanced/rime-data/source-hashes.json').read_text('utf8'))
+    for data_name,expected in hashes.items():
+     assert sha(z.read('assets/local-rime/'+data_name.replace('\\','/')))==expected,data_name
    if path.name=='voice-helper.apk':
     assert sha(z.read('assets/local-punctuation/model.int8.onnx'))=='65a3fb9f5ad7bfb96bf69e0dc4481df97f6ee60513c1d94ce981ba6effd524b1'
     assert 'assets/licenses/PUNCTUATION-LICENSE' in z.namelist()

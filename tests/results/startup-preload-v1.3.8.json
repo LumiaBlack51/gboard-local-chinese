@@ -1,0 +1,37 @@
+{
+  "samples": [
+    {
+      "cold_main_ms": 913.690501,
+      "background_preload_ms": 642.387479,
+      "warm_main_ms": 0.293213
+    },
+    {
+      "cold_main_ms": 518.611972,
+      "background_preload_ms": 539.925511,
+      "warm_main_ms": 4.366883
+    },
+    {
+      "cold_main_ms": 490.26442,
+      "background_preload_ms": 528.533091,
+      "warm_main_ms": 0.301743
+    }
+  ],
+  "synthetic_shared_rows": 20001,
+  "synthetic_history_rows": 20000,
+  "cached_preload_idempotent": true,
+  "shared_counts_not_reexported": true,
+  "passed": true,
+  "version": "1.3.8",
+  "device": "isolated x86_64 AVD",
+  "physical_phone_tested": false,
+  "real_energy_consumption_measured": false,
+  "sources": {
+    "enhanced/src/local/gboard/enhanced/DictionaryFile.java": "0a55a10f10ecf43915a519f42764d0e5e9210f6985e2dd736ad89a30fc8ad04a",
+    "enhanced/src/local/gboard/enhanced/LearningFile.java": "229070edc699e56ba0b1e3e5b707c037ededa816cb01a9f5727f1465e0cb8eca",
+    "enhanced/src/local/gboard/enhanced/LearningStore.java": "bb5c43a8e7b1cc390aba412d09be0df97880a8435a9e033a371d6d2d5bf6c5d8",
+    "enhanced/src/local/gboard/enhanced/SelectionLearning.java": "fb6e51cf95cb7c921087548ea1db972c281a296b493cbb7bc5ade7fb9936b1b3",
+    "enhanced/src/local/gboard/enhanced/EmojiSuggestions.java": "426e6527bce4892004e365c93f61131fc68a9ad61b024214c47550c534de8969",
+    "tests/android/StartupInstrumentation.java": "8fb597a3ccc5c07e23ec6b3147046a02c7cf410a0087039d794cad5c43e94a86"
+  },
+  "offline_emoji_lookup_verified": true
+}

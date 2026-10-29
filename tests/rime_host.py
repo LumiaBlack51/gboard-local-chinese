@@ -16,11 +16,14 @@ class Commit(C.Structure):
     _fields_=[('data_size',C.c_int),('text',C.c_char_p)]
 
 class RimeHost:
-    def __init__(self,live=None,learning=False,configure=None):
+    def __init__(self,live=None,learning=False,configure=None,lua_source=None,annotate=True):
         self.live=live or Path.home()/'.local/share/fcitx5/rime'
         self.temp=tempfile.TemporaryDirectory(prefix='rime-isolated-check-')
         self.user=Path(self.temp.name);build=self.user/'build';build.mkdir()
         shutil.copytree(self.live/'lua',self.user/'lua')
+        if lua_source:
+            for source in Path(lua_source).glob('*.lua'):
+                shutil.copyfile(source,self.user/'lua'/source.name)
         for source in (self.live/'build').iterdir():
             if source.is_file():
                 if source.suffix=='.yaml':shutil.copyfile(source,build/source.name)
@@ -34,7 +37,7 @@ class RimeHost:
         schema=build/'rime_ice.schema.yaml';config=yaml.safe_load(schema.read_text())
         config.setdefault('translator',{})['enable_user_dict']=learning
         if configure:configure(self.user,config)
-        config['engine']['filters'].append('lua_filter@*verify_candidate_source')
+        if annotate:config['engine']['filters'].append('lua_filter@*verify_candidate_source')
         (self.user/'lua/verify_candidate_source.lua').write_text("return {func=function(t,e) for c in t:iter() do c.comment='VERIFY:'..c.type..'|'..c.start..'|'..c._end..'|'..c.preedit..'|'..c.quality yield(c) end end}\n")
         schema.write_text(yaml.safe_dump(config,allow_unicode=True))
         self.r=C.CDLL(ctypes.util.find_library('rime'),mode=C.RTLD_GLOBAL)

@@ -1,0 +1,10 @@
+{
+  "version": "1.3.8",
+  "python_unit_tests": 25,
+  "python_passed": true,
+  "offline_emoji_java_checks": 10,
+  "emoji_passed": true,
+  "all_production_java_sources_compile": true,
+  "physical_phone_tested": false,
+  "emoji_table_sha256": "415fb8109898f229a410e706fa1107b95f4c74d5ea5bc5d30ba2d85b8248b44d"
+}

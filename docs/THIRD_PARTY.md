@@ -7,6 +7,7 @@
 | Rime 1.16.1 | [librime](https://github.com/rime/librime)，附 `enhanced/LIBRIME-LICENSE` |
 | Fcitx5 Android 运行库 | [fcitx5-android](https://github.com/fcitx5-android/fcitx5-android)，原 ARM64 包 `0.1.3-0-g048f581c`，外部输入，保留上游许可 |
 | 雾凇词库 | [rime-ice](https://github.com/iDvel/rime-ice)，GPL-3.0，附 `enhanced/rime-data/LICENSE`，字典来源哈希见同目录 `source-hashes.json` |
+| 离线 Emoji 别名 | 雾凇 [opencc/emoji.txt](https://github.com/iDvel/rime-ice/blob/main/opencc/emoji.txt)，GPL-3.0；完整表随包分发，SHA-256 记于 `enhanced/rime-data/source-hashes.json`，沿用雾凇许可 |
 | 万象语法数据 | [RIME-LMDG](https://github.com/amzxyz/RIME-LMDG)，LTS 的 `wanxiang-lts-zh-hans.gram`，附 `enhanced/RIME-LMDG-LICENSE` |
 | Sherpa-ONNX 1.13.8 | [官方 Android 运行库](https://github.com/k2-fsa/sherpa-onnx/releases/tag/v1.13.8)，附 `enhanced/SHERPA-LICENSE`，含 ONNX Runtime |
 | 普通话/英语模型 | [官方双语模型](https://k2-fsa.github.io/sherpa/onnx/pretrained_models/online-transducer/zipformer-transducer-models.html)，`streaming-zipformer-bilingual-zh-en-2023-02-20-mobile`，Apache-2.0，附上游模型说明 |

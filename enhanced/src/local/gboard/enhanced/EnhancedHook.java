@@ -87,7 +87,7 @@ public final class EnhancedHook {
   private static void choose(Session s,Candidate chosen)throws Exception {
     String learningCode=s.composing&&!s.privateMode?s.raw:"";
     if(chosen.index==-3){s.handwriting=false;KeyboardGestures.clearInk();commit(s,chosen.text);s.dismissed=false;update(s);return;}
-    if(chosen.index==-4){RimeBridge.clear(s.id);commit(s,chosen.text);update(s);return;}
+    if(chosen.index==-4||chosen.index==-5){RimeBridge.clear(s.id);commit(s,chosen.text);update(s);return;}
     if(chosen.index>=0){learningCode=select(s,chosen.index,chosen.text);}
     else if(chosen.index==-1){
             RimeBridge.clear(s.id);for(char ch:chosen.code.toCharArray())RimeBridge.key(s.id,ch);
@@ -211,6 +211,11 @@ public final class EnhancedHook {
     // Keep an unrecognized remainder visible without leaving the previous
     // segment's candidate objects on screen. Selecting it commits it literally.
     if(s.composing&&choices.isEmpty())choices.add(new Candidate(s,-4,s.raw));
+    if(s.composing){
+      List<String> originals=new ArrayList<>();for(int i=4;i<Math.min(result.length,7);i++)originals.add(result[i]);
+      int position=Math.min(1,choices.size());
+      for(String emoji:EmojiSuggestions.suggest(s.raw,originals))if(seen.add(emoji))choices.add(position++,new Candidate(s,-5,emoji));
+    }
     if(!s.composing&&!s.dismissed)for(WordIndex.Entry e:WordIndex.following(s.context))if(seen.add(e.word))choices.add(new Candidate(s,-2,e.word));
     ArrayList<Object> list=new ArrayList<>();for(Candidate c:choices)list.add(candidate(c,list.size()));
     s.suggesting=!s.composing&&!list.isEmpty();

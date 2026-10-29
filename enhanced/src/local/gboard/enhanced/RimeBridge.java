@@ -10,12 +10,17 @@ public final class RimeBridge {
     if(!started.compareAndSet(false,true))return;
     final Context app=context.getApplicationContext();
     new Thread(()->{
+      android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
       try {
         File root=new File(app.getNoBackupFilesDir(),"local-rime");
         File shared=new File(root,"shared"), user=new File(root,"user");
         user.mkdirs(); copy(app,"local-rime",shared);
         WordIndex.load(new File(shared,"word-index-v3.bin"));
         LocalWords.load(app);
+        // These immutable lookups used to load on the first key on the UI
+        // thread. Pay that once on this existing worker before publishing ready.
+        try {LearningStore.preload(app);}catch(IOException error){Log.w("LocalChinese","Learning preload unavailable",error);}
+        try(InputStream emoji=app.getAssets().open("local-rime/emoji.txt")){EmojiSuggestions.load(emoji);}
         System.loadLibrary("c++_shared");
         System.loadLibrary("Fcitx5Utils");
         System.loadLibrary("Fcitx5Config");

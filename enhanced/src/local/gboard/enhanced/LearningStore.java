@@ -97,4 +97,6 @@ public final class LearningStore {
     return result;
   }
   public static synchronized void reload(Context context)throws IOException {states.remove(context.getNoBackupFilesDir().getCanonicalPath());}
+  /** Reuse the IME's one-shot initialization worker; no timer or keep-alive. */
+  public static synchronized void preload(Context context)throws IOException {state(context);}
 }

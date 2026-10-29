@@ -1,31 +1,31 @@
 {
   "format": 1,
-  "version": "1.3.7",
+  "version": "1.3.8",
   "certificateSha256": "ca8e7c0c1f35a1821fc417499635e5bc8c0a774edaf19e2682f1cb6040154c74",
-  "notes": "双向共享真实选词次数，并用于手机和桌面的原生候选排序；新近本地选词即时生效，重复同步不累加计数。导入权重继续用于补充词条，不固定覆盖原生首屏。保留词库、设置和定时同步配置。",
+  "notes": "首次候选所需的学习数据改为随键盘初始化一次性后台预载，无定时唤醒或常驻服务；恢复中文键盘的离线 emoji 候选（含 ok → 👌）。桌面共享词库改用紧凑缓存，降低输入和退格延迟，保留双向学习。",
   "components": [
     {
       "package": "com.localx.android.inputmethod.latin",
-      "versionCode": 176027096,
+      "versionCode": 176027097,
       "assets": [
         {
           "name": "base.apk",
-          "sha256": "4805dec7de60081407deb6d8c21cd8a54b893f6a4e90656763ccdb188784f9bf",
-          "size": 548959870
+          "sha256": "1e4c75b770d0f7a72cf7898a86f53e38186dd297dac4a5002b526b3a20d294a6",
+          "size": 572938008
         },
         {
           "name": "split_brella_feature_split.apk",
-          "sha256": "24de5e9d5c2178227435bbd78c3b9116e6066e5b86839123cb93611badea1bbf",
+          "sha256": "e5e43060d81781b24e67fd5b7240deeeeac3ccedd08813ce70f2fb4351576d7a",
           "size": 35656040
         },
         {
           "name": "split_config.xxxhdpi.apk",
-          "sha256": "2944d5be76b7577f948e9dff2ff072aa7ce611f5b7cad3e82bb86e545fffa1f5",
+          "sha256": "3af4fd4c6b10f2ade56f20ef87625886a319b20dce6b6bfe1850510c6433e179",
           "size": 129884
         },
         {
           "name": "split_tenoranimation_feature_split.apk",
-          "sha256": "99c6dd8cee6062fa10851f2b26c57b1716aa8b298d20d31ec5ccfd64604f3032",
+          "sha256": "392a674b407564e428a874c13ed36818fbea1599bc8978d7db5f1ef4b9e89401",
           "size": 11321708
         }
       ]

@@ -9,6 +9,9 @@ import java.util.regex.*;
 /** Actual cumulative selections. Dictionary import frequency is not learning. */
 public final class LearningFile {
   public static final String PREFIX="# learned\t";
+  private static final Pattern CODE=Pattern.compile("[a-z]{1,128}");
+  private static final Pattern COUNT=Pattern.compile("[0-9]{1,7}");
+  private static final Pattern STAMP=Pattern.compile("[0-9]{1,16}");
   public static final class Entry {
     public final String word,code;public final int count;public final long last;
     public Entry(String w,String c,int n,long t){word=w;code=c;count=n;last=t;}
@@ -42,7 +45,7 @@ public final class LearningFile {
       if(packet){if(!line.startsWith(PREFIX))continue;line=line.substring(PREFIX.length());}
       else if(line.isEmpty()||line.startsWith("#"))continue;
       String[] f=line.split("\\t",-1);
-      if(f.length!=4||!validWord(f[0])||!f[1].matches("[a-z]{1,128}")||!f[2].matches("[0-9]{1,7}")||!f[3].matches("[0-9]{1,16}"))throw new IOException("invalid learning record");
+      if(f.length!=4||!validWord(f[0])||!CODE.matcher(f[1]).matches()||!COUNT.matcher(f[2]).matches()||!STAMP.matcher(f[3]).matches())throw new IOException("invalid learning record");
       try{int count=Integer.parseInt(f[2]);long last=Long.parseLong(f[3]);if(count<1||count>1000000||last<0||last>9000000000000000L)throw new NumberFormatException();add(result,new Entry(f[0],f[1],count,last));}
       catch(NumberFormatException error){throw new IOException("invalid learning counter",error);}
     }
@@ -59,7 +62,7 @@ public final class LearningFile {
       while((line=reader.readLine())!=null){total+=line.length();if(total>DictionaryFile.MAX_BYTES)throw new IOException("Rime snapshot too large");
         if(line.startsWith("#"))continue;String[] f=line.split("\\t");if(f.length!=3)continue;
         Matcher match=counter.matcher(f[2]);String code=DictionaryFile.normalize(f[0]);
-        if(!match.find()||!validWord(f[1])||!code.matches("[a-z]{1,128}"))continue;
+        if(!match.find()||!validWord(f[1])||!CODE.matcher(code).matches())continue;
         try{long count=Long.parseLong(match.group(1));if(count>0)add(result,new Entry(f[1],code,(int)Math.min(1000000,count),0));}
         catch(NumberFormatException ignored){}
       }

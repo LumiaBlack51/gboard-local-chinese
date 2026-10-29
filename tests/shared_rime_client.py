@@ -14,7 +14,7 @@ root=Path(__file__).resolve().parents[1]
 incoming=base64.b64decode(sys.argv[1])
 def configure(user,config):
     (user/'selection-learning').mkdir()
-    for name in ['cloud_phrase.lua','cloud_native_filter.lua','selection_learning.lua']:
+    for name in ['compact_tsv.lua','cloud_phrase.lua','cloud_native_filter.lua','selection_learning.lua']:
         shutil.copyfile(root/'sync'/name,user/'lua'/name)
 
 with RimeHost(learning=True,configure=configure) as engine:

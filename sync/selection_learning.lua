@@ -1,7 +1,9 @@
 -- Aggregate actual selections only. No per-keystroke history or network work.
 local M = {}
+local compact_tsv = require('compact_tsv')
 local local_codes, cloud_path, fingerprint, cloud = {}, nil, nil, {}
 local history_path,history_fingerprint,history=nil,nil,{}
+local local_count = 0
 
 function M.compact(code)
   return (code:gsub('u:','v'):gsub('ü','v'):gsub("[' ’]",''))
@@ -37,32 +39,48 @@ local function local_group(code)
     local groups={}
     local file=io.open(path,'r')
     if file then read_rows(file,groups);file:close() end
-    local_codes[path]=groups[code] or {}
+    if local_count>=128 then local_codes={};local_count=0 end
+    local_codes[path]=groups[code] or {};local_count=local_count+1
   end
   return local_codes[path],path
 end
 
-local function shared()
+local function read_compact(file)
+  file:seek('set', 0)
+  return compact_tsv.read(file, function(line)
+    local word,code,count,last=line:match('^([^\t]+)\t([a-z]+)\t(%d+)\t(%d+)$')
+    if word and #code<=128 and valid_word(word) and tonumber(count)>0 and tonumber(count)<=1000000 then
+      return code, word..'\t'..count..'\t'..last
+    end
+  end)
+end
+local function group(index, code)
+  local rows = {}
+  for line in compact_tsv.rows(index, code) do
+    local word,count,last=line:match('^([^\t]+)\t(%d+)\t(%d+)$')
+    rows[word]={count=tonumber(count),last=tonumber(last)}
+  end
+  return rows
+end
+local function shared(code)
   local path=root()..'/cloud-learning.tsv'
   local file=io.open(path,'r')
   if not file then return {} end
   local current=file:read('*l')
   if path~=cloud_path or current~=fingerprint then
-    local next_cloud={};read_rows(file,next_cloud)
-    cloud_path,fingerprint,cloud=path,current,next_cloud
+    cloud=read_compact(file);cloud_path,fingerprint=path,current
   end
   file:close()
-  return cloud
+  return group(cloud,code)
 end
-
-local function historical()
+local function historical(code)
   local path=root()..'/local-native-learning.tsv'
   local file=io.open(path,'r');if not file then return {} end
   local current=file:read('*l')
   if path~=history_path or current~=history_fingerprint then
-    local rows={};read_rows(file,rows);history_path,history_fingerprint,history=path,current,rows
+    history=read_compact(file);history_path,history_fingerprint=path,current
   end
-  file:close();return history
+  file:close();return group(history,code)
 end
 
 function M.ranking(raw)
@@ -70,7 +88,7 @@ function M.ranking(raw)
   if #code>128 or not code:match('^[a-z]+$') then return {},nil end
   local own=local_group(code)
   local merged,latest_remote,latest_local,preferred={},0,0,nil
-  for word,row in pairs(shared()[code] or {}) do
+  for word,row in pairs(shared(code)) do
     merged[word]={count=row.count,last=row.last}
     latest_remote=math.max(latest_remote,row.last)
   end
@@ -89,10 +107,10 @@ function M.record(raw,word,native_count)
   if #code>128 or not code:match('^[a-z]+$') or not valid_word(word) then return end
   local group,path=local_group(code)
   local previous=group[word] or {count=0,last=0}
-  local baseline=(historical()[code] or {})[word]
+  local baseline=historical(code)[word]
   local latest=0
   for _,row in pairs(group) do latest=math.max(latest,row.last) end
-  for _,row in pairs(shared()[code] or {}) do latest=math.max(latest,row.last) end
+  for _,row in pairs(shared(code)) do latest=math.max(latest,row.last) end
   local now=os.time()*1000
   group[word]={count=math.min(1000000,math.max(previous.count+1,(native_count or 0)+1,(baseline and baseline.count or 0)+1)),
     last=math.max(now,math.min(now+300000,latest+1))}

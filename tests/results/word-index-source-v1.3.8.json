@@ -1,0 +1,8 @@
+{
+  "entries": 874429,
+  "bytes": 50796135,
+  "sha256": "bb2d5780bb53a7d7bbbfc34c5171698752e2cdb01fc5677b599b5cbbc15be40a",
+  "version": "1.3.8",
+  "bundled_index_matches_rebuilt_public_sources": true,
+  "passed": true
+}

@@ -9,6 +9,9 @@ import shutil
 import string
 import time
 import yaml
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from release_version import VERSION
 from rime_host import RimeHost
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def configure(user, config):
     (user/'selection-learning').mkdir(exist_ok=True)
-    for name in ('cloud_phrase.lua', 'cloud_native_filter.lua', 'selection_learning.lua'):
+    for name in ('compact_tsv.lua', 'cloud_phrase.lua', 'cloud_native_filter.lua', 'selection_learning.lua'):
         shutil.copyfile(ROOT / 'sync' / name, user / 'lua' / name)
 
 
@@ -96,8 +99,8 @@ def main():
     results.update(passed=True, live_user_database_opened=False,
                    elapsed_seconds=round(time.monotonic()-started, 2),
                    sources={name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-                            for name in ['sync/cloud_phrase.lua', 'sync/cloud_native_filter.lua', 'sync/selection_learning.lua']})
-    (ROOT / 'tests/results/cloud-learning-v1.3.7.json').write_text(json.dumps(results, indent=2)+'\n')
+                            for name in ['sync/compact_tsv.lua', 'sync/cloud_phrase.lua', 'sync/cloud_native_filter.lua', 'sync/selection_learning.lua']})
+    (ROOT / f'tests/results/cloud-learning-v{VERSION}.json').write_text(json.dumps(results, indent=2)+'\n')
     print(json.dumps(results, indent=2))
 
 

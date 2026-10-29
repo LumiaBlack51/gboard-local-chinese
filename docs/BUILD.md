@@ -1,3 +1,11 @@
+## 1.3.8 延迟与 Emoji 回归
+
+`python3 tests/benchmark_rime.py --baseline-ref v1.3.7` 在不同子进程使用同一套部署词典与个人数据副本，按键后枚举前五候选，排除第一轮热身；不向桌面发送按键，不修改活跃数据库。`python3 -m unittest discover -s tests -p 'test_compact_tsv.py'` 直接执行实际 Lua 模块，检查大快照、字母前缀碰撞与未知编码。
+
+`python3 tests/run_startup_checks.py --serial emulator-XXXX` 在独立 UID 的临时 APK 中，以 20,001 条合成共享记录与 20,000 条历史记录比较主线程首次查询、后台预载与预载后首次查询，验证重复预载复用快照且不把远端次数回传。只接受隔离 AVD，退出自动卸载，不需要手机。此项不测真实电池能耗。JDK 可单独编译 `EmojiSuggestions.java` 与 `tests/EmojiSuggestionsTest.java`，传入 `enhanced/rime-data/emoji.txt` 检查完整别名表。
+
+同签名 `PhoneCandidateInstrumentation` 在已安装正式键盘的隔离 AVD 中还检查 `ok` 的普通／隐私候选及实际 Emoji 选择提交；沿用候选原生编号与学习回归。正式打包必须包含 GBI3 补全索引和 Emoji 别名，`tests/verify_release.py` 核验这些资产和字典来源哈希。构建缓存与临时 AVD可在保存测试报告及发布文件后删除，保留可重复运行的测试源码。
+
 正式传输链检查：在隔离 AVD 安装正式键盘、更新器及同签名 `tests/build_sync_checks.py` 生成的 synccheck 后，执行 `python3 -B tests/run_installed_learning_checks.py --serial emulator-XXXX`。它使用临时自签名 HTTPS 服务、合成词条与临时配对，验证正式更新器解析学习记录、签名保护 provider 写入成功和重复交换不回传总计数。只接受 AVD；会替换测试更新器的配对，不可用于个人手机。测试后删除测试 AVD 和临时包。
 
 1.3.7 增加真实学习的双向集成检查：`python3 -B tests/run_learning_checks.py --serial emulator-XXXX`。需要本机 Android SDK/JDK 和已启动的隔离 AVD。测试用独立 UID APK 实际写入 Android AtomicFile，通过临时 HTTP 服务与隔离的真实 librime 交换学习记录，验证原生候选重新排序、原生编号保留、历史本机次数接续、重启保存、较新的本地/远端选择，以及往返重试无计数反馈。APK 无网络权限和 Activity，测试完成自动卸载；不会打开个人词库或使用生产令牌。输出 `tests/results/shared-learning-integration-v1.3.7.json` 记录源码哈希与测试范围。

@@ -19,7 +19,9 @@ import threading
 import zipfile
 
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT))
 sys.path.insert(0,str(ROOT/'sync'))
+from release_version import VERSION
 from common import parse_learning
 from server import Handler,database
 
@@ -86,15 +88,15 @@ with tempfile.TemporaryDirectory(prefix='shared-learning-check-') as folder:
             received=instrument('receive',learning=base64.b64encode(reply).decode(),expected='知')
             reply=exchange('android',base64.b64decode(received['outgoing_base64']))
             assert parse_learning(reply)==expected,'Retries/aggregate feedback inflated counters'
-        sources=['sync/common.py','sync/server.py','sync/desktop.py','sync/cloud_phrase.lua','sync/cloud_native_filter.lua','sync/selection_learning.lua']
+        sources=['sync/compact_tsv.lua','sync/common.py','sync/server.py','sync/desktop.py','sync/cloud_phrase.lua','sync/cloud_native_filter.lua','sync/selection_learning.lua']
         sources += ['enhanced/src/local/gboard/enhanced/'+name+'.java' for name in names]
-        report={'version':'1.3.7','android_device':a.serial,'isolated_test_uid':True,'personal_database_opened':False,
+        report={'version':VERSION,'android_device':a.serial,'isolated_test_uid':True,'personal_database_opened':False,
                 'android_to_native_rime':{k:v for k,v in native.items() if k!='outgoing_base64'},
                 'native_rime_to_android':{'native_word_promoted':'知','native_id_preserved':True,'survives_reload':True},
                 'actual_android_atomic_file_checks':{k:v for k,v in self_checks.items() if k!='outgoing_base64'},
                 'repeated_bidirectional_exchange_without_feedback':True,'passed':True,
                 'sources':{name:hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in sources}}
-        (ROOT/'tests/results/shared-learning-integration-v1.3.7.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+        (ROOT/f'tests/results/shared-learning-integration-v{VERSION}.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
         print(json.dumps({k:v for k,v in report.items() if k not in ['sources','actual_android_atomic_file_checks']},ensure_ascii=False,indent=2))
     finally:
         if server:server.shutdown();server.server_close()

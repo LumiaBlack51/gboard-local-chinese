@@ -1,7 +1,8 @@
 -- Called only by normal Rime translation. No timer, watcher or network.
 local M = {}
 local learning = require('selection_learning')
-local fingerprint, words = nil, {}
+local compact_tsv = require('compact_tsv')
+local fingerprint, source_path, words = nil, nil, {}
 local function compact(code)
   return (code:gsub("u:","v"):gsub("ü","v"):gsub("[' ]",''))
 end
@@ -73,7 +74,8 @@ local function native_entry(env, word, code)
       if i+length-1<=#syllables and compact(table.concat(syllables,'',i,i+length-1))==code then found=true;break end
     end
   end
-  env.native[key] = found
+  if (env.native_count or 0) >= 256 then env.native = {}; env.native_count = 0 end
+  env.native[key] = found; env.native_count = (env.native_count or 0) + 1
   return found
 end
 function M.func(input, seg, env)
@@ -82,24 +84,21 @@ function M.func(input, seg, env)
   local file = io.open(path, 'r')
   if not file then return end
   local current = file:read('*l')
-  if current ~= fingerprint then
-    local next_words = {}
-    for line in file:lines() do
+  if path ~= source_path or current ~= fingerprint then
+    file:seek('set', 0)
+    words = compact_tsv.read(file, function(line)
       local word, code, weight = line:match('^([^\t]+)\t([a-z]+)\t(%d+)$')
-      if word then
-        next_words[code] = next_words[code] or {}
-        table.insert(next_words[code], {word=word, weight=tonumber(weight)})
-      end
-    end
-    for _, group in pairs(next_words) do table.sort(group,function(a,b) return a.weight==b.weight and a.word<b.word or a.weight>b.weight end) end
-    words, fingerprint = next_words, current
+      if word then return code, word .. '\t' .. weight end
+    end)
+    source_path, fingerprint = path, current
   end
   file:close()
   local code = compact(input)
   local stats,preferred = learning.ranking(input)
   local found,seen,emitted = {},{},0
-  for _,row in ipairs(words[code] or {}) do
-    found[#found+1]=row;seen[row.word]=true
+  for line in compact_tsv.rows(words, code) do
+    local word, weight = line:match('^([^\t]+)\t(%d+)$')
+    found[#found+1]={word=word, weight=tonumber(weight)};seen[word]=true
   end
   for word in pairs(stats) do
     if not seen[word] then found[#found+1]={word=word,weight=0} end

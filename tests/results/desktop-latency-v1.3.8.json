@@ -1,0 +1,42 @@
+{
+  "before": {
+    "input": {
+      "n": 280,
+      "median_ms": 43.036,
+      "p95_ms": 53.885,
+      "max_ms": 59.903
+    },
+    "delete": {
+      "n": 280,
+      "median_ms": 42.627,
+      "p95_ms": 54.024,
+      "max_ms": 58.224
+    }
+  },
+  "after": {
+    "input": {
+      "n": 280,
+      "median_ms": 1.698,
+      "p95_ms": 12.111,
+      "max_ms": 15.098
+    },
+    "delete": {
+      "n": 280,
+      "median_ms": 1.64,
+      "p95_ms": 12.055,
+      "max_ms": 15.259
+    }
+  },
+  "baseline_revision": "d467237c6e1b03b0fe8064837f036e281f2e45aa",
+  "method": "Isolated copies of deployed schema/database/shared data; normal mode, each key followed by first five candidates; one warm-up pass excluded; no input-window/display timing.",
+  "front_input_events_sent": false,
+  "sources": {
+    "sync/compact_tsv.lua": "cb9403cca1f925ce71886c302a583e6b493efc58387f44cc11c82d7cda60ccfa",
+    "sync/cloud_native_filter.lua": "221406960c08663a370ba3fb65a6ed572a58744dde92b77b5df8c6e589bd079d",
+    "sync/cloud_phrase.lua": "0c19b657258d3accee79387a5fcea2b016d70949117344d1c97dca7d12cfa48e",
+    "sync/selection_learning.lua": "c3b1fea18cb929c56304bc8580a0d54ff27e9d0c77551e96179ef0631cb732e2"
+  },
+  "installed_to_local_disk": true,
+  "active_input_method_restarted": false,
+  "activation_note": "New Lua files will load when the input method engine is restarted; no active desktop process or focus was interrupted."
+}
