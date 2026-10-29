@@ -42,6 +42,7 @@ try {
     if (-not $nativeStatus.success) { throw ('Native profile setup failed: ' + $nativeStatus.error_type) }
 } finally {
     Unregister-ScheduledTask -TaskName $setupName -Confirm:$false -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $setupStatus -Force -ErrorAction SilentlyContinue
 }
 Register-ScheduledTask -TaskName $taskName -Action $action -Trigger @($hourly, $logon) -Settings $settings -Principal $principal -Description 'Hourly AC-only phrase/selection aggregate sync; no persistent process or IME restart.' -Force | Out-Null
 [xml]$taskXml = Export-ScheduledTask -TaskName $taskName

@@ -2,6 +2,8 @@
 
 Windows 客户端使用小狼毫（Weasel）和雾凇拼音 `rime_ice`，复用 [1.3.7 同步协议](DICTIONARY-SYNC.md)。它与 Linux 客户端共用文本快照和学习计数转换，不访问运行中的 LevelDB。每台 Windows 电脑须单独注册设备令牌，接入现有权威服务器，不能把旧服务器副本当成新的独立词库。
 
+可从 [v1.3.7 Release](https://github.com/LumiaBlack51/gboard-local-chinese/releases/tag/v1.3.7) 下载 `windows-phrase-sync-1.3.7.zip` 及同名 `.sha256` 校验文件。解压后在包根目录运行下文命令。该补充包只含同步源码、配置工具和说明；Python、PyYAML、小狼毫及雾凇拼音需单独安装，不含个人词库、配对令牌、私钥或第三方模型。
+
 ## 微软拼音词条
 
 先将 `%APPDATA%\Microsoft\InputMethod\Chs\ChsPinyinUDL.dat` 复制到私有备份目录，再转换该副本：
