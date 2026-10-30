@@ -1,0 +1,42 @@
+{
+  "synthetic_phrases": 33000,
+  "synthetic_learning_rows": 17000,
+  "shared_enabled": true,
+  "scope": "installed librime key processing, first candidate page and selection-to-commit; excludes UI/IPC and OS repeat delay",
+  "typing": {
+    "mean_ms": 3.4,
+    "p50_ms": 3.14,
+    "p95_ms": 5.63,
+    "max_ms": 6.09,
+    "events": 60
+  },
+  "backspace": {
+    "mean_ms": 3.18,
+    "p50_ms": 2.98,
+    "p95_ms": 5.5,
+    "max_ms": 5.59,
+    "events": 60
+  },
+  "commit_first": {
+    "mean_ms": 1.46,
+    "p50_ms": 1.48,
+    "p95_ms": 1.61,
+    "max_ms": 1.61,
+    "events": 12
+  },
+  "commit_repeat": {
+    "mean_ms": 2.18,
+    "p50_ms": 2.14,
+    "p95_ms": 2.57,
+    "max_ms": 3.97,
+    "events": 708
+  },
+  "success": true,
+  "commit_methods": [
+    "space",
+    "number_1",
+    "RimeSelectCandidate"
+  ],
+  "components": "deployed d0af93f Lua components",
+  "live_user_database_written": false
+}

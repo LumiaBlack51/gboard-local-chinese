@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-31",
+  "reported_surface": "browser web input fields",
+  "engine_report": "windows-commit-before-2026-10-31.json",
+  "engine_commit_stall_reproduced": false,
+  "frontend_end_to_end_measured": false,
+  "frontend_verification_limitation": "Browser automation stopped because the tool could not reliably identify the current URL.",
+  "mitigation": {
+    "setting": "style/layout/shadow_radius",
+    "before": 8,
+    "after": 0,
+    "backup_created": true,
+    "deployment_exit_code": 0,
+    "compiled_setting_verified": true,
+    "inline_preedit_preserved": true,
+    "upstream_ui_code_replaced": false,
+    "browser_latency_resolution_confirmed": false
+  },
+  "validation": {
+    "configuration_merge_backup_and_idempotence": true,
+    "windows_sync_unit_tests": 5,
+    "native_rime_learning_privacy_and_hot_update": true
+  },
+  "cleanup": {
+    "obsolete_release_artifacts_removed": 3,
+    "temporary_browser_probe_removed": true,
+    "files_removed": 4,
+    "bytes_removed": 41267,
+    "remaining_project_build_cache_directories": 0,
+    "existing_uncommitted_mobile_work_preserved": true,
+    "build_dependencies_and_models_preserved": true,
+    "live_rime_compiled_dictionaries_and_learning_preserved": true
+  }
+}

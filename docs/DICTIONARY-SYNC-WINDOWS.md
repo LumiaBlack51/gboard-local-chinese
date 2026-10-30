@@ -68,4 +68,18 @@ Set-WinDefaultInputMethodOverride -InputTip '0804:{81D4E9C9-1D3B-41BC-9E6C-4B40B
 
 `tests/test_windows_sync.py` 用合成数据验证格式边界、隐私过滤、供电限制、互斥及学习计数不会回流。`python -X utf8 tests/verify_windows_rime.py` 使用已安装的小狼毫 DLL 和临时用户目录，验证导入词候选、共享排序、重复选词持久化及隐私模式，不向真实用户数据库提交测试词。
 
-`python -B -X utf8 tests/verify_windows_latency.py` 在临时目录生成 33000 条合成词和 17000 条学习记录，测量输入及退格后生成首屏候选的耗时，默认要求预热后的 p95 小于 33 毫秒。结果不包含 Windows 按键重复等待、跨进程通信或界面绘制，因此不是完整前台延迟或微软输入法对比测试。
+`python -B -X utf8 tests/verify_windows_latency.py` 在临时目录生成 33000 条合成词和 17000 条学习记录，测量输入、退格后生成首屏候选，以及空格、数字键和候选点击 API 到取得提交文本的耗时。分别统计首次选词与重复选词，默认要求各组 p95 小于 33 毫秒。`--commit-rounds 60` 做 720 次选词，`--without-shared` 可诊断共享组件的额外成本。结果不包含 Windows 按键重复等待、跨进程通信或界面绘制，因此不是完整前台延迟或微软输入法对比测试。
+
+## 浏览器输入延迟排查
+
+2026-10-31 的 Windows 隔离引擎测试中，720 次选词的重复提交 p95 为 2.57 毫秒，最大 3.97 毫秒，未复现明显上屏卡顿；不能据此排除网页前台延迟。原有测试只测输入和退格，现在补上选词提交，结果见 `tests/results/windows-commit-before-2026-10-31.json`。
+
+上游 [Weasel #1413](https://github.com/rime/weasel/issues/1413) 和 [PR #1869](https://github.com/rime/weasel/pull/1869) 记录了浏览器长期运行后候选窗重复显示、定位带来的延迟。当前仍不能把这些报告直接当成本机根因或修复证明。候选窗阴影也增加绘制成本，可先使用当前仓库源码中的工具应用保守的减负配置（旧版补充包不含此工具）：
+
+```powershell
+python -B -X utf8 sync\configure_weasel.py --rime C:\实际Rime用户目录
+```
+
+然后重新部署小狼毫。工具只将 `style/layout/shadow_radius` 设为 `0`，保留字体、配色、行内拼音、候选规则和学习数据；第一次修改前备份为 `weasel.custom.yaml.before-low-latency`。要恢复阴影，将备份中的该项值合并回当前配置并重新部署。此配置减少阴影绘制开销，但不会修复上游重复 `ShowWindow` / `SetWindowPos` 的代码，也不保证消除浏览器长时间运行后的卡顿。未自动安装尚未合并的第三方分支。
+
+本轮未取得实际网页文本框的前后计时。若引擎测试正常而某个浏览器窗口仍迟缓，可以把受影响标签移到新窗口后比较，保留原页面内容；不要据此删除浏览器用户数据或 Rime 用户词库。
