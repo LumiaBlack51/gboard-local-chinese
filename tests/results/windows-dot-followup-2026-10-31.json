@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-31",
+  "client_version": "26.1027.3384.0",
+  "weasel_version": "0.17.4",
+  "reported_affected_surface": "Dot main composer: candidate selection to visible committed text",
+  "reported_unaffected_surface": "Current Codex session composer",
+  "observations_are_user_reports_not_event_timings": true,
+  "experiments": {
+    "external_preedit_for_chatgpt_exe": {
+      "deployed_and_compiled_setting_verified": true,
+      "user_reported_improvement": false,
+      "reverted": true,
+      "configuration_matches_pre_experiment_snapshot": true
+    },
+    "weasel_service_restart": {
+      "process_restarted_successfully": true,
+      "user_reported_improvement": false
+    }
+  },
+  "unavailable_controls": {
+    "blank_dot_chat": "Not applicable: the user reports Dot cannot create a blank chat",
+    "microsoft_pinyin": "Disabled; configuration was not changed to enable it",
+    "dot_frontend_event_timing": "Not measured"
+  },
+  "conclusion": {
+    "root_cause_confirmed": false,
+    "latency_fixed": false,
+    "next_diagnostic_scope": "Dot composer commit/display handling and Rime/TSF interaction",
+    "app_bundle_modified": false,
+    "private_logs_or_text_uploaded": false
+  },
+  "cleanup": {
+    "one_off_code_files_created": 0,
+    "build_cache_created": false,
+    "personal_dictionaries_and_learning_preserved": true
+  }
+}
