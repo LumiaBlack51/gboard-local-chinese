@@ -80,6 +80,22 @@ Set-WinDefaultInputMethodOverride -InputTip '0804:{81D4E9C9-1D3B-41BC-9E6C-4B40B
 python -B -X utf8 sync\configure_weasel.py --rime C:\实际Rime用户目录
 ```
 
-然后重新部署小狼毫。工具只将 `style/layout/shadow_radius` 设为 `0`，保留字体、配色、行内拼音、候选规则和学习数据；第一次修改前备份为 `weasel.custom.yaml.before-low-latency`。要恢复阴影，将备份中的该项值合并回当前配置并重新部署。此配置减少阴影绘制开销，但不会修复上游重复 `ShowWindow` / `SetWindowPos` 的代码，也不保证消除浏览器长时间运行后的卡顿。未自动安装尚未合并的第三方分支。
+然后重新部署小狼毫。默认调用只将 `style/layout/shadow_radius` 设为 `0`，保留字体、配色、行内拼音、候选规则和学习数据；第一次修改前备份为 `weasel.custom.yaml.before-low-latency`。要恢复阴影，将备份中的该项值合并回当前配置并重新部署。此配置减少阴影绘制开销，但不会修复上游重复 `ShowWindow` / `SetWindowPos` 的代码，也不保证消除浏览器长时间运行后的卡顿。未自动安装尚未合并的第三方分支。
 
 本轮未取得实际网页文本框的前后计时。若引擎测试正常而某个浏览器窗口仍迟缓，可以把受影响标签移到新窗口后比较，保留原页面内容；不要据此删除浏览器用户数据或 Rime 用户词库。
+
+### 单个应用的预编辑对照
+
+如果延迟集中在一个应用，可以只对该进程切换预编辑方式，比较富文本编辑器与 Rime 的交互。比如本机 ChatGPT / Dot 的实际进程名为 `ChatGPT.exe`：
+
+```powershell
+python -B -X utf8 sync\configure_weasel.py --rime C:\实际Rime用户目录 --external-preedit-for ChatGPT.exe
+```
+
+重新部署后，点击输入框外再点回来。此时未选定的拼音应显示在候选窗内；其他进程仍使用原来的行内拼音。第一次应用专用修改前另存 `weasel.custom.yaml.before-app-preedit`，工具只接受进程文件名，不接受可执行文件路径。按进程覆盖 `inline_preedit` 是 [Weasel 官方支持的配置](https://github.com/rime/weasel/wiki/Weasel-%E5%AE%9A%E5%88%B6%E5%8C%96#应用设置)，但这项对照不是已证实的通用性能修复；若没有改善或出现漏字、重复字、选词异常，应恢复该进程的行内预编辑：
+
+```powershell
+python -B -X utf8 sync\configure_weasel.py --rime C:\实际Rime用户目录 --inline-preedit-for ChatGPT.exe
+```
+
+再重新部署即可。两条命令均保留已关闭的阴影和现有学习数据。评价效果应在实际应用中连续输入、退格，并分别用空格和数字键选词；仅检查生成配置或运行隔离引擎测试不能证明前台延迟已经降低。
