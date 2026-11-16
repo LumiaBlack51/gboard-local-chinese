@@ -11,16 +11,19 @@ public final class RimeBridge {
     final Context app=context.getApplicationContext();
     new Thread(()->{
       android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+      long began=android.os.SystemClock.elapsedRealtime();String stage="assets";
       try {
         File root=new File(app.getNoBackupFilesDir(),"local-rime");
         File shared=new File(root,"shared"), user=new File(root,"user");
         user.mkdirs(); copy(app,"local-rime",shared);
+        Log.i("LocalChinese","Startup assets: "+(android.os.SystemClock.elapsedRealtime()-began)+" ms");stage="lookups";
         WordIndex.load(new File(shared,"word-index-v3.bin"));
-        LocalWords.load(app);
+        try {DictionaryStore.load(app);}catch(IOException error){Log.w("LocalChinese","Imported dictionary unavailable",error);}
         // These immutable lookups used to load on the first key on the UI
         // thread. Pay that once on this existing worker before publishing ready.
         try {LearningStore.preload(app);}catch(IOException error){Log.w("LocalChinese","Learning preload unavailable",error);}
         try(InputStream emoji=app.getAssets().open("local-rime/emoji.txt")){EmojiSuggestions.load(emoji);}
+        Log.i("LocalChinese","Startup lookups: "+(android.os.SystemClock.elapsedRealtime()-began)+" ms cumulative");stage="native";
         System.loadLibrary("c++_shared");
         System.loadLibrary("Fcitx5Utils");
         System.loadLibrary("Fcitx5Config");
@@ -29,14 +32,15 @@ public final class RimeBridge {
         System.loadLibrary("gboard_local_rime");
         String version=init(shared.getAbsolutePath(),user.getAbsolutePath());
         if(version.contains("dlopen")||version.contains("Missing"))throw new IOException(version);
-        long session=create(true);
-        if(session==0)throw new IOException("Cannot create Chinese session");
-        key(session,'n');key(session,'i');
-        String[] probe=state(session);
-        if(probe.length<5)throw new IOException("Chinese dictionary not loaded");
-        destroy(session);
-        ready=true;new android.os.Handler(android.os.Looper.getMainLooper()).post(KeyboardGestures::refresh);Log.i("LocalChinese","Rime ready: "+version);
-      }catch(Throwable failure){started.set(false);Log.e("LocalChinese","Offline engine initialization failed",failure);}
+        Log.i("LocalChinese","Startup native: "+(android.os.SystemClock.elapsedRealtime()-began)+" ms cumulative");stage="sessions";
+        long session=create(true);if(session==0)throw new IOException("Cannot create Chinese session");
+        try{key(session,'n');key(session,'i');if(state(session).length<5)throw new IOException("Chinese dictionary not loaded");}
+        finally{clear(session);destroy(session);}
+        ready=true;new android.os.Handler(android.os.Looper.getMainLooper()).post(KeyboardGestures::refresh);Log.i("LocalChinese","Rime ready: "+version+"; startup "+(android.os.SystemClock.elapsedRealtime()-began)+" ms");
+      }catch(Throwable failure){started.set(false);Log.e("LocalChinese","Offline engine initialization failed at "+stage,failure);return;}
+      // A slow/unresponsive Android user-dictionary provider must not prevent
+      // the offline Chinese engine from becoming ready.
+      LocalWords.load(app);
     },"LocalChinese-Prepare").start();
   }
   private static void copy(Context app,String name,File dest)throws IOException {

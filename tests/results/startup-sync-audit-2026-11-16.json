@@ -1,0 +1,40 @@
+{
+  "verified_at": "2026-11-16T17:59:01.429559+08:00",
+  "installed_keyboard_version": "1.3.8",
+  "installed_updater_version": "1.3.7",
+  "phone_model": "PLQ110",
+  "phone_last_attempt": "2026-11-16T17:03:06+08:00",
+  "phone_last_result": "deferred",
+  "phone_hourly_persisted_job_registered": true,
+  "phone_default_runs_on_battery": true,
+  "job_scheduler_completion_is_not_exchange_success": true,
+  "desktop_last_success": "2026-11-01T13:00:13.246392+08:00",
+  "desktop_last_success_words": 34047,
+  "desktop_last_success_learned_words": 18479,
+  "endpoint_probe_without_credentials": {
+    "tls_connected": false,
+    "error_type": "URLError",
+    "reason_type": "SSLEOFError"
+  },
+  "production_sync_recovery_verified": false,
+  "phone_anr_since_boot_recorded": false,
+  "formal_apk_built_or_installed": false,
+  "formal_signing_key_available": false,
+  "temporary_phone_test_install_executed": false,
+  "temporary_phone_install_session_abandoned": true,
+  "test_scope": "Synthetic isolated-UID Java store and updater status checks on API 24 AVD; not a production IME or physical-phone first-key latency measurement. Java sources compiled against Android SDK 36.",
+  "storage_regression_passed": true,
+  "main_query_export_baseline_ms": [
+    8607.116625,
+    8694.565022
+  ],
+  "main_query_export_fixed_ms": [
+    0.217754,
+    0.090165
+  ],
+  "native_maintenance_lock_race_still_requires_signed_runtime_followup": true,
+  "personal_words_or_credentials_in_report": false,
+  "temporary_avd_removed": true,
+  "temporary_test_apks_and_java_classes_removed": true,
+  "approx_temporary_avd_disk_reclaimed_gib": 1.3
+}

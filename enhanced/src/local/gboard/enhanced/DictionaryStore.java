@@ -33,7 +33,15 @@ public final class DictionaryStore {
     load(context);return DictionaryFile.merge(entries,words).size();
   }
   public static synchronized void merge(Context context,List<DictionaryFile.Entry> words)throws IOException {
-    load(context);List<DictionaryFile.Entry> merged=DictionaryFile.merge(entries,words);
+    load(context);boolean unchanged=true;
+    for(DictionaryFile.Entry word:words){boolean found=false;List<WordIndex.Entry> group=index.get(word.code);
+      if(group!=null)for(WordIndex.Entry e:group)if(e.word.equals(word.word)&&e.weight>=word.weight){found=true;break;}
+      if(!found){unchanged=false;break;}
+    }
+    // An hourly full download is usually unchanged. Do not rewrite the entire
+    // dictionary and rebuild its index for every identical 500-row batch.
+    if(unchanged)return;
+    List<DictionaryFile.Entry> merged=DictionaryFile.merge(entries,words);
     AtomicFile target=file(context);FileOutputStream stream=null;
     try{stream=target.startWrite();stream.write(DictionaryFile.encode(merged));target.finishWrite(stream);}
     catch(IOException error){if(stream!=null)target.failWrite(stream);throw error;}

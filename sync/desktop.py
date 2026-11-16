@@ -10,6 +10,8 @@ import socket
 import ssl
 import subprocess
 import threading
+import time
+from types import SimpleNamespace
 import urllib.request
 import urllib.parse
 from common import parse, encode, parse_learning, encode_learning, packet, MAX_BYTES
@@ -25,11 +27,19 @@ def powered(root=Path('/sys/class/power_supply')):
     return False
 
 
-def main():
-    p=argparse.ArgumentParser()
-    p.add_argument('--config',type=Path,default=Path.home()/'.config/gboard-phrase-sync/config.json')
-    p.add_argument('--rime',type=Path,default=Path.home()/'.local/share/fcitx5/rime')
-    args=p.parse_args()
+def save_status(directory, values):
+    """Keep the last confirmed success visible even after a later failure."""
+    path=directory/'status.json'
+    try: previous=json.loads(path.read_text())
+    except (OSError,ValueError): previous={}
+    now=time.time()
+    last_success=previous.get('last_success',previous.get('at') if previous.get('success') else None)
+    status=dict(values,at=now,last_success=now if values['success'] else last_success)
+    atomic(path,json.dumps(status,indent=2).encode())
+
+
+def sync(config_path, rime):
+    args=SimpleNamespace(config=config_path,rime=rime)
     if not powered(): return
     os.umask(0o077)
     config=json.loads(args.config.read_text())
@@ -86,10 +96,27 @@ def main():
             if learning_supported:
                 data=encode_learning(learned,comments=False)
                 atomic(args.rime/'cloud-learning.tsv',('# snapshot '+hashlib.sha256(data).hexdigest()+'\n').encode()+data)
-            atomic(args.config.parent/'status.json',json.dumps({'success':True,'words':len(merged),'learning_supported':learning_supported,'learned_words':len(learned),'at':__import__('time').time()},indent=2).encode())
+            save_status(args.config.parent,{'success':True,'words':len(merged),'learning_supported':learning_supported,'learned_words':len(learned)})
             print('Phrase sync complete:',len(merged),'words;',len(learned),'learned entries')
         finally:
             stopped.set();watcher.join(timeout=1)
 
+def main():
+    p=argparse.ArgumentParser()
+    p.add_argument('--config',type=Path,default=Path.home()/'.config/gboard-phrase-sync/config.json')
+    p.add_argument('--rime',type=Path,default=Path.home()/'.local/share/fcitx5/rime')
+    args=p.parse_args()
+    try: sync(args.config,args.rime)
+    except Exception as error:
+        # Exception messages may include endpoints or response data. Persist
+        # only class names, including the underlying TLS/DNS/network reason.
+        reason=getattr(error,'reason',None)
+        status={'success':False,'error_type':type(error).__name__,'reason_type':type(reason).__name__ if reason is not None else type(error).__name__}
+        save_status(args.config.parent,status)
+        print('Phrase sync failed:',status['error_type'],status['reason_type'])
+        return 1
+    return 0
+
+
 if __name__=='__main__':
-    main()
+    raise SystemExit(main())

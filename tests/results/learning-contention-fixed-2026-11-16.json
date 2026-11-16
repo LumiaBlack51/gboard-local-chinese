@@ -1,0 +1,48 @@
+{
+  "samples": [
+    {
+      "export_ms": 351.877894,
+      "main_query_during_export_ms": 0.217754
+    },
+    {
+      "export_ms": 309.590151,
+      "main_query_during_export_ms": 0.090165
+    }
+  ],
+  "sync_status_checks": {
+    "last_success_preserved_after_failure_and_cancel": true,
+    "tls_failure_stage_displayed": true,
+    "legacy_deferred_not_reported_as_success": true
+  },
+  "history_rows": 12000,
+  "local_files": 600,
+  "slow_write_delay_ms": 800,
+  "main_query_during_shared_write_ms": 0.129541,
+  "unchanged_shared_write_skipped": true,
+  "unchanged_dictionary_write_skipped": true,
+  "own_counts_and_remote_exclusion_verified": true,
+  "durable_remote_update_verified": true,
+  "passed": true,
+  "source_ref": "working tree",
+  "device": "Android SDK built for x86_64",
+  "android_api": 24,
+  "physical_phone_tested": false,
+  "isolated_test_uid": true,
+  "installed_keyboard_modified": false,
+  "physical_keyboard_first_key_measured": false,
+  "sources": {
+    "enhanced/src/local/gboard/enhanced/DictionaryFile.java": "0a55a10f10ecf43915a519f42764d0e5e9210f6985e2dd736ad89a30fc8ad04a",
+    "enhanced/src/local/gboard/enhanced/LearningFile.java": "229070edc699e56ba0b1e3e5b707c037ededa816cb01a9f5727f1465e0cb8eca",
+    "enhanced/src/local/gboard/enhanced/LearningStore.java": "bee532ee940b3eee23bc301b9a2b1f250349897cc2ec3ca859cac5c9e926b771",
+    "enhanced/src/local/gboard/enhanced/SelectionLearning.java": "fb6e51cf95cb7c921087548ea1db972c281a296b493cbb7bc5ade7fb9936b1b3",
+    "enhanced/src/local/gboard/enhanced/DictionaryStore.java": "f0c28b2384a590c0578317dee72383d7de48a0e02dc74e643e8c1d7268cef233",
+    "enhanced/src/local/gboard/enhanced/WordIndex.java": "5bb8051a424595e11ff702fe4c2626e978f43a5f61b5b229f5d369484d148ee9",
+    "tests/android/LearningContentionInstrumentation.java": "bf16e7d23a9562620cd0b7c6097a82429b5c07a9def3499f4cf1c93f5446efe5",
+    "enhanced/updater/InstallReceiver.java": "a4b77f59cb467ba1b4cde9ed7de780d8d321b5249bbb42a88965b6ba830a0e40",
+    "enhanced/updater/InstalledRelease.java": "21f9e059abc4f85a6d7f76ec4d6111f99a3434bd6f9578a05032ffebfe8077ce",
+    "enhanced/updater/PhraseSync.java": "2509a3d7e25f7313936c926a3caea3d3c0d1593345431784b7b2a5631c05be53",
+    "enhanced/updater/PhraseSyncReceiver.java": "29567cfda011d3f80a3ebb939ee05fdd6b55f309b74131151a8d774325abe47d",
+    "enhanced/updater/PhraseSyncSettings.java": "bd3711fb8556a9520cb8e85a8ab54377f454f2821e11c063a2ccb746fd775936",
+    "enhanced/updater/UpdateActivity.java": "52a01c2361916c2f825025e1c0a42a156d268191bbc78813ab0578e9b422a131"
+  }
+}
