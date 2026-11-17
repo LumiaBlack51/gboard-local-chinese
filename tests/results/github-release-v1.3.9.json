@@ -1,0 +1,24 @@
+{
+  "release": "v1.3.9",
+  "source_commit": "423115f42e62e9dc9453b662389d7d305cfc7e44",
+  "assets_verified": 15,
+  "total_bytes": 1032156091,
+  "all_remote_sizes_and_sha256_match": true,
+  "draft": false,
+  "latest_public_api_verified": true,
+  "public_update_manifest_verified": true,
+  "published_at": "2026-11-17T03:43:35Z",
+  "tag_points_to_source_commit": true,
+  "verified_at": "2026-11-17T11:45:20.876572+08:00",
+  "release_url": "https://github.com/LumiaBlack51/gboard-local-chinese/releases/tag/v1.3.9",
+  "local_task_build_and_release_artifacts_removed": true,
+  "windows_cleanup": {
+    "bytes_removed": 5594265780,
+    "original_dependency_directories_preserved": true,
+    "original_signing_key_preserved": true,
+    "owned_stage_removed": true,
+    "junctions_detached": 7,
+    "original_repository_status_unchanged": true
+  },
+  "private_data_rollback_backups_retained": true
+}
