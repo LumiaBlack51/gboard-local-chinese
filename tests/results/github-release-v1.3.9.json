@@ -20,5 +20,14 @@
     "junctions_detached": 7,
     "original_repository_status_unchanged": true
   },
-  "private_data_rollback_backups_retained": true
+  "private_data_rollback_backups_retained": true,
+  "phone_cleanup": {
+    "verified_at": "2026-11-17T13:12:41.959076+08:00",
+    "temporary_checker_removed": true,
+    "temporary_ui_dump_files_removed": 2,
+    "original_probe_retained": true,
+    "installed_component_versions_preserved": true,
+    "default_input_method_preserved": true,
+    "hourly_sync_job_still_registered": true
+  }
 }
