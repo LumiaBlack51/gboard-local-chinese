@@ -27,6 +27,24 @@ public final class PhraseSyncInstrumentation extends Instrumentation {
       Object service=sync.getConstructor().newInstance();Method attach=ContextWrapper.class.getDeclaredMethod("attachBaseContext",Context.class);attach.setAccessible(true);attach.invoke(service,c);
       Method exchange=sync.getDeclaredMethod("sync",JobParameters.class);exchange.setAccessible(true);exchange.invoke(service,new Object[]{null});
       result.putBoolean("actual_phrase_exchange",true);
+      long now=System.currentTimeMillis();c.getSharedPreferences("phrase-sync",0).edit().putString("last_result","success").putLong("last_attempt",now).putLong("last_success",now).commit();
+    }
+    if("inspect".equals(args.getString("mode"))||"export".equals(args.getString("mode"))){
+      android.content.SharedPreferences prefs=c.getSharedPreferences("phrase-sync",0);
+      result.putString("last_result",prefs.getString("last_result",""));result.putLong("last_attempt",prefs.getLong("last_attempt",0));result.putLong("last_success",prefs.getLong("last_success",0));
+      result.putInt("learned_words",prefs.getInt("learned_words",0));
+      if("export".equals(args.getString("mode"))){
+        // Recovery output contains private data. The host must capture it to a
+        // private file, never print instrumentation output or attach it to CI.
+        result.putString("pairing_base64",android.util.Base64.encodeToString(prefs.getString("config","{}").getBytes("UTF-8"),android.util.Base64.NO_WRAP));
+        java.io.ByteArrayOutputStream bytes=new java.io.ByteArrayOutputStream();
+        try(java.io.InputStream in=c.getContentResolver().openInputStream(Uri.parse("content://com.localx.android.inputmethod.latin.dictionary_sync/export?allow_battery=true"))){
+          byte[] buffer=new byte[8192];int n;while((n=in.read(buffer))!=-1){if(bytes.size()+n>16*1024*1024)throw new java.io.IOException("export too large");bytes.write(buffer,0,n);}
+        }
+        String encoded=android.util.Base64.encodeToString(bytes.toByteArray(),android.util.Base64.NO_WRAP);
+        for(int pos=0;pos<encoded.length();pos+=65536){Bundle chunk=new Bundle();chunk.putString("export_chunk",encoded.substring(pos,Math.min(pos+65536,encoded.length())));sendStatus(2,chunk);}
+        result.putInt("export_bytes",bytes.size());
+      }
     }
     if("result".equals(args.getString("mode"))){String status=c.getSharedPreferences("phrase-sync",0).getString("last_result","");if(!status.equals("success"))throw new Exception("sync result "+status);result.putBoolean("sync_success",true);}
     if(args.containsKey("expected_learned")){android.content.SharedPreferences prefs=c.getSharedPreferences("phrase-sync",0);if(!prefs.getBoolean("learning_synced",false)||prefs.getInt("learned_words",-1)!=Integer.parseInt(args.getString("expected_learned")))throw new Exception("learning exchange not applied");result.putBoolean("actual_learning_exchange",true);}

@@ -15,5 +15,5 @@ ProtectSystem=strict
 ProtectHome=true
 ReadWritePaths=/var/lib/phrase-sync
 MemoryMax=256M
-CPUQuota=20%
+CPUQuota=50%
 TimeoutStopSec=5

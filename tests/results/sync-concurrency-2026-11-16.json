@@ -1,0 +1,22 @@
+{
+  "parallel_clients": [
+    {
+      "device": "desktop",
+      "http": 200,
+      "seconds": 8.014,
+      "words": 37972,
+      "learned_rows": 24049
+    },
+    {
+      "device": "windows",
+      "http": 200,
+      "seconds": 4.094,
+      "words": 37972,
+      "learned_rows": 24049
+    }
+  ],
+  "both_finish_within_client_15s_read_timeout": true,
+  "server_cpu_quota_percent": 50,
+  "gateway_sync_only_connect_timeout_seconds": 15,
+  "tls_validation_preserved": true
+}

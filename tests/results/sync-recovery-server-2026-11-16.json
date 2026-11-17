@@ -1,0 +1,11 @@
+{
+  "server": "64.56.71.36",
+  "authenticated_devices_restored": 3,
+  "words_after_initial_restore": 36828,
+  "learning_rows_after_initial_restore": 24049,
+  "all_exported_words_preserved": true,
+  "all_cached_aggregate_counts_covered_by_restored_own_counts": true,
+  "own_counter_sum_exactly_matches_initial_server_response": true,
+  "downloaded_aggregate_counts_reuploaded_as_local": false,
+  "tls_system_trust_and_hostname_validation": true
+}

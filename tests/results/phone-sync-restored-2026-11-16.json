@@ -1,0 +1,13 @@
+{
+  "verified_at": "2026-11-16T21:19:31.154957+08:00",
+  "actual_formal_updater_exchange": true,
+  "signature_protected_provider_export_and_merge": true,
+  "endpoint": "https://64.56.71.36:8443/v1/sync",
+  "word_count_at_least": 37000,
+  "learned_words": 24049,
+  "last_result": "success",
+  "hourly_persisted_job_preserved": true,
+  "default_runs_on_battery_preserved": true,
+  "pairing_token_preserved": true,
+  "passed": true
+}
