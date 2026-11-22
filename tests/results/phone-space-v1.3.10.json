@@ -1,0 +1,14 @@
+{
+  "version": "1.3.10",
+  "device": "PLQ110",
+  "editor": "local.gboard.probe",
+  "before": "Chinese QWERTY space key visibly blank on 1.3.9",
+  "chinese_label": "空格",
+  "other_layout_label": "QWERTY",
+  "chinese_label_after_language_round_trip": true,
+  "chinese_label_after_number_page_round_trip": true,
+  "private_literal_space": " ",
+  "private_nihao_space_commit": "你好",
+  "private_nihao_space_drag_insert_c_enter": "nichao",
+  "passed": true
+}

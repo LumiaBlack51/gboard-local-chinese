@@ -102,6 +102,33 @@ for method,hook in [('onAttachedToWindow()V','attach'),('onDetachedFromWindow()V
   start=source.index(method);body_start=source.index('\n',source.index('.locals',start))+1
   source=source[:body_start]+'    invoke-static {p0}, Llocal/gboard/enhanced/KeyboardGestures;->'+hook+'(Landroid/view/View;)V\n'+source[body_start:]
 (patches/'SoftKeyboardView.smali').write_text(source,encoding='utf8')
+# Bind the Chinese space label in the native spacebar decorator. Its normal
+# refresh runs on layout and language changes, before the key draws its text.
+source=(ROOT/'gboard-18.4.1/smali/smali/euq.smali').read_text('utf8')
+field='.field private final i:Z'
+constructor='    invoke-direct {p0}, Ljava/lang/Object;-><init>()V'
+label_read='    iget-object v1, p0, Leuq;->h:Ljava/lang/CharSequence;'
+assert all(source.count(anchor)==1 for anchor in (field,constructor,label_read))
+source=source.replace(field,field+'\n\n.field private final localChinese:Z')
+source=source.replace(constructor,constructor+'''
+    iget-object v1, p2, Lcom/google/android/libraries/inputmethod/metadata/ImeDef;->f:Lrxu;
+    invoke-virtual {v1}, Lrxu;->u()Ljava/util/Locale;
+    move-result-object v1
+    invoke-virtual {v1}, Ljava/util/Locale;->getLanguage()Ljava/lang/String;
+    move-result-object v1
+    const-string v2, "zh"
+    invoke-virtual {v2, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+    move-result v1
+    iput-boolean v1, p0, Leuq;->localChinese:Z
+''')
+source=source.replace(label_read,'''
+    iget-boolean v1, p0, Leuq;->localChinese:Z
+    if-eqz v1, :local_native_language_label
+    const-string p0, "空格"
+    goto :goto_2
+    :local_native_language_label
+'''+label_read)
+(patches/'euq.smali').write_text(source,encoding='utf8')
 rel=Path('com/google/android/libraries/inputmethod/widgets/SoftKeyView.smali')
 source=(ROOT/'gboard-18.4.1/smali/smali'/rel).read_text('utf8')
 # Apply before native width measurement; restore around native label/theme scaling

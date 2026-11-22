@@ -8,7 +8,7 @@ release=gh('release','view',json.loads((root/'release-manifest.json').read_text(
 repo=gh('repo','view','LumiaBlack51/gboard-local-chinese','--json','visibility')
 assert repo['visibility']=='PUBLIC'
 expected={x['name']:(x['bytes'],x['sha256'],root/x['file']) for x in json.loads((root/'release-manifest.json').read_text('utf8'))['assets']}
-for name in ['update-manifest.json','release-manifest.json','SHA256SUMS.txt']:
+for name in ['update-manifest.json','release-manifest.json','source-manifest.json','dependency-manifest.json','SHA256SUMS.txt']:
  raw=(root/name).read_bytes().replace(b'\r\n',b'\n')
  expected[name]=(len(raw),hashlib.sha256(raw).hexdigest(),None)
 assets={x['name']:x for x in release['assets']}

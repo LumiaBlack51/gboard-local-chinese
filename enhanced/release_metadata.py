@@ -20,7 +20,7 @@ for package,version,paths in groups:
   items.append({'name':path.name,'sha256':sha,'size':size})
   assets.append({'file':path.relative_to(ROOT).as_posix(),'bytes':size,'sha256':sha,'name':path.name})
  components.append({'package':package,'versionCode':version,'assets':items})
-save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'修复词库同步导出、共享学习写盘阻塞候选查询的问题，跳过不变批次；系统用户词典查询不再拖延中文引擎就绪。词库共享页分别显示最近成功、最近尝试及失败阶段。继续保留离线键盘、真实学习、隐私模式和现有系统小时调度。','components':components[:3],'optionalComponents':components[3:]})
+save('update-manifest.json',{'format':1,'version':VERSION,'certificateSha256':certificate_digest().hex(),'notes':'中文拼音键盘的空格键固定显示“空格”。切换到其他语言会显示该布局的原生标签。','components':components[:3],'optionalComponents':components[3:]})
 save('release-manifest.json',{'tag':'v'+VERSION,'assets':assets})
 (ROOT/'SHA256SUMS.txt').write_text(''.join(a['sha256']+'  '+a['name']+'\n' for a in assets),encoding='ascii')
 source={}

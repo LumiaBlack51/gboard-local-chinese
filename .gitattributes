@@ -6,3 +6,9 @@
 *.md text eol=lf
 *.yaml text eol=lf
 *.ps1 text eol=crlf
+# The signed APK embeds these bytes and verifies dictionary SHA-256 on Windows.
+enhanced/*-LICENSE text eol=lf
+enhanced/THIRD_PARTY_SOURCES.txt text eol=lf
+enhanced/rime-data/LICENSE text eol=lf
+enhanced/rime-data/emoji.txt text eol=lf
+enhanced/rime-data/source-hashes.json text eol=lf

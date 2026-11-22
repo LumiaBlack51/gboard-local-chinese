@@ -50,6 +50,13 @@ Get-ScheduledTaskInfo -TaskName GboardPhraseSync
 Get-Content "$env:USERPROFILE\.config\gboard-phrase-sync\status.json"
 ```
 
+检查自动运行时，可直接查看计划任务的 `LastRunTime` 和 `NextRunTime`，再核对客户端回执。`success` 为 `true` 且完成时间与本次触发相符，表示这次已经和服务器交换词库。可用 PowerShell 显示本地完成时间：
+
+```powershell
+$status = Get-Content "$env:USERPROFILE\.config\gboard-phrase-sync\status.json" -Raw | ConvertFrom-Json
+[DateTimeOffset]::FromUnixTimeSeconds([long][Math]::Floor($status.at)).LocalDateTime
+```
+
 如仅需停用同步：
 
 ```powershell
