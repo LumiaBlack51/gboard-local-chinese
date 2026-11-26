@@ -1,0 +1,439 @@
+{
+  "date": "2026-11-26",
+  "device": "PLQ110",
+  "version": "1.3.11",
+  "version_code": 176027100,
+  "release_commit": "5fed6381dc18904cb9a6cefa2e5f6353b912864d",
+  "method": "Each test used a fresh private field in local.gboard.probe, the installed release keyboard, and ADB taps on the visible keys. We expanded the candidate panel and paged forward. A successful result required tapping the candidate and finding the identical Unicode character in the editor. Private fields exclude personal word learning.",
+  "rank_convention": "The UI page is one-based. Display rank counts distinct candidate labels in UI Automator order from the start of the expanded panel, including the top row. For a miss, ui_pages_read and displayed_candidates count distinct pages and distinct labels visited until the end.",
+  "dictionary_check": "The character and spelling were looked up in active rows of the 8105 and 41448 character tables extracted from the same signed base.apk as the installed version.",
+  "summary": {
+    "character_readings_tested": 35,
+    "distinct_characters": 31,
+    "character_readings_committed": 34,
+    "in_table_readings_tested": 34,
+    "in_table_readings_committed": 34,
+    "out_of_table_readings_tested": 1,
+    "out_of_table_readings_committed": 0,
+    "commits_beyond_rank_100": 4
+  },
+  "variant_reference": {
+    "character": "𠮷",
+    "pinyin": "ji",
+    "source": "教育部《異體字字典》「吉」",
+    "url": "https://dict.variants.moe.edu.tw/dictView.jsp?ID=5462&la=0"
+  },
+  "cases": [
+    {
+      "pinyin": "zhang",
+      "character": "张",
+      "ui_page": 1,
+      "display_rank": 2,
+      "committed": true,
+      "unicode": "U+5F20",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "cheng",
+      "character": "程",
+      "ui_page": 1,
+      "display_rank": 3,
+      "committed": true,
+      "unicode": "U+7A0B",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "jing",
+      "character": "鲸",
+      "ui_page": 1,
+      "display_rank": 28,
+      "committed": true,
+      "unicode": "U+9CB8",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "xin",
+      "character": "鑫",
+      "ui_page": 1,
+      "display_rank": 14,
+      "committed": true,
+      "unicode": "U+946B",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "miao",
+      "character": "淼",
+      "ui_page": 1,
+      "display_rank": 8,
+      "committed": true,
+      "unicode": "U+6DFC",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "yao",
+      "character": "垚",
+      "ui_page": 2,
+      "display_rank": 38,
+      "committed": true,
+      "unicode": "U+579A",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "yan",
+      "character": "焱",
+      "ui_page": 2,
+      "display_rank": 34,
+      "committed": true,
+      "unicode": "U+7131",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "yi",
+      "character": "燚",
+      "ui_page": 5,
+      "display_rank": 107,
+      "committed": true,
+      "unicode": "U+71DA",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "yun",
+      "character": "赟",
+      "ui_page": 1,
+      "display_rank": 29,
+      "committed": true,
+      "unicode": "U+8D5F",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "zhe",
+      "character": "喆",
+      "ui_page": 1,
+      "display_rank": 15,
+      "committed": true,
+      "unicode": "U+5586",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "rong",
+      "character": "镕",
+      "ui_page": 1,
+      "display_rank": 17,
+      "committed": true,
+      "unicode": "U+9555",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "chang",
+      "character": "昶",
+      "ui_page": 1,
+      "display_rank": 18,
+      "committed": true,
+      "unicode": "U+6636",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "yue",
+      "character": "玥",
+      "ui_page": 1,
+      "display_rank": 14,
+      "committed": true,
+      "unicode": "U+73A5",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "heng",
+      "character": "珩",
+      "ui_page": 1,
+      "display_rank": 9,
+      "committed": true,
+      "unicode": "U+73E9",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "yi",
+      "character": "翊",
+      "ui_page": 3,
+      "display_rank": 64,
+      "committed": true,
+      "unicode": "U+7FCA",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "jun",
+      "character": "珺",
+      "ui_page": 1,
+      "display_rank": 16,
+      "committed": true,
+      "unicode": "U+73FA",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "yan",
+      "character": "琰",
+      "ui_page": 2,
+      "display_rank": 42,
+      "committed": true,
+      "unicode": "U+7430",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "yu",
+      "character": "钰",
+      "ui_page": 2,
+      "display_rank": 46,
+      "committed": true,
+      "unicode": "U+94B0",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "jing",
+      "character": "璟",
+      "ui_page": 2,
+      "display_rank": 38,
+      "committed": true,
+      "unicode": "U+749F",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "yu",
+      "character": "彧",
+      "ui_page": 3,
+      "display_rank": 67,
+      "committed": true,
+      "unicode": "U+5F67",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "sheng",
+      "character": "晟",
+      "ui_page": 1,
+      "display_rank": 12,
+      "committed": true,
+      "unicode": "U+665F",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "cheng",
+      "character": "晟",
+      "ui_page": 2,
+      "display_rank": 38,
+      "committed": true,
+      "unicode": "U+665F",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "chong",
+      "character": "重",
+      "ui_page": 1,
+      "display_rank": 3,
+      "committed": true,
+      "unicode": "U+91CD",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "zhong",
+      "character": "重",
+      "ui_page": 1,
+      "display_rank": 4,
+      "committed": true,
+      "unicode": "U+91CD",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "hang",
+      "character": "行",
+      "ui_page": 1,
+      "display_rank": 1,
+      "committed": true,
+      "unicode": "U+884C",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "xing",
+      "character": "行",
+      "ui_page": 1,
+      "display_rank": 1,
+      "committed": true,
+      "unicode": "U+884C",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "le",
+      "character": "乐",
+      "ui_page": 1,
+      "display_rank": 2,
+      "committed": true,
+      "unicode": "U+4E50",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "yue",
+      "character": "乐",
+      "ui_page": 1,
+      "display_rank": 9,
+      "committed": true,
+      "unicode": "U+4E50",
+      "source_tables": [
+        "8105",
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "da",
+      "character": "龘",
+      "ui_page": 3,
+      "display_rank": 76,
+      "committed": true,
+      "unicode": "U+9F98",
+      "source_tables": [
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "cu",
+      "character": "麤",
+      "ui_page": 3,
+      "display_rank": 55,
+      "committed": true,
+      "unicode": "U+9EA4",
+      "source_tables": [
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "biang",
+      "character": "𰻝",
+      "ui_page": 1,
+      "display_rank": 5,
+      "committed": true,
+      "unicode": "U+30EDD",
+      "source_tables": [
+        "8105"
+      ]
+    },
+    {
+      "pinyin": "cheng",
+      "character": "𢐞",
+      "ui_page": 7,
+      "display_rank": 148,
+      "committed": true,
+      "unicode": "U+2241E",
+      "source_tables": [
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "zhe",
+      "character": "𪚥",
+      "ui_page": 7,
+      "display_rank": 164,
+      "committed": true,
+      "unicode": "U+2A6A5",
+      "source_tables": [
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "yi",
+      "character": "㐹",
+      "ui_page": 6,
+      "display_rank": 150,
+      "committed": true,
+      "unicode": "U+3439",
+      "source_tables": [
+        "41448"
+      ]
+    },
+    {
+      "pinyin": "ji",
+      "character": "𠮷",
+      "ui_pages_read": 28,
+      "displayed_candidates": 674,
+      "committed": false,
+      "unicode": "U+20BB7",
+      "source_tables": []
+    }
+  ]
+}
