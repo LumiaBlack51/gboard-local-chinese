@@ -1,0 +1,22 @@
+{
+  "version": "1.3.11",
+  "device": "PLQ110",
+  "keyboard": "installed signed release, versionCode 176027100",
+  "method": "ADB taps on the visible soft keyboard in the existing local.gboard.probe editor. Candidate positions observed on screen. Committed text checked in the EditText via UI Automator.",
+  "cheng": {
+    "private_editor": true,
+    "expanded_candidate_rank": 19,
+    "committed_text": "铖"
+  },
+  "xiaojing": {
+    "normal_editor": true,
+    "visible_in_initial_candidate_strip": false,
+    "separate_xiao_jing_commits_verified": 2,
+    "candidate_rank_after_two_pairs": 2,
+    "whole_phrase_tap_committed_text": "小鲸",
+    "rank_on_next_composition": 1,
+    "space_committed_text": "小鲸",
+    "visible_in_private_candidate_strip_after_learning": false
+  },
+  "passed": true
+}
