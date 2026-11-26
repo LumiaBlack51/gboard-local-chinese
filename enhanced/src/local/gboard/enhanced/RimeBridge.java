@@ -22,6 +22,7 @@ public final class RimeBridge {
         // These immutable lookups used to load on the first key on the UI
         // thread. Pay that once on this existing worker before publishing ready.
         try {LearningStore.preload(app);}catch(IOException error){Log.w("LocalChinese","Learning preload unavailable",error);}
+        SplitPhraseLearning.preload(app);
         try(InputStream emoji=app.getAssets().open("local-rime/emoji.txt")){EmojiSuggestions.load(emoji);}
         Log.i("LocalChinese","Startup lookups: "+(android.os.SystemClock.elapsedRealtime()-began)+" ms cumulative");stage="native";
         System.loadLibrary("c++_shared");
@@ -46,7 +47,8 @@ public final class RimeBridge {
   private static void copy(Context app,String name,File dest)throws IOException {
     String[] children=app.getAssets().list(name);
     if(children.length>0){dest.mkdirs();for(String child:children)copy(app,name+"/"+child,new File(dest,child));}
-    else if(!dest.isFile()||name.endsWith("schema.yaml")||name.endsWith("default.yaml")){
+    else if(!dest.isFile()||name.endsWith("schema.yaml")||name.endsWith("default.yaml")||
+            name.endsWith("/rime_ice.dict.yaml")||name.endsWith("/source-hashes.json")){
       if(dest.isFile()){
         ByteArrayOutputStream desired=new ByteArrayOutputStream();try(InputStream in=app.getAssets().open(name)){byte[] buf=new byte[4096];int n;while((n=in.read(buf))!=-1)desired.write(buf,0,n);}
         if(java.util.Arrays.equals(desired.toByteArray(),java.nio.file.Files.readAllBytes(dest.toPath())))return;
@@ -67,5 +69,8 @@ public final class RimeBridge {
   public static synchronized native boolean select(long session,int index);
   public static synchronized native boolean forget(long session,int index);
   public static synchronized native boolean sync();
-  public static synchronized native String[] state(long session);
+  static final int CANDIDATE_BATCH=100;
+  public static String[] state(long session){return readState(session,CANDIDATE_BATCH);}
+  private static synchronized native String[] readState(long session,int candidateLimit);
+  static synchronized native String[] candidatePage(long session,int offset,int count);
 }

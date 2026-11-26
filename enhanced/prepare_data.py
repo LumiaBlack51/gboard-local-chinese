@@ -17,9 +17,12 @@ with zipfile.ZipFile(ROOT/'enhanced'/'rime-ice.zip') as z:
         if name.endswith('/'):
             continue
         rel=Path(*Path(name).parts[1:])
-        if rel.parts[0]=='cn_dicts' or rel.name in ('rime_ice.dict.yaml','LICENSE'):
+        # The checked-in root dictionary selects the tables shipped on Android.
+        if rel.parts[0]=='cn_dicts' or rel.name=='LICENSE':
             dest=data/rel; dest.parent.mkdir(parents=True,exist_ok=True)
             dest.write_bytes(z.read(name))
-manifest={str(p.relative_to(data)):hashlib.sha256(p.read_bytes()).hexdigest() for p in data.rglob('*') if p.is_file()}
-(data/'source-hashes.json').write_text(json.dumps(manifest,indent=2),encoding='utf8')
+manifest=json.loads((data/'source-hashes.json').read_text(encoding='utf8'))
+for name,expected in manifest.items():
+    if hashlib.sha256((data/name.replace('\\','/')).read_bytes()).hexdigest()!=expected:
+        raise ValueError(f'Dictionary source hash mismatch: {name}')
 print('native libraries',len(list(out.glob('*.so'))),'dictionary sources',len(manifest))

@@ -5,7 +5,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from build_config import ROOT,JAVA,BT,ANDROID,SIGN_ARGS
 
 def run(*args):subprocess.run([str(a) for a in args],check=True)
-for package,klass,target in [('local.gboard.synccheck','PhraseSyncInstrumentation','local.gboard.updater'),('local.gboard.candidateregression','CandidateRegressionInstrumentation','com.localx.android.inputmethod.latin'),('local.gboard.phonecandidatecheck','PhoneCandidateInstrumentation','com.localx.android.inputmethod.latin')]:
+for package,klass,target in [('local.gboard.synccheck','PhraseSyncInstrumentation','local.gboard.updater'),('local.gboard.candidateregression','CandidateRegressionInstrumentation','com.localx.android.inputmethod.latin'),('local.gboard.phonecandidatecheck','PhoneCandidateInstrumentation','com.localx.android.inputmethod.latin'),('local.gboard.splitpinyincheck','SplitPinyinInstrumentation','com.localx.android.inputmethod.latin')]:
     out=ROOT/'artifacts/sync-check'/package
     classes=out/'classes';dex=out/'dex';classes.mkdir(parents=True,exist_ok=True);dex.mkdir(exist_ok=True)
     manifest=out/'AndroidManifest.xml';manifest.write_text(f'''<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="{package}" android:versionCode="2"><uses-sdk android:minSdkVersion="32" android:targetSdkVersion="35" /><application android:allowBackup="false" /><instrumentation android:name=".{klass}" android:targetPackage="{target}" android:functionalTest="true" /></manifest>''')

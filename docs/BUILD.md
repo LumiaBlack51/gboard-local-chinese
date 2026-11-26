@@ -1,3 +1,7 @@
+## 生僻字与分段选词回归
+
+在独立 AVD 安装键盘与 `tests/build_sync_checks.py` 构建的同签名 `splitpinyincheck` 检查包。在旧键盘的空白测试数据上运行 `adb -s SERIAL shell am instrument -w -e mode baseline local.gboard.splitpinyincheck/.SplitPinyinInstrumentation`，随后覆盖安装新键盘，保留应用数据。将同一命令的模式依次改为 `verify`、`restart`、`selected`、`audit`，每次均应返回 `passed=true`。检查使用合成编辑框，验证旧数据升级、深页选字、分段造词、隐私输入和进程重启后的候选排序。`audit` 按安装包两张字表中的每个读音枚举全部原生候选，报告不可达的字音数。
+
 ## 1.3.8 延迟与 Emoji 回归
 
 `python3 tests/benchmark_rime.py --baseline-ref v1.3.7` 在不同子进程使用同一套部署词典与个人数据副本，按键后枚举前五候选，排除第一轮热身；不向桌面发送按键，不修改活跃数据库。`python3 -m unittest discover -s tests -p 'test_phrase_lookup.py'` 直接执行实际 Lua 模块，检查大快照、字母前缀碰撞与未知编码。

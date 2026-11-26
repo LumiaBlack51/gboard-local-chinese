@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-26",
+  "baseline": "1.3.10",
+  "baseline_apk_sha256": "e054f1956f7354eb8e05d5a02b4b061086110ac59783365fee6948927dddb78b",
+  "environment": "Disposable Android API 37 x86_64 AVD with ARM64 translation. The isolated test APK uses the release ARM64 librime 1.16.1, dictionary sources, grammar, word index and Gboard candidate classes. Synthetic decoder events and editor exercise the production adapter. No keyboard UI or personal learning database used.",
+  "method": "Ran the baseline adapter, then replaced the test APK in place without clearing its dictionary or user data. Ran each subsequent mode in a new process.",
+  "rank_convention": "One-based displayed ranks. Zero means absent after exhausting candidate pages. deep_rank uses 㐹/yi and split_phrase_rank uses 小鲸/xiaojing.",
+  "tests": {
+    "baseline": {
+      "cheng_candidates": 48,
+      "cheng_rank": 27,
+      "deep_rank": 0,
+      "passed": true,
+      "split_phrase_rank": 0
+    },
+    "verify": {
+      "cheng_candidates": 189,
+      "cheng_rank": 19,
+      "deep_rank": 150,
+      "passed": true,
+      "split_phrase_rank": 2
+    },
+    "restart": {
+      "passed": true
+    },
+    "selected": {
+      "passed": true
+    },
+    "audit": {
+      "character_readings": 46273,
+      "characters": 40596,
+      "passed": true,
+      "spellings": 416,
+      "unreachable": 0
+    },
+    "existing": {
+      "adapter_cases": 72,
+      "all_native_first_pages_preserved": true,
+      "emoji_normal_and_private_selection_checks": 2,
+      "known_shared_words_do_not_mask_native_rank": true,
+      "later_native_choice_clears_shared_boost": true,
+      "native_learning_ids_preserved": true,
+      "novel_shared_selection_learns": true,
+      "passed": true,
+      "private_mode_excludes_personal_words": true,
+      "remote_counts_reorder_native_candidates": true
+    }
+  },
+  "source_sha256": {
+    "enhanced/src/local/gboard/enhanced/EnhancedHook.java": "6c9ad75bcc6b3ee316917a15a82f309ea45bbaf41c477d6735bfb239b052483c",
+    "enhanced/src/local/gboard/enhanced/RimeBridge.java": "328548efd17b0824e30992181f91f825c5d91b78df5814bf3b9c587720753454",
+    "enhanced/src/local/gboard/enhanced/SplitPhraseLearning.java": "70ab0a18c3f7d65690937308a838360a5c3a527cb4f52fe4634ac8801941aa5f",
+    "enhanced/native/bridge.cpp": "d3dae1bb3e30ba03ed571a30235436dac34d9ef80e955732b6401e76741208b1",
+    "enhanced/rime-data/rime_ice.dict.yaml": "a9c7d475eeb01029b10d3b1d932456256cb61686151577a3c1e6954174fcd0b3",
+    "tests/android/SplitPinyinInstrumentation.java": "b97efa6a9d6ec7a9932a3dd507d6ae5d8ef0bda0eea94361fd9003b8bc80cea1"
+  }
+}

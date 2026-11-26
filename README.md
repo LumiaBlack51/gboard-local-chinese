@@ -6,6 +6,8 @@
 
 ## 已实现
 
+- 1.3.11 启用扩展字表，支持继续翻页选取生僻字。在普通输入框分别选「小」「鲸」，重复两次后，连打 `xiaojing` 即可选「小鲸」。
+
 - 1.3.10 修复中文拼音键盘的空白空格键，键帽固定显示“空格”。
 
 - 1.3.9 修复后台词库导出和共享学习写盘持有候选查询锁的问题，跳过不变的同步批次；系统用户词典查询移到中文引擎就绪之后。共享页分别显示最近成功、最近尝试和失败阶段。隔离合成测试中，导出期间查询从约 8.6 秒降至 0.09～0.22 毫秒；这不是手机触摸到显示的延迟测量。
@@ -58,7 +60,7 @@
 
 首次安装下载最新 Release 的七个 APK：`base.apk`、三个 `split_*.apk`、`voice-helper.apk`、`updater.apk`、`proofread.apk`。键盘 split 必须一起安装；ARM64、Android 12L 或更高。`proofread.apk` 是可选的中英校对组件，不安装仍可录音、识别并整理英文大小写。首次安装校对组件后打开一次“中英本地校对”，等待准备完成。
 
-已有版本可通过“检查更新”升级到 1.3.10，也可从 [1.3.10 Release](https://github.com/LumiaBlack51/gboard-local-chinese/releases/tag/v1.3.10) 下载。旧更新器会先升级三个核心组件，完成后再检查一次安装校对组件。同签名覆盖保留词库和设置，请勿卸载或清除键盘数据。
+已有版本可通过“检查更新”升级到 1.3.11，也可从 [1.3.11 Release](https://github.com/LumiaBlack51/gboard-local-chinese/releases/tag/v1.3.11) 下载。旧更新器会先升级三个核心组件，完成后再检查一次安装校对组件。同签名覆盖保留词库和设置，请勿卸载或清除键盘数据。
 
 ```powershell
 ./install.ps1 -Serial YOUR_ADB_SERIAL -ApkDirectory ./downloads

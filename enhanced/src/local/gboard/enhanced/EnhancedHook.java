@@ -13,13 +13,16 @@ public final class EnhancedHook {
   private static final Map<Object,Session> sessions=new WeakHashMap<>();
   private static Session active;
   private static class Candidate {
-    final Session session;final int index;final String text,code;
+    final Session session;int index;final String text,code;
     Candidate(Session s,int i,String t){this(s,i,t,"");}
     Candidate(Session s,int i,String t,String c){session=s;index=i;text=t;code=c;}
   }
   private static class Session {
     final Object processor;boolean privateMode;long id;String raw="";int caret;
     List<Object> candidates=Collections.emptyList();int page;boolean composing,suggesting,dismissed,handwriting,openingCandidates;String context="";
+    final SplitPhraseLearning splitPhrases=new SplitPhraseLearning();
+    final Map<String,Candidate> pagedWords=new HashMap<>();
+    int nextNative=-1;
     Session(Object p){processor=p;}
   }
   private static Field field(Class<?> cls,String name)throws Exception {
@@ -40,11 +43,12 @@ public final class EnhancedHook {
   public static synchronized boolean dispatch(Object processor,Object event) {
     try {
       int type=(Integer)get(event,"B");
-      if(!processor.getClass().getName().endsWith("HmmPinyinQwertyDecodeProcessor")){if(type==2){active=null;KeyboardGestures.reset();}return false;}
+      if(!processor.getClass().getName().endsWith("HmmPinyinQwertyDecodeProcessor")){if(type==2){if(active!=null)active.splitPhrases.reset();active=null;KeyboardGestures.reset();}return false;}
       if(type==2){RimeBridge.prepare((Context)get(processor,"u"));HandwritingBridge.prepare((Context)get(processor,"u"));}
       Session s=sessions.get(processor);
       if(s==null){s=new Session(processor);sessions.put(processor,s);}
       if(type==2){
+        s.splitPhrases.reset();s.pagedWords.clear();s.nextNative=-1;
         if(s.id!=0){RimeBridge.destroy(s.id);s.id=0;}
         EditorInfo editor=(EditorInfo)get(event,"b");
         int variation=editor.inputType&0xfff;
@@ -55,7 +59,7 @@ public final class EnhancedHook {
       if(s.id==0){s.id=RimeBridge.create(s.privateMode);if(s.id==0)return false;}
       if(type==4){active=s;return key(s,get(event,"i"));}
       // User selection/cursor movement invalidates predictions from the old position.
-      if(type==18&&!s.composing&&!(Boolean)call(Class.forName("owv"),"c",get(event,"e"))){if(s.handwriting)cancelInk();dismiss(s);return false;}
+      if(type==18&&!(Boolean)call(Class.forName("owv"),"c",get(event,"e"))){s.splitPhrases.reset();if(!s.composing){if(s.handwriting)cancelInk();dismiss(s);}return false;}
       if(type==8&&(s.composing||s.suggesting||s.handwriting)){publish(s,(Integer)get(event,"m"));return true;}
       if(type==10||type==14||type==22){
         Object candidate=get(event,"j");if(candidate==null)return false;
@@ -73,8 +77,10 @@ public final class EnhancedHook {
         // The native expansion command also sends a decoder-reset event.
         // Keep the same candidates while its panel is being opened.
         if(type==15&&(s.openingCandidates||isExpansionEvent(get(event,"i")))){s.openingCandidates=false;return true;}
+        s.splitPhrases.reset();
         if(s.handwriting)cancelInk();
         if(s.composing)finish(s);
+        s.splitPhrases.reset();
         if(s.suggesting)dismiss(s);
         if(type==25||type==26){RimeBridge.destroy(s.id);s.id=0;if(active==s)active=null;KeyboardGestures.reset();}
         return false;
@@ -86,6 +92,8 @@ public final class EnhancedHook {
   }
   private static void choose(Session s,Candidate chosen)throws Exception {
     String learningCode=s.composing&&!s.privateMode?s.raw:"";
+    String completionCode=null;
+    if(chosen.index< -1)s.splitPhrases.reset();
     if(chosen.index==-3){s.handwriting=false;KeyboardGestures.clearInk();commit(s,chosen.text);s.dismissed=false;update(s);return;}
     if(chosen.index==-4||chosen.index==-5){RimeBridge.clear(s.id);commit(s,chosen.text);update(s);return;}
     if(chosen.index>=0){learningCode=select(s,chosen.index,chosen.text);}
@@ -94,12 +102,16 @@ public final class EnhancedHook {
             String[] state=RimeBridge.state(s.id);int found=-1;
             for(int i=4;i<state.length;i++)if(state[i].equals(chosen.text)){found=i-4;break;}
             if(found>=0){learningCode=select(s,found,chosen.text);}
-            else{RimeBridge.clear(s.id);commit(s,chosen.text);update(s);}
+            else{RimeBridge.clear(s.id);commit(s,chosen.text);completionCode=chosen.code;update(s);}
     }else{commit(s,chosen.text);update(s);}
-    if(!s.privateMode&&!learningCode.isEmpty())SelectionLearning.record((Context)get(s.processor,"u"),learningCode,chosen.text);
+    if(!s.privateMode&&!learningCode.isEmpty()){
+      Context context=(Context)get(s.processor,"u");
+      SelectionLearning.record(context,learningCode,chosen.text);
+      s.splitPhrases.committed(context,completionCode==null?learningCode:completionCode,chosen.text,android.os.SystemClock.elapsedRealtime());
+    }else s.splitPhrases.reset();
   }
   private static String selectedCode(String raw,String[] state,String text){
-    if(!state[2].isEmpty())return raw;
+    if(!state[2].isEmpty())return state[2].equals(text)?raw:"";
     if(state[3].startsWith(text)){
       String tail=state[3].substring(text.length()).replace(" ","");
       if(!tail.isEmpty()&&tail.matches("[a-z']+")&&state[0].endsWith(tail)&&tail.length()<state[0].length())return state[0].substring(0,state[0].length()-tail.length());
@@ -140,36 +152,39 @@ public final class EnhancedHook {
       if(!s.composing){
         // An in-progress composition that started before initialization stays
         // with the original decoder until it has been committed or cleared.
-        if((Boolean)get(s.processor,"n"))return false;
+        if((Boolean)get(s.processor,"n")){s.splitPhrases.reset();return false;}
         call(s.processor,"at",true);active=s;
       }
       RimeBridge.key(s.id,text.charAt(0));update(s);return true;
     }
-    if(!s.composing){if(s.suggesting)dismiss(s);return false;}
-    if(code==67){RimeBridge.key(s.id,0xff08);update(s);return true;}
+    if(!s.composing){s.splitPhrases.reset();if(s.suggesting)dismiss(s);return false;}
+    if(code==67){s.splitPhrases.reset();RimeBridge.key(s.id,0xff08);update(s);return true;}
     if(code==21||code==22){move(s,s.caret+(code==21?-1:1));return true;}
     if(code==62){chooseFirst(s);return true;}
     if(code==66||code==-10009){
       // Enter confirms the literal spelling; a subsequent Enter performs the editor action.
+      s.splitPhrases.reset();
       String literal=s.raw;RimeBridge.clear(s.id);commit(s,literal);s.dismissed=true;s.context="";update(s);return true;
     }
-    if(text.length()==1){finish(s);return false;}
+    if(text.length()==1){finish(s);s.splitPhrases.reset();return false;}
+    s.splitPhrases.reset();
     return false;
   }
   private static void finish(Session s)throws Exception {
     if(!s.composing)return;
     chooseFirst(s);
     // Rime may have selected only the first segment; complete remaining segments.
+    if(s.composing)s.splitPhrases.reset();
     int count=0;while(s.composing&&count++<64){RimeBridge.key(s.id,' ');update(s);}
   }
   private static void chooseFirst(Session s)throws Exception {
     if(!s.candidates.isEmpty())choose(s,(Candidate)get(s.candidates.get(0),"m"));
-    else{commit(s,s.raw);RimeBridge.clear(s.id);update(s);}
+    else{s.splitPhrases.reset();commit(s,s.raw);RimeBridge.clear(s.id);update(s);}
   }
-  public static synchronized void finishActive()throws Exception {if(active!=null&&active.handwriting)cancelInk();if(active!=null&&active.composing)finish(active);}
+  public static synchronized void finishActive()throws Exception {if(active!=null){if(active.handwriting)cancelInk();if(active.composing)finish(active);active.splitPhrases.reset();}}
   public static synchronized void voiceCommitted(String text){
     try{if(active==null||!RimeBridge.ready)return;Session s=active;if(s.id==0)s.id=RimeBridge.create(s.privateMode);if(s.id==0)return;s.dismissed=false;
-      s.context+=text;if(s.context.length()>32)s.context=s.context.substring(s.context.length()-32);
+      s.splitPhrases.reset();s.context+=text;if(s.context.length()>32)s.context=s.context.substring(s.context.length()-32);
       RimeBridge.clear(s.id);update(s);
     }catch(Throwable error){Log.e("LocalChinese","Voice predictions failed",error);}
   }
@@ -193,7 +208,10 @@ public final class EnhancedHook {
     // They carry selection learning; a static imported row must not mask them.
     for(int i=4;i<Math.min(result.length,4+nativeLead);i++)if(seen.add(result[i]))choices.add(new Candidate(s,i-4,result[i]));
     if(s.composing&&!s.privateMode)for(WordIndex.Entry e:LocalWords.match(s.raw))if(!nativeWords.contains(e.word)&&seen.add(e.word))choices.add(new Candidate(s,-1,e.word,e.code));
-    if(s.composing)for(WordIndex.Entry e:WordIndex.complete(s.raw))if(!nativeWords.contains(e.word)&&seen.add(e.word))choices.add(new Candidate(s,-1,e.word,e.code));
+    // For a single unsegmented syllable with a native character, leave the
+    // homophones together. Longer word completions otherwise bury name characters.
+    boolean charactersFirst=result.length>4&&s.raw.equals(result[3])&&result[4].codePointCount(0,result[4].length())==1;
+    if(s.composing&&!charactersFirst)addCompletions(s,choices,seen,nativeWords);
     for(int i=4+nativeLead;i<result.length;i++)if(seen.add(result[i]))choices.add(new Candidate(s,i-4,result[i]));
     if(s.composing&&!s.privateMode){
       Context app=(Context)get(s.processor,"u");String preferred=SelectionLearning.preferred(app,s.raw);
@@ -207,7 +225,19 @@ public final class EnhancedHook {
         int[] order=SharedRanking.order(texts,ids,learned,preferred);ArrayList<Candidate> sorted=new ArrayList<>();
         for(int i:order)sorted.add(choices.get(i));choices=sorted;
       }
+      int position=Math.min(1,choices.size());
+      for(String word:SplitPhraseLearning.match(app,s.raw)){
+        Candidate inferred=new Candidate(s,-1,word,s.raw);
+        if(!seen.add(word)){
+          int i=0;while(i<choices.size()&&!choices.get(i).text.equals(word))i++;
+          if(i<position)continue;
+          Candidate existing=choices.remove(i);
+          if(existing.index>=0)inferred=existing;
+        }
+        choices.add(position++,inferred);
+      }
     }
+    if(s.composing&&charactersFirst)addCompletions(s,choices,seen,nativeWords);
     // Keep an unrecognized remainder visible without leaving the previous
     // segment's candidate objects on screen. Selecting it commits it literally.
     if(s.composing&&choices.isEmpty())choices.add(new Candidate(s,-4,s.raw));
@@ -218,6 +248,9 @@ public final class EnhancedHook {
     }
     if(!s.composing&&!s.dismissed)for(WordIndex.Entry e:WordIndex.following(s.context))if(seen.add(e.word))choices.add(new Candidate(s,-2,e.word));
     ArrayList<Object> list=new ArrayList<>();for(Candidate c:choices)list.add(candidate(c,list.size()));
+    int nativeCount=result.length-4;
+    s.nextNative=s.composing&&nativeCount==RimeBridge.CANDIDATE_BATCH?nativeCount:-1;
+    s.pagedWords.clear();if(s.nextNative>=0)for(Candidate c:choices)s.pagedWords.put(c.text,c);
     s.suggesting=!s.composing&&!list.isEmpty();
     s.candidates=list;s.page=0;
     // An unrecognized spelling must remain visible and editable even when
@@ -227,6 +260,10 @@ public final class EnhancedHook {
     ComposingLens.refresh();
     // Normal candidate requests flow through dispatch(type=8).
     if(list.isEmpty())sendCandidates(s,Collections.emptyList(),false);
+  }
+  private static void addCompletions(Session s,List<Candidate> choices,Set<String> seen,Set<String> nativeWords){
+    for(WordIndex.Entry e:WordIndex.complete(s.raw))
+      if(!nativeWords.contains(e.word)&&seen.add(e.word))choices.add(new Candidate(s,-1,e.word,e.code));
   }
   private static void commit(Session s,String text)throws Exception {
     call(s.processor,"aK",text,1);s.context+=text;if(s.context.length()>32)s.context=s.context.substring(s.context.length()-32);
@@ -239,11 +276,30 @@ public final class EnhancedHook {
   private static Object getStatic(String cls,String name)throws Exception{return field(Class.forName(cls),name).get(null);}
   private static void publish(Session s,int count)throws Exception {
     int start=s.page;
+    // Only expand the Rime iterator when the view reaches the cached tail.
+    // Bound work even if the native widget requests Integer.MAX_VALUE.
+    if(s.composing&&s.nextNative>=0&&count>0&&(long)start+count>=s.candidates.size()){
+      do{
+        int offset=s.nextNative;
+        String[] words=RimeBridge.candidatePage(s.id,offset,RimeBridge.CANDIDATE_BATCH+1);
+        int loaded=Math.min(RimeBridge.CANDIDATE_BATCH,words.length);
+        for(int i=0;i<loaded;i++){
+          Candidate existing=s.pagedWords.get(words[i]);
+          if(existing!=null){
+            if(existing.index==-1)existing.index=offset+i;
+            continue;
+          }
+          Candidate c=new Candidate(s,offset+i,words[i]);s.pagedWords.put(c.text,c);
+          s.candidates.add(candidate(c,s.candidates.size()));
+        }
+        s.nextNative=words.length>loaded?offset+loaded:-1;
+      }while(s.nextNative>=0&&start==s.candidates.size());
+    }
     int end=start+(int)Math.min((long)Math.max(0,count),(long)s.candidates.size()-start);
     List<Object> page=new ArrayList<>(s.candidates.subList(s.page,end));s.page=end;
     // Gboard retains previously loaded pages. Re-selecting each batch's first item
     // moves the viewport to that item and can cascade to the final page.
-    sendCandidates(s,page,end<s.candidates.size(),start==0&&!page.isEmpty()?page.get(0):null);
+    sendCandidates(s,page,end<s.candidates.size()||s.composing&&s.nextNative>=0,start==0&&!page.isEmpty()?page.get(0):null);
   }
   private static void sendCandidates(Session s,List<Object> list,boolean more)throws Exception {
     sendCandidates(s,list,more,null);
@@ -254,6 +310,7 @@ public final class EnhancedHook {
   }
   private static void dismiss(Session s)throws Exception {
     if(s.composing)return;
+    s.splitPhrases.reset();
     // Also clear native next-word predictions (for example after a voice commit).
     call(s.processor,"at",true);
     s.dismissed=true;s.suggesting=false;s.context="";s.page=0;s.candidates=Collections.emptyList();
@@ -384,6 +441,7 @@ public final class EnhancedHook {
     }catch(Exception ignored){}return false;
   }
   private static void move(Session s,int position)throws Exception {
+    s.splitPhrases.reset();
     RimeBridge.caret(s.id,Math.max(0,Math.min(s.raw.length(),position)));update(s);
   }
   static synchronized boolean chineseActive(){return active!=null;}
@@ -394,10 +452,10 @@ public final class EnhancedHook {
   static synchronized int caret(){return active==null?0:active.caret;}
   static synchronized void confirmSpace(Object session){try{if(active==session&&active.composing)chooseFirst(active);}catch(Throwable e){Log.e("LocalChinese","Space confirmation failed",e);}}
   static synchronized void selectCaret(int position,View source){try{if(active!=null&&active.composing){int before=active.caret;move(active,position);if(before!=active.caret)tick(source);}}catch(Throwable e){Log.e("LocalChinese","Caret selection failed",e);}}
-  static synchronized void selectCaretWithTicks(int position,View source){try{if(active==null||!active.composing)return;Session s=active;int target=Math.max(0,Math.min(s.raw.length(),position));while(s.caret!=target){int before=s.caret;RimeBridge.caret(s.id,before+(target>before?1:-1));s.caret=Integer.parseInt(RimeBridge.state(s.id)[1]);if(s.caret==before)break;tick(source);}update(s);}catch(Throwable e){Log.e("LocalChinese","Space caret failed",e);}}
+  static synchronized void selectCaretWithTicks(int position,View source){try{if(active==null||!active.composing)return;Session s=active;s.splitPhrases.reset();int target=Math.max(0,Math.min(s.raw.length(),position));while(s.caret!=target){int before=s.caret;RimeBridge.caret(s.id,before+(target>before?1:-1));s.caret=Integer.parseInt(RimeBridge.state(s.id)[1]);if(s.caret==before)break;tick(source);}update(s);}catch(Throwable e){Log.e("LocalChinese","Space caret failed",e);}}
   private static void tick(View view){if(LocalSettings.ticks(view.getContext()))view.performHapticFeedback(android.view.HapticFeedbackConstants.TEXT_HANDLE_MOVE);}
   static synchronized void undoPress(String before,int caret,String letter)throws Exception{if(active==null||!active.composing||letter.length()!=1)return;String inserted=before.substring(0,Math.min(caret,before.length()))+letter+before.substring(Math.min(caret,before.length()));if(active.raw.equals(inserted)){RimeBridge.key(active.id,0xff08);update(active);}}
-  static synchronized void beginInk()throws Exception{if(active==null||!RimeBridge.ready)throw new IllegalStateException("Chinese engine is loading");Session s=active;if(s.handwriting)return;finish(s);if(s.id==0)s.id=RimeBridge.create(s.privateMode);RimeBridge.clear(s.id);call(s.processor,"at",true);s.handwriting=true;s.composing=s.suggesting=false;s.dismissed=false;s.raw="";s.caret=0;s.page=0;s.candidates=Collections.emptyList();call(s.processor,"au","");call(s.processor,"aJ",false);sendCandidates(s,s.candidates,false);ComposingLens.hide();refreshCandidateBars();}
+  static synchronized void beginInk()throws Exception{if(active==null||!RimeBridge.ready)throw new IllegalStateException("Chinese engine is loading");Session s=active;if(s.handwriting)return;finish(s);s.splitPhrases.reset();if(s.id==0)s.id=RimeBridge.create(s.privateMode);RimeBridge.clear(s.id);call(s.processor,"at",true);s.handwriting=true;s.composing=s.suggesting=false;s.dismissed=false;s.raw="";s.caret=0;s.page=0;s.candidates=Collections.emptyList();call(s.processor,"au","");call(s.processor,"aJ",false);sendCandidates(s,s.candidates,false);ComposingLens.hide();refreshCandidateBars();}
   static synchronized void inkCandidates(String[] words){try{if(active==null||!active.handwriting)return;Session s=active;ArrayList<Object> list=new ArrayList<>();HashSet<String> seen=new HashSet<>();for(String word:words)if(!word.isEmpty()&&seen.add(word))list.add(candidate(new Candidate(s,-3,word),list.size()));s.candidates=list;s.page=0;call(s.processor,"aJ",!list.isEmpty());publish(s,3);refreshCandidateBars();}catch(Throwable e){Log.e("LocalChinese","Handwriting candidates failed",e);}}
   static synchronized boolean confirmInk(Object token){try{if(active!=token||active==null||!active.handwriting||active.candidates.isEmpty())return false;chooseFirst(active);return true;}catch(Throwable e){Log.e("LocalChinese","Continuous handwriting commit failed",e);return false;}}
   static synchronized void cancelInk(){try{if(active!=null&&active.handwriting){active.handwriting=false;KeyboardGestures.clearInk();update(active);}}catch(Throwable e){Log.e("LocalChinese","Handwriting cancellation failed",e);}}

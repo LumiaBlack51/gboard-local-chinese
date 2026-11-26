@@ -47,7 +47,25 @@ extern "C" JNIEXPORT void JNICALL Java_local_gboard_enhanced_RimeBridge_caret(JN
 extern "C" JNIEXPORT jboolean JNICALL Java_local_gboard_enhanced_RimeBridge_select(JNIEnv*,jclass,jlong id,jint index) {return api&&api->select_candidate(id,index);}
 extern "C" JNIEXPORT jboolean JNICALL Java_local_gboard_enhanced_RimeBridge_forget(JNIEnv*,jclass,jlong id,jint index) {return api&&RIME_API_AVAILABLE(api,delete_candidate)&&api->delete_candidate(id,index);}
 extern "C" JNIEXPORT jboolean JNICALL Java_local_gboard_enhanced_RimeBridge_sync(JNIEnv*,jclass) {if(!api)return false;Bool result=api->sync_user_data();api->join_maintenance_thread();return result;}
-extern "C" JNIEXPORT jobjectArray JNICALL Java_local_gboard_enhanced_RimeBridge_state(JNIEnv* env,jclass,jlong id) {
+static jobjectArray strings(JNIEnv* env,const std::vector<std::string>& values) {
+  jobjectArray result=env->NewObjectArray(values.size(),env->FindClass("java/lang/String"),nullptr);
+  for(size_t i=0;i<values.size();++i){auto s=str(env,values[i].c_str());env->SetObjectArrayElement(result,i,s);env->DeleteLocalRef(s);}
+  return result;
+}
+static void appendCandidates(std::vector<std::string>& values,jlong id,int offset,int count) {
+  RimeCandidateListIterator it={0};
+  if(api&&api->candidate_list_from_index(id,&it,offset)){
+    for(int i=0;i<count&&api->candidate_list_next(&it);++i)
+      values.emplace_back(it.candidate.text?it.candidate.text:"");
+    api->candidate_list_end(&it);
+  }
+}
+extern "C" JNIEXPORT jobjectArray JNICALL Java_local_gboard_enhanced_RimeBridge_candidatePage(JNIEnv* env,jclass,jlong id,jint offset,jint count) {
+  std::vector<std::string> values;
+  if(offset>=0&&count>0)appendCandidates(values,id,offset,count);
+  return strings(env,values);
+}
+extern "C" JNIEXPORT jobjectArray JNICALL Java_local_gboard_enhanced_RimeBridge_readState(JNIEnv* env,jclass,jlong id,jint candidateLimit) {
   std::vector<std::string> values(4); // raw, caret, commit, formatted preedit, candidates...
   if(api) {
     const char* input=api->get_input(id);values[0]=input?input:"";
@@ -59,13 +77,7 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_local_gboard_enhanced_RimeBridge_
       values[3]=context.composition.preedit?context.composition.preedit:"";
       api->free_context(&context);
     }
-    RimeCandidateListIterator it={0};
-    if(api->candidate_list_begin(id,&it)){
-      while(values.size()<104&&api->candidate_list_next(&it))values.push_back(it.candidate.text?it.candidate.text:"");
-      api->candidate_list_end(&it);
-    }
+    appendCandidates(values,id,0,candidateLimit);
   }
-  jobjectArray result=env->NewObjectArray(values.size(),env->FindClass("java/lang/String"),nullptr);
-  for(size_t i=0;i<values.size();++i){auto s=str(env,values[i].c_str());env->SetObjectArrayElement(result,i,s);env->DeleteLocalRef(s);}
-  return result;
+  return strings(env,values);
 }
